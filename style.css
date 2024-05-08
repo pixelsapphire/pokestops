@@ -1,0 +1,27 @@
+@font-face {
+    font-family: "Genshin";
+    src: url("genshin.ttf");
+}
+
+.exploration {
+    -webkit-text-stroke-width: 0.125vw;
+    -webkit-text-stroke-color: black;
+    color: white;
+    font-family: Genshin, sans-serif;
+    font-size: 3vw;
+    position: absolute;
+    bottom: 0.5em;
+    right: 1em;
+    z-index: 1000;
+    text-align: right;
+}
+
+.marker {
+    font-size: 32px;
+    background-color: white;
+    text-align: center;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    border-radius: 50%;
+}
