@@ -3,15 +3,12 @@
     src: url("genshin.ttf");
 }
 
-.exploration {
+.hud-text {
     -webkit-text-stroke-width: min(0.25vh, 0.25vw);
     -webkit-text-stroke-color: black;
     color: white;
     font-family: Genshin, sans-serif;
     font-size: min(6vh, 6vw);
-    position: absolute;
-    bottom: 0.5em;
-    right: 1em;
     z-index: 1000;
     text-align: right;
 }
@@ -24,4 +21,68 @@
     height: 20px;
     line-height: 20px;
     border-radius: 50%;
+}
+
+#control {
+    position: absolute;
+    top: min(3vh, 3vw);
+    right: min(5vh, 5vw);
+    z-index: 1000;
+    text-align: right;
+}
+
+#exploration {
+    position: absolute;
+    bottom: 0.5em;
+    right: 1em;
+}
+
+.hidden {
+    displaY: none;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: min(12vh, 12vw);
+    height: min(6vh, 6vw);
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #aaa;
+    transition: linear 0.5s;
+    border: min(0.5vh, 0.5vw) solid black;
+    border-radius: min(3vh, 3vw);
+}
+
+.toggle-switch input:checked + .slider {
+    background-color: #4CAF50;
+}
+
+.slider:before {
+    content: "";
+    position: absolute;
+    width: min(4.5vh, 4.5vw);
+    height: min(4.5vh, 4.5vw);
+    left: min(0.75vh, 0.75vw);
+    top: min(0.375vh, 0.375vw);
+    background-color: white;
+    border-radius: min(2.25vh, 2.25vw);
+    transition: cubic-bezier(0, 0.67, 0.67, 1) 0.5s;
+}
+
+.toggle-switch input:checked + .slider:before {
+    transform: translateX(min(4.875vh, 4.875vw));
 }
