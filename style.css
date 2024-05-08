@@ -4,11 +4,11 @@
 }
 
 .exploration {
-    -webkit-text-stroke-width: 0.125vw;
+    -webkit-text-stroke-width: min(0.25vh, 0.25vw);
     -webkit-text-stroke-color: black;
     color: white;
     font-family: Genshin, sans-serif;
-    font-size: 3vw;
+    font-size: min(6vh, 6vw);
     position: absolute;
     bottom: 0.5em;
     right: 1em;
