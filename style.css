@@ -41,6 +41,8 @@
     displaY: none;
 }
 
+/* toggle switch implementation styles */
+
 .toggle-switch {
     position: relative;
     display: inline-block;
