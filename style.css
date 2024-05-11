@@ -23,6 +23,23 @@
     border-radius: 50%;
 }
 
+.stop-popup {
+    white-space: nowrap;
+    font-family: Genshin, sans-serif;
+}
+
+.stop-name {
+    font-size: min(2vh, 2vw);
+}
+
+.stop-visitors {
+    font-size: min(1.5vh, 1.5vw);
+}
+
+.hidden {
+    displaY: none;
+}
+
 #control {
     position: absolute;
     top: min(3vh, 3vw);
@@ -33,12 +50,27 @@
 
 #exploration {
     position: absolute;
-    bottom: 0.5em;
-    right: 1em;
+    bottom: min(3vh, 3vw);
+    right: min(17vh, 17vw);
 }
 
-.hidden {
-    displaY: none;
+#exploration {
+    line-height: 85%;
+}
+
+#exploration-progress {
+    font-size: min(4.5vh, 4.5vw);
+    -webkit-text-stroke-width: min(0.2vh, 0.2vw);
+    -webkit-text-stroke-color: black;
+}
+
+#compass {
+    position: absolute;
+    bottom: min(5vh, 5vw);
+    right: min(5vh, 5vw);
+    width: min(10vh, 10vw);
+    height: min(10vh, 10vw);
+    z-index: 1000;
 }
 
 /* toggle switch implementation styles */
@@ -69,8 +101,12 @@
     border-radius: min(3vh, 3vw);
 }
 
+.players .slider {
+    background-color: #8566d9;
+}
+
 .toggle-switch input:checked + .slider {
-    background-color: #4CAF50;
+    background-color: #4caf50;
 }
 
 .slider:before {

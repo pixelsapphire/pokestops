@@ -1,5 +1,4 @@
 .idea
 .venv
-caught.csv
-main.py
-stops.csv
+*.csv
+*.py
