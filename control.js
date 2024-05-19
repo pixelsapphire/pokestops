@@ -10,11 +10,11 @@ let colors = {
 function refreshMap() {
     document.querySelectorAll(`.marker.visited-${activePlayer.toLowerCase()}`).forEach(m => {
         m.style.color = colors[activePlayer];
-        m.style.display = null;
+        m.parentElement.style.display = null;
     });
     document.querySelectorAll(`.marker:not(.visited-${activePlayer.toLowerCase()})`).forEach(m => {
         m.style.color = 'red';
-        m.style.display = showUnvisited ? null : 'none';
+        m.parentElement.style.display = showUnvisited ? null : 'none';
     });
     document.querySelectorAll('.progress-list').forEach(
         list => list.style.display = list.getAttribute('data-player') === activePlayer.toLowerCase() ? null : 'none');
