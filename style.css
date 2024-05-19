@@ -101,10 +101,6 @@
     border-radius: min(3vh, 3vw);
 }
 
-.players .slider {
-    background-color: #8566d9;
-}
-
 .toggle-switch input:checked + .slider {
     background-color: #4caf50;
 }
@@ -126,6 +122,15 @@
 }
 
 /* end of toggle switch implementation styles  */
+
+.dropdown {
+    background-color: rgb(112, 112, 112);
+    border-radius: min(2vh, 2vw) min(2vh, 2vw);
+    border: min(0.5vh, 0.5vw) solid black;
+    padding: 0 min(2vh, 2vw);
+    margin-top: min(1vh, 1vw);
+    text-align: center;
+}
 
 #achievements {
     position: absolute;

@@ -1,9 +1,15 @@
 let showUnvisited = false;
 let activePlayer = 'Zorie';
 
-function refreshMarkersAndAchievements() {
+let colors = {
+    'Zorie': '#4caf50',
+    'Sapphire': '#8566d9',
+    'Camomile': '#ff9800',
+};
+
+function refreshMap() {
     document.querySelectorAll(`.marker.visited-${activePlayer.toLowerCase()}`).forEach(m => {
-        m.style.color = activePlayer === 'Zorie' ? '#4caf50' : '#8566d9';
+        m.style.color = colors[activePlayer];
         m.style.display = null;
     });
     document.querySelectorAll(`.marker:not(.visited-${activePlayer.toLowerCase()})`).forEach(m => {
@@ -12,22 +18,28 @@ function refreshMarkersAndAchievements() {
     });
     document.querySelectorAll('.progress-list').forEach(
         list => list.style.display = list.getAttribute('data-player') === activePlayer.toLowerCase() ? null : 'none');
+    const percentage = document.querySelector('#exploration-percentage');
+    percentage.innerHTML = percentage.getAttribute(`data-${activePlayer.toLowerCase()}`);
 }
 
 function toggleUnvisited() {
     showUnvisited = document.querySelector("#visited-switch").checked;
-    refreshMarkersAndAchievements();
+    refreshMap();
 }
 
-function togglePlayer() {
-    activePlayer = document.querySelector("#player-switch").checked ? 'Zorie' : 'Sapphire';
-    document.querySelector('#nickname').innerHTML = activePlayer;
-    const percentage = document.querySelector('#exploration-percentage');
-    percentage.innerHTML = percentage.getAttribute(`data-${activePlayer.toLowerCase()}`);
-    refreshMarkersAndAchievements();
+function selectPlayer() {
+    activePlayer = document.querySelector("#player-selection select").value;
+    localStorage.setItem('activePlayer', activePlayer);
+    refreshMap();
 }
 
 function toggleAchievements() {
     document.querySelector('#achievements').classList.toggle('expanded');
     document.querySelector('#toggle-achievements').classList.toggle('expanded');
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    activePlayer = localStorage.getItem('activePlayer') || 'Zorie';
+    document.querySelector("#player-selection select").value = activePlayer;
+    refreshMap();
+});

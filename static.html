@@ -1,13 +1,20 @@
 <script src="control.js"></script>
 <link rel="stylesheet" href="style.css">
 <div id="control">
-    <span class="hud-text">Show unvisited</span><br>
-    <label class="toggle-switch" onclick="toggleUnvisited()">
-        <input id="visited-switch" type="checkbox"><span class="slider"></span>
-    </label><br>
-    <span id="nickname" class="hud-text">Zorie</span><br>
-    <label class="toggle-switch players" onclick="togglePlayer()">
-        <input id="player-switch" type="checkbox" checked><span class="slider"></span>
+    <div style="display:table-cell;vertical-align:middle;">
+        <div style="margin:0;" class="hud-text">Show unvisited</div>
+        <div>
+            <label style="margin:0;" class="toggle-switch" onclick="toggleUnvisited()">
+                <input id="visited-switch" type="checkbox"><span class="slider"></span>
+            </label>
+        </div>
+    </div>
+    <label id="player-selection">
+        <select class="dropdown hud-text" onchange="selectPlayer()">
+            <option value="Zorie">Zorie</option>
+            <option value="Sapphire">Sapphire</option>
+            <option value="Camomile">Camomile</option>
+        </select>
     </label>
 </div>
 <img id="compass" src="compass.png">
