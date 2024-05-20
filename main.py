@@ -132,10 +132,17 @@ for player in players:
         reader = csv.reader(file)
         next(reader)
         for row in reader:
-            stop = stops.get(row[0])
-            stop.add_visit(Visit(player.nickname, row[1]))
-            visited_stops.add(stop)
-            player.add_stop(stop)
+            if not row[0].lstrip().startswith('#'):
+                stop = stops.get(row[0])
+                if stop:
+                    stop.add_visit(Visit(player.nickname, row[1]))
+                    visited_stops.add(stop)
+                    player.add_stop(stop)
+                else:
+                    print(f'Stop {row[0]} not found, remove {player.nickname}\'s entry from {row[1]}')
+            else:
+                if stops.get(row[0].replace('#','').lstrip()):
+                    print(f'Found a commented out {player.nickname}\'s {row[0]} entry, restore it')
 
 if update_map:
 
