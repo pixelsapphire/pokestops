@@ -26,7 +26,7 @@ class Stop:
         self.full_name: str = full_name
         self.latitude: float = float(latitude)
         self.longitude: float = float(longitude)
-        self.zone = zone
+        self.zone: str = zone
         self.visits: set[Visit] = set()
 
     def __hash__(self):
@@ -98,13 +98,33 @@ class Player:
         return sorted(prog, key=lambda p: (p.percentage(), p.completed), reverse=True)
 
 
+def read_stops() -> (dict[str, Stop], dict[str, set[str]]):
+    stops: dict[str, Stop] = {}
+    stop_groups: dict[str, set[str]] = {}
+    with open('stops.csv', 'r', encoding='utf-8') as file:
+        reader = csv.reader(file)
+        next(reader)
+        for row in reader:
+            stop = Stop(row[1], row[2], row[3], row[4], row[5])
+            if stop.zone == 'A':
+                stops[row[1]] = stop
+                if stop.safe_full_name() not in stop_groups:
+                    stop_groups[stop.safe_full_name()] = set()
+                stop_groups[stop.safe_full_name()].add(stop.short_name)
+    return stops, stop_groups
+
+
 players = {
     Player('Zorie', 'caught_zorie.csv'),
     Player('Sapphire', 'caught_sapphire.csv'),
     Player('Camomile', 'caught_camomile.csv'),
 }
 
+old_stops = {}
+first_update = not os.path.exists('stops.csv')
 if update_ztm_stops:
+    if not first_update:
+        old_stops, _ = read_stops()
     response: requests.Response = requests.get('https://www.ztm.poznan.pl/pl/dla-deweloperow/getGTFSFile')
     with open('gtfs.zip', 'wb') as file:
         file.write(response.content)
@@ -112,19 +132,24 @@ if update_ztm_stops:
         zip_ref.extract('stops.txt')
         os.rename('stops.txt', 'stops.csv')
     os.remove('gtfs.zip')
+elif not os.path.exists('stops.csv'):
+    raise FileNotFoundError('stops.csv not found. Run the script with update_ztm_stops set to True')
 
-stops: dict[str, Stop] = {}
-stop_groups = {}
-with open('stops.csv', 'r', encoding='utf-8') as file:
-    reader = csv.reader(file)
-    next(reader)
-    for row in reader:
-        stop = Stop(row[1], row[2], row[3], row[4], row[5])
-        if stop.zone == 'A':
-            stops[row[1]] = stop
-            if stop.safe_full_name() not in stop_groups:
-                stop_groups[stop.safe_full_name()] = set()
-            stop_groups[stop.safe_full_name()].add(stop.short_name)
+stops, stop_groups = read_stops()
+
+if update_ztm_stops:
+    added_stops = {s for s in stops.values() if s not in old_stops.values()}
+    removed_stops = {s for s in old_stops.values() if s not in stops.values()}
+    if first_update:
+        print('Stops database created.')
+    else:
+        print('Stops database updated.')
+        if added_stops:
+            print(f'Added stops:\n- {'\n- '.join(f'{s.full_name} [{s.short_name}]' for s in added_stops)}')
+        if removed_stops:
+            print(f'Removed stops:\n- {'\n- '.join(f'{s.full_name} [{s.short_name}]' for s in removed_stops)}')
+        if not added_stops and not removed_stops:
+            print('No changes')
 
 visited_stops: set[Stop] = set()  # this is only needed to determine the center of the map
 for player in players:
@@ -141,7 +166,7 @@ for player in players:
                 else:
                     print(f'Stop {row[0]} not found, remove {player.nickname}\'s entry from {row[1]}')
             else:
-                if stops.get(row[0].replace('#','').lstrip()):
+                if stops.get(row[0].replace('#', '').lstrip()):
                     print(f'Found a commented out {player.nickname}\'s {row[0]} entry, restore it')
 
 if update_map:
