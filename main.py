@@ -106,7 +106,7 @@ def read_stops() -> (dict[str, Stop], dict[str, set[str]]):
         next(reader)
         for row in reader:
             stop = Stop(row[1], row[2], row[3], row[4], row[5])
-            if stop.zone == 'A':
+            if stop.zone == 'A' or '/' not in stop.full_name:
                 stops[row[1]] = stop
                 if stop.safe_full_name() not in stop_groups:
                     stop_groups[stop.safe_full_name()] = set()
