@@ -1,6 +1,7 @@
 import csv
 import folium
 import os
+from typing import Callable
 import requests
 import zipfile
 
@@ -20,6 +21,15 @@ class Visit:
         return self.date < other.date if self.date != other.date else self.name > other.name
 
 
+def strip_diacritics(s: str) -> str:
+    return (s
+            .replace('ą', 'a').replace('Ą', 'A').replace('ć', 'c').replace('Ć', 'C')
+            .replace('ę', 'e').replace('Ę', 'E').replace('ł', 'l').replace('Ł', 'L')
+            .replace('ń', 'n').replace('Ń', 'N').replace('ó', 'o').replace('Ó', 'O')
+            .replace('ś', 's').replace('Ś', 'S').replace('ź', 'z').replace('Ź', 'Z')
+            .replace('ż', 'z').replace('Ż', 'Z').replace('ō', 'o').replace('Ō', 'O'))
+
+
 class Stop:
     def __init__(self, short_name: str, full_name: str, latitude: str, longitude: str, zone: str):
         self.short_name: str = short_name
@@ -28,6 +38,7 @@ class Stop:
         self.longitude: float = float(longitude)
         self.zone: str = zone
         self.visits: set[Visit] = set()
+        self.region: Region | None = None
 
     def __hash__(self):
         return hash(self.short_name)
@@ -36,12 +47,7 @@ class Stop:
         return self.short_name == other.short_name
 
     def safe_full_name(self) -> str:
-        return (self.full_name
-                .replace('ą', 'a').replace('Ą', 'A').replace('ć', 'c').replace('Ć', 'C')
-                .replace('ę', 'e').replace('Ę', 'E').replace('ł', 'l').replace('Ł', 'L')
-                .replace('ń', 'n').replace('Ń', 'N').replace('ó', 'o').replace('Ó', 'O')
-                .replace('ś', 's').replace('Ś', 'S').replace('ź', 'z').replace('Ź', 'Z')
-                .replace('ż', 'z').replace('Ż', 'Z'))
+        return strip_diacritics(self.full_name)
 
     def visited_by(self, name: str) -> str | None:
         return next((visit.date for visit in self.visits if name in visit.name), None)
@@ -98,6 +104,69 @@ class Player:
         return sorted(prog, key=lambda p: (p.percentage(), p.completed), reverse=True)
 
 
+class Region:
+    def __init__(self, number: int, short_name: str, full_name: str, predicate: Callable[[Stop], bool]):
+        self.number: int = number
+        self.short_name: str = short_name
+        self.full_name: str = full_name
+        self.predicate: Callable[[Stop], bool] = predicate
+        self.stops: set[Stop] = set()
+
+    def add_stop(self, s: Stop) -> None:
+        self.stops.add(s)
+        s.region = self
+
+    def safe_full_name(self) -> str:
+        return strip_diacritics(self.full_name)
+
+    def __contains__(self, item):
+        return self.predicate(item)
+
+
+def stop_in(s: Stop, towns: set[str]) -> bool:
+    return '/' in s.full_name and s.full_name[:s.full_name.index('/')] in towns
+
+
+regions: dict[str, Region] = {r.short_name: r for r in {
+    Region(1, 'POZ', 'Poznań', lambda s: s.zone == 'A' or '/' not in s.full_name),
+    Region(3, 'SAR', 'San Region', lambda s: stop_in(s, {
+        'Annowo', 'Bolechowo', 'Bolechowo-Os.', 'Bolechówko', 'Czerwonak', 'Dębogóra', 'Kicin', 'Kliny', 'Koziegłowy',
+        'Mielno', 'Miękowo', 'M. Goślina', 'Owińska', 'Potasze', 'Promnice', 'Przebędowo', 'Szlachęcin', 'Trzaskowo'
+    })),
+    Region(4, 'YOR', 'Yon Region', lambda s: stop_in(s, {
+        'Biskupice', 'Bogucin', 'Bugaj', 'Bylin', 'Gortatowo', 'Gowarzewo', 'Garby Małe', 'Garby Wielkie', 'Gruszczyn',
+        'Janikowo', 'Jankowo', 'Jasin', 'Jerzykowo', 'Karłowice', 'Kleszczewo', 'Kobylnica', 'Komorniki gm.Kleszczewo',
+        'Krerowo', 'Kruszewnia', 'Krzyżowniki', 'Lipowiec', 'Łowęcin', 'Markowice', 'Nagradowice', 'Paczkowo',
+        'Pobiedziska', 'Poklatki', 'Promno', 'Rabowice', 'Sarbinowo', 'Siekierki Wielkie', 'Sokolniki Gwiazdowskie',
+        'Swarzędz', 'Szewce', 'Śródka', 'Tanibórz', 'Trzek', 'Tuczno', 'Tulce', 'Uzarzewo', 'Wierzenica', 'Wierzonka',
+        'Zalasewo', 'Zimin'
+    })),
+    Region(5, 'GOR', 'Go Region', lambda s: stop_in(s, {
+        'Babki', 'Biernatki', 'Błażejewko', 'Błażejewo', 'Borówiec', 'Czapury', 'Dachowa', 'Daszewice', 'Dziećmierowo',
+        'Gądki', 'Jaryszki', 'Jeziory Małe', 'Jeziory Wielkie', 'Kamionki', 'Koninko', 'Kórnik', 'Łękno', 'Prusinowo',
+        'Robakowo', 'Skrzynki', 'Szczodrzykowo', 'Szczytniki', 'Świątniczki', 'Wiórek', 'Zaniemyśl', 'Żerniki'
+    })),
+    Region(6, 'ROR', 'Roku Region', lambda s: stop_in(s, {
+        'Luboń', 'Mosina', 'Puszczykowo'
+    })),
+    Region(7, 'SHR', 'Shichi Region', lambda s: stop_in(s, {
+        'Chomęcice', 'Dąbrowa', 'Dąbrówka', 'Dopiewiec', 'Dopiewo', 'Fiałkowo', 'Głuchowo', 'Gołuski', 'Komorniki',
+        'Konarzewo', 'Lisówki', 'Łęczyca', 'Palędzie', 'Plewiska', 'Pokrzywnica', 'Rosnowo', 'Rosnówko', 'Skórzewo',
+        'Szreniawa', 'Trzcielin', 'Walerianowo', 'Więckowice', 'Wiry', 'Zakrzewo', 'Zborowo'
+    })),
+    Region(8, 'HAR', 'Hachi Region', lambda s: stop_in(s, {
+        'Baranowo', 'Batorowo', 'Brzezno', 'Bytkowo', 'Bytyń', 'Ceradz Dolny', 'Ceradz Kościelny', 'Cerekwica', 'Chyby',
+        'Dalekie', 'Gaj Wielki', 'Góra', 'Grzebienisko', 'Jankowice', 'Kaźmierz', 'Kiekrz', 'Kobylniki', 'Kokoszczyn',
+        'Krzyszkowo', 'Lusowo', 'Lusówko', 'Młodasko', 'Mrowino', 'Napachanie', 'Otowo', 'Pawłowice', 'Piersko',
+        'Pólko', 'Przecław', 'Przeźmierowo', 'Przybroda', 'Rogierówko', 'Rokietnica', 'Rostworowo', 'Rumianek', 'Sady',
+        'Sierosław', 'Sobota', 'Starzyny', 'Swadzim', 'Tarnowo Pdg', 'Witkowice', 'Wysogotowo', 'Żydowo'
+    })),
+    Region(9, 'KYR', 'Kyuu Region', lambda s: stop_in(s, {
+        'Biedrusko', 'Chludowo', 'Golęczewo', 'Jelonek', 'Suchy Las', 'Zielątkowo', 'Złotniki', 'Złotkowo'
+    })),
+}}
+
+
 def read_stops() -> (dict[str, Stop], dict[str, set[str]]):
     stops: dict[str, Stop] = {}
     stop_groups: dict[str, set[str]] = {}
@@ -106,11 +175,14 @@ def read_stops() -> (dict[str, Stop], dict[str, set[str]]):
         next(reader)
         for row in reader:
             stop = Stop(row[1], row[2], row[3], row[4], row[5])
-            if stop.zone == 'A' or '/' not in stop.full_name:
-                stops[row[1]] = stop
-                if stop.safe_full_name() not in stop_groups:
-                    stop_groups[stop.safe_full_name()] = set()
-                stop_groups[stop.safe_full_name()].add(stop.short_name)
+            region = next((r for r in regions.values() if stop in r), None)
+            if not region:
+                raise ValueError(f'Stop {stop.full_name} [{stop.short_name}] not in any region')
+            region.add_stop(stop)
+            stops[row[1]] = stop
+            if stop.safe_full_name() not in stop_groups:
+                stop_groups[stop.safe_full_name()] = set()
+            stop_groups[stop.safe_full_name()].add(stop.short_name)
     return stops, stop_groups
 
 
@@ -171,12 +243,14 @@ for player in players:
 
 if update_map:
 
-    avg_lat = (min(float(s.latitude) for s in visited_stops) + max(float(s.latitude) for s in visited_stops)) / 2
-    avg_lon = (min(float(s.longitude) for s in visited_stops) + max(float(s.longitude) for s in visited_stops)) / 2
+    visible_stops = visited_stops if len(visited_stops) > 0 else stops.values()
+    avg_lat = (min(float(s.latitude) for s in visible_stops) + max(float(s.latitude) for s in visible_stops)) / 2
+    avg_lon = (min(float(s.longitude) for s in visible_stops) + max(float(s.longitude) for s in visible_stops)) / 2
     fmap: folium.Map = folium.Map(location=(avg_lat, avg_lon), zoom_start=12)
 
     for stop in stops.values():
-        classes = ' '.join([f'visited-{visit.name.lower()}' for visit in stop.visits])
+        classes = ' '.join(
+            [f'visited-{visit.name.lower()}' for visit in stop.visits] + [f'region-{stop.region.short_name}'])
         visited_label = '<br>'.join([f'visited by {visit.name} on {visit.date}' for visit in
                                      sorted(stop.visits)]) if stop.visits else 'not yet visited'
         icon = visited_icon_zorie = f'<div class="marker {classes}">●</div>'
@@ -190,18 +264,22 @@ if update_map:
     with open('index.html', "r") as f:
         html_content = f.read()
 
-    progress: dict[str, float] = {
-        p.nickname: round(len(list(filter(lambda s: s.visited_by(p.nickname), visited_stops))) /
-                          len(stops.values()) * 100, 1) for p in players
-    }
+    progress: dict[str, dict[str, float]] = {r.short_name: {
+        p.nickname: round(len(list(filter(lambda s: s in r and s.visited_by(p.nickname), visited_stops))) /
+                          len(list(filter(lambda s: s in r, stops.values()))) * 100, 1) for p in players
+    } for r in regions.values()}
     with open('static.html', "r") as f:
         content = f.read()
 
         content += (
-            f'<p id="exploration" class="hud-text">Poznan<br><span id="exploration-progress">Exploration progress: '
-            f'<span id="exploration-percentage" '
-            f'{' '.join([f'data-{p.nickname.lower()}={progress[p.nickname]}' for p in players])}>'
-            f'{progress['Zorie']}</span>%</span></p>')
+            '<p id="exploration" class="hud-text"><label id="region-selection">'
+            '<select class="dropdown hud-text" onchange="selectRegion()">'
+            f'{' '.join([f'<option value="{r.short_name}">{r.safe_full_name()}</option>'
+                         for r in sorted(regions.values(), key=lambda r: r.number)])}</select></label>'
+            f'<br><span id="exploration-progress">Exploration progress: <span id="exploration-percentage" '
+            f'{' '.join([f'data-{r.short_name.lower()}-{p.nickname.lower()}={progress[r.short_name][p.nickname]}'
+                         for p in players for r in regions.values()])}>'
+            f'{progress['POZ']['Zorie']}</span>%</span></p>')
 
         content += '<div id="achievements">'
         for player in players:
