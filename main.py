@@ -268,8 +268,8 @@ if update_map:
         p.nickname: round(len(list(filter(lambda s: s in r and s.visited_by(p.nickname), visited_stops))) /
                           len(list(filter(lambda s: s in r, stops.values()))) * 100, 1) for p in players
     } for r in regions.values()}
-    with open('static.html', "r") as f:
-        content = f.read()
+    with open('static.html', "r") as static:
+        content = static.read()
 
         content += (
             '<p id="exploration" class="hud-text"><label id="region-selection">'
@@ -297,5 +297,10 @@ if update_map:
 
         closing_body_index = html_content.rfind("</body>")
         new_content = html_content[:closing_body_index] + content + html_content[closing_body_index:]
-        with open('index.html', "w") as f:
-            f.write(new_content)
+
+        closing_head_index = new_content.rfind("</head>")
+        title = '<title>Pokestops</title>'
+        new_content = new_content[:closing_head_index] + title + new_content[closing_head_index:]
+
+        with open('index.html', "w") as output:
+            output.write(new_content)
