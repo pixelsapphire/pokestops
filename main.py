@@ -130,8 +130,9 @@ def stop_in(s: Stop, towns: set[str]) -> bool:
 regions: dict[str, Region] = {r.short_name: r for r in {
     Region(1, 'POZ', 'Poznań', lambda s: s.zone == 'A' or '/' not in s.full_name),
     Region(3, 'SAR', 'San Region', lambda s: stop_in(s, {
-        'Annowo', 'Bolechowo', 'Bolechowo-Os.', 'Bolechówko', 'Czerwonak', 'Dębogóra', 'Kicin', 'Kliny', 'Koziegłowy',
-        'Mielno', 'Miękowo', 'M. Goślina', 'Owińska', 'Potasze', 'Promnice', 'Przebędowo', 'Szlachęcin', 'Trzaskowo'
+        'Annowo', 'Biedrusko', 'Bolechowo', 'Bolechowo-Os.', 'Bolechówko', 'Czerwonak', 'Dębogóra', 'Kicin', 'Kliny',
+        'Koziegłowy', 'Mielno', 'Miękowo', 'M. Goślina', 'Owińska', 'Potasze', 'Promnice', 'Przebędowo', 'Szlachęcin',
+        'Trzaskowo'
     })),
     Region(4, 'YOR', 'Yon Region', lambda s: stop_in(s, {
         'Biskupice', 'Bogucin', 'Bugaj', 'Bylin', 'Gortatowo', 'Gowarzewo', 'Garby Małe', 'Garby Wielkie', 'Gruszczyn',
@@ -147,12 +148,12 @@ regions: dict[str, Region] = {r.short_name: r for r in {
         'Robakowo', 'Skrzynki', 'Szczodrzykowo', 'Szczytniki', 'Świątniczki', 'Wiórek', 'Zaniemyśl', 'Żerniki'
     })),
     Region(6, 'ROR', 'Roku Region', lambda s: stop_in(s, {
-        'Luboń', 'Mosina', 'Puszczykowo'
+        'Luboń', 'Łęczyca', 'Mosina', 'Puszczykowo'
     })),
     Region(7, 'SHR', 'Shichi Region', lambda s: stop_in(s, {
         'Chomęcice', 'Dąbrowa', 'Dąbrówka', 'Dopiewiec', 'Dopiewo', 'Fiałkowo', 'Głuchowo', 'Gołuski', 'Komorniki',
-        'Konarzewo', 'Lisówki', 'Łęczyca', 'Palędzie', 'Plewiska', 'Pokrzywnica', 'Rosnowo', 'Rosnówko', 'Skórzewo',
-        'Szreniawa', 'Trzcielin', 'Walerianowo', 'Więckowice', 'Wiry', 'Zakrzewo', 'Zborowo'
+        'Konarzewo', 'Lisówki', 'Palędzie', 'Plewiska', 'Pokrzywnica', 'Rosnowo', 'Rosnówko', 'Skórzewo', 'Szreniawa',
+        'Trzcielin', 'Walerianowo', 'Więckowice', 'Wiry', 'Zakrzewo', 'Zborowo'
     })),
     Region(8, 'HAR', 'Hachi Region', lambda s: stop_in(s, {
         'Baranowo', 'Batorowo', 'Brzezno', 'Bytkowo', 'Bytyń', 'Ceradz Dolny', 'Ceradz Kościelny', 'Cerekwica', 'Chyby',
@@ -162,7 +163,7 @@ regions: dict[str, Region] = {r.short_name: r for r in {
         'Sierosław', 'Sobota', 'Starzyny', 'Swadzim', 'Tarnowo Pdg', 'Witkowice', 'Wysogotowo', 'Żydowo'
     })),
     Region(9, 'KYR', 'Kyuu Region', lambda s: stop_in(s, {
-        'Biedrusko', 'Chludowo', 'Golęczewo', 'Jelonek', 'Suchy Las', 'Zielątkowo', 'Złotniki', 'Złotkowo'
+        'Chludowo', 'Golęczewo', 'Jelonek', 'Suchy Las', 'Zielątkowo', 'Złotniki', 'Złotkowo'
     })),
 }}
 
