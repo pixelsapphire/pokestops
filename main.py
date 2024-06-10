@@ -38,7 +38,7 @@ class Stop:
         self.longitude: float = float(longitude)
         self.zone: str = zone
         self.visits: set[Visit] = set()
-        self.region: Region | None = None
+        self.regions: list[Region] = []
 
     def __hash__(self):
         return hash(self.short_name)
@@ -114,7 +114,7 @@ class Region:
 
     def add_stop(self, s: Stop) -> None:
         self.stops.add(s)
-        s.region = self
+        s.regions.append(self)
 
     def safe_full_name(self) -> str:
         return strip_diacritics(self.full_name)
@@ -127,8 +127,9 @@ def stop_in(s: Stop, towns: set[str]) -> bool:
     return '/' in s.full_name and s.full_name[:s.full_name.index('/')] in towns
 
 
+district = Region(0, 'PZD', 'Poznań', lambda s: True)
 regions: dict[str, Region] = {r.short_name: r for r in {
-    Region(1, 'POZ', 'Poznań', lambda s: s.zone == 'A' or '/' not in s.full_name),
+    Region(1, 'POZ', 'Poznań City', lambda s: s.zone == 'A' or '/' not in s.full_name),
     Region(3, 'SAR', 'San Region', lambda s: stop_in(s, {
         'Annowo', 'Biedrusko', 'Bolechowo', 'Bolechowo-Os.', 'Bolechówko', 'Czerwonak', 'Dębogóra', 'Kicin', 'Kliny',
         'Koziegłowy', 'Mielno', 'Miękowo', 'M. Goślina', 'Owińska', 'Potasze', 'Promnice', 'Przebędowo', 'Szlachęcin',
@@ -180,6 +181,7 @@ def read_stops() -> (dict[str, Stop], dict[str, set[str]]):
             if not region:
                 raise ValueError(f'Stop {stop.full_name} [{stop.short_name}] not in any region')
             region.add_stop(stop)
+            district.add_stop(stop)
             stops[row[1]] = stop
             if stop.safe_full_name() not in stop_groups:
                 stop_groups[stop.safe_full_name()] = set()
@@ -251,7 +253,8 @@ if update_map:
 
     for stop in stops.values():
         classes = ' '.join(
-            [f'visited-{visit.name.lower()}' for visit in stop.visits] + [f'region-{stop.region.short_name}'])
+            [f'visited-{visit.name.lower()}' for visit in stop.visits] +
+            [f'region-{region.short_name}' for region in stop.regions])
         visited_label = '<br>'.join([f'visited by {visit.name} on {visit.date}' for visit in
                                      sorted(stop.visits)]) if stop.visits else 'not yet visited'
         icon = visited_icon_zorie = f'<div class="marker {classes}">●</div>'
@@ -265,6 +268,7 @@ if update_map:
     with open('index.html', "r") as f:
         html_content = f.read()
 
+    regions[district.short_name] = district
     progress: dict[str, dict[str, float]] = {r.short_name: {
         p.nickname: round(len(list(filter(lambda s: s in r and s.visited_by(p.nickname), visited_stops))) /
                           len(list(filter(lambda s: s in r, stops.values()))) * 100, 1) for p in players
