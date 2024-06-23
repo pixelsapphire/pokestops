@@ -57,6 +57,19 @@ class Stop:
             raise ValueError(f'{visit.name} already visited {self.short_name}, remove the entry from {visit.date}')
         self.visits.add(visit)
 
+    def marker(self) -> tuple[str, float, str|None]:
+        number = int(self.short_name[-2:])
+        if 0 < number < 20:
+            return '●', 1.1, None
+        elif 20 < number < 40:
+            return '★', 1, None
+        elif 40 < number < 70:
+            return '■', 0.9, 'transform: rotate(45deg);'
+        elif 70 < number < 90:
+            return '■', 0.9, None
+        else:
+            return '▲', 0.8, None
+
 
 class AchievementProgress:
     def __init__(self, name: str, visited: int, total: int, completed: str | None = None):
@@ -257,12 +270,13 @@ if update_map:
             [f'region-{region.short_name}' for region in stop.regions])
         visited_label = '<br>'.join([f'visited by {visit.name} on {visit.date}' for visit in
                                      sorted(stop.visits)]) if stop.visits else 'not yet visited'
-        icon = visited_icon_zorie = f'<div class="marker {classes}">●</div>'
+        icon, scale, style = stop.marker()
+        marker = f'<div class="marker {classes}" style="font-size: {scale}em; {style}">{icon}</div>'
         popup = folium.Popup(
             f'<span class="stop-popup stop-name"><b>{stop.safe_full_name()}</b> [{stop.short_name}]</span>'
             f'<br><span class="stop-popup stop-visitors">{visited_label}</span>')
         folium.Marker(location=(stop.latitude, stop.longitude), popup=popup,
-                      icon=folium.DivIcon(html=icon)).add_to(fmap)
+                      icon=folium.DivIcon(html=marker)).add_to(fmap)
     fmap.save('index.html')
 
     with open('index.html', "r") as f:

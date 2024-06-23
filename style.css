@@ -14,13 +14,29 @@
 }
 
 .marker {
-    font-size: 32px;
-    background-color: white;
-    text-align: center;
-    width: 20px;
-    height: 20px;
-    line-height: 20px;
-    border-radius: 50%;
+    width: 1em;
+    transform: translateX(-25%);
+    line-height: 0;
+}
+
+@supports (-webkit-text-stroke: 4px white) {
+    .marker {
+        -webkit-text-stroke: 4px white;
+    }
+
+    .leaflet-marker-pane {
+        font-size: 40px;
+    }
+}
+
+@supports not (-webkit-text-stroke: 4px white) {
+    .marker {
+        text-shadow: 3px 3px white, -3px 3px white, 3px -3px white, -3px -3px white, 0 4px white, 0 -4px white, 4px 0 white, -4px 0 white;
+    }
+
+    .leaflet-marker-pane {
+        font-size: 32px;
+    }
 }
 
 .stop-popup {
