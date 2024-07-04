@@ -57,7 +57,7 @@ class Stop:
             raise ValueError(f'{visit.name} already visited {self.short_name}, remove the entry from {visit.date}')
         self.visits.add(visit)
 
-    def marker(self) -> tuple[str, float, str|None]:
+    def marker(self) -> tuple[str, float, str | None]:
         number = int(self.short_name[-2:])
         if 0 < number < 20:
             return '●', 1.1, None
@@ -144,17 +144,16 @@ district = Region(0, 'PZD', 'Poznań', lambda s: True)
 regions: dict[str, Region] = {r.short_name: r for r in {
     Region(1, 'POZ', 'Poznań City', lambda s: s.zone == 'A' or '/' not in s.full_name),
     Region(3, 'SAR', 'San Region', lambda s: stop_in(s, {
-        'Annowo', 'Biedrusko', 'Bolechowo', 'Bolechowo-Os.', 'Bolechówko', 'Czerwonak', 'Dębogóra', 'Kicin', 'Kliny',
-        'Koziegłowy', 'Mielno', 'Miękowo', 'M. Goślina', 'Owińska', 'Potasze', 'Promnice', 'Przebędowo', 'Szlachęcin',
-        'Trzaskowo'
+        'Annowo', 'Biedrusko', 'Bolechowo', 'Bolechowo-Os.', 'Bolechówko', 'Czerwonak', 'Dębogóra', 'Karłowice',
+        'Kicin', 'Kliny', 'Koziegłowy', 'Mielno', 'Miękowo', 'M. Goślina', 'Owińska', 'Potasze', 'Promnice',
+        'Przebędowo', 'Szlachęcin', 'Trzaskowo', 'Tuczno', 'Wierzonka'
     })),
     Region(4, 'YOR', 'Yon Region', lambda s: stop_in(s, {
         'Biskupice', 'Bogucin', 'Bugaj', 'Bylin', 'Gortatowo', 'Gowarzewo', 'Garby Małe', 'Garby Wielkie', 'Gruszczyn',
-        'Janikowo', 'Jankowo', 'Jasin', 'Jerzykowo', 'Karłowice', 'Kleszczewo', 'Kobylnica', 'Komorniki gm.Kleszczewo',
+        'Janikowo', 'Jankowo', 'Jasin', 'Jerzykowo', 'Kleszczewo', 'Kobylnica', 'Komorniki gm.Kleszczewo',
         'Krerowo', 'Kruszewnia', 'Krzyżowniki', 'Lipowiec', 'Łowęcin', 'Markowice', 'Nagradowice', 'Paczkowo',
         'Pobiedziska', 'Poklatki', 'Promno', 'Rabowice', 'Sarbinowo', 'Siekierki Wielkie', 'Sokolniki Gwiazdowskie',
-        'Swarzędz', 'Szewce', 'Śródka', 'Tanibórz', 'Trzek', 'Tuczno', 'Tulce', 'Uzarzewo', 'Wierzenica', 'Wierzonka',
-        'Zalasewo', 'Zimin'
+        'Swarzędz', 'Szewce', 'Śródka', 'Tanibórz', 'Trzek', 'Tulce', 'Uzarzewo', 'Wierzenica', 'Zalasewo', 'Zimin'
     })),
     Region(5, 'GOR', 'Go Region', lambda s: stop_in(s, {
         'Babki', 'Biernatki', 'Błażejewko', 'Błażejewo', 'Borówiec', 'Czapury', 'Dachowa', 'Daszewice', 'Dziećmierowo',
