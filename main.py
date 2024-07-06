@@ -3,10 +3,11 @@ import folium
 import os
 from typing import Callable
 import requests
+import sys
 import zipfile
 
-update_ztm_stops = False
-update_map = True
+update_ztm_stops = '--update' in sys.argv or '-u' in sys.argv
+update_map = '--map' in sys.argv or '-m' in sys.argv
 
 
 class Visit:
