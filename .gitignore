@@ -1,4 +1,6 @@
 .idea
 .venv
+deploy.sh
+changelog.txt
 stops.csv
 test.py
