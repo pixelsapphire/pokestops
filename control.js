@@ -2,13 +2,14 @@ let showUnvisited = false;
 let activePlayer = 'Zorie';
 let activeRegion = 'POZ';
 
+// EV - fourth tints from color-hex.com
 let colors = {
     'Zorie': '#4caf50',
-    'ZorieEV': '#99ff9c',
+    'ZorieEV': '#93cf96',
     'Sapphire': '#8566d9',
-    'SapphireEV': '#b499ff',
+    'SapphireEV': '#b5a3e8',
     'Camomile': '#ff9800',
-    'CamomileEV': '#ffb84d',
+    'CamomileEV': '#ffc166',
 };
 
 function refreshMap() {
