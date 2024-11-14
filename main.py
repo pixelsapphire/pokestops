@@ -50,12 +50,14 @@ class Stop:
     def safe_full_name(self) -> str:
         return strip_diacritics(self.full_name)
 
-    def visited_by(self, name: str) -> str | None:
-        return next((visit.date for visit in self.visits if name == visit.name), None)
+    def visited_by(self, name: str, include_ev: bool = True) -> str | None:
+        return next((visit.date for visit in self.visits
+                     if name == visit.name and (visit.date != '2000-01-01' or include_ev)), None)
 
     def add_visit(self, visit: Visit):
         if self.visited_by(visit.name):
-            raise ValueError(f'{visit.name} already visited {self.short_name}, remove the entry from {visit.date}')
+            raise ValueError(f'{visit.name} already visited {self.short_name}, '
+                             f'remove the entry from {visit.date if visit.date != '2000-01-01' else 'her EV file'}')
         self.visits.add(visit)
 
     def marker(self) -> tuple[str, float, str | None]:
@@ -95,9 +97,10 @@ class Achievements:
 
 
 class Player:
-    def __init__(self, nickname: str, save_file: str):
+    def __init__(self, nickname: str, save_file: str, ev_file: str):
         self.nickname: str = nickname
         self.save_file: str = save_file
+        self.ev_file: str = ev_file
         self.__achievements__: Achievements = Achievements()
 
     def add_stop(self, s: Stop) -> None:
@@ -203,12 +206,9 @@ def read_stops() -> (dict[str, Stop], dict[str, set[str]]):
 
 
 players = {
-    Player('Zorie', 'caught_zorie.csv'),
-    Player('ZorieEV', 'ever_visited_zorie.csv'),
-    Player('Sapphire', 'caught_sapphire.csv'),
-    Player('SapphireEV', 'ever_visited_sapphire.csv'),
-    Player('Camomile', 'caught_camomile.csv'),
-    Player('CamomileEV', 'ever_visited_camomile.csv'),
+    Player('Zorie', 'caught_zorie.csv', 'ever_visited_zorie.csv'),
+    Player('Sapphire', 'caught_sapphire.csv', 'ever_visited_sapphire.csv'),
+    Player('Camomile', 'caught_camomile.csv', 'ever_visited_camomile.csv'),
 }
 
 old_stops = {}
@@ -242,15 +242,13 @@ if update_ztm_stops:
         if not added_stops and not removed_stops:
             print('No changes')
 
-visited_stops: set[Stop] = set()  # this is only needed to determine the center of the map
+ever_visited_stops: set[Stop] = set()
+documented_visited_stops: set[Stop] = set()
+
 for player in players:
     with open(player.save_file, 'r') as file:
         reader = csv.reader(file)
-        try:
-            next(reader)
-        except StopIteration:
-            print(f'{player.nickname}\'s save file is empty')
-            continue
+        next(reader)
         for row in reader:
             if len(row) == 0:
                 continue
@@ -258,17 +256,35 @@ for player in players:
                 stop = stops.get(row[0])
                 if stop:
                     stop.add_visit(Visit(player.nickname, row[1]))
-                    visited_stops.add(stop)
+                    ever_visited_stops.add(stop)
+                    documented_visited_stops.add(stop)
                     player.add_stop(stop)
                 else:
-                    print(f'Stop {row[0]} not found, remove {player.nickname}\'s entry from {row[1]}')
+                    print(f'Stop {row[0].lstrip()} not found, remove {player.nickname}\'s entry from her save file')
             else:
-                if stops.get(row[0].replace('#', '').lstrip()):
-                    print(f'Found a commented out {player.nickname}\'s {row[0]} entry, restore it')
+                stop_id = row[0].replace('#', '').lstrip()
+                if stops.get(stop_id):
+                    print(f'Found a commented out {player.nickname}\'s {stop_id} save file entry, restore it')
+    with open(player.ev_file) as file:
+        for stop_id in map(lambda s: s.strip(), file.readlines()):
+            if len(stop_id) == 0:
+                continue
+            elif not stop_id.startswith('#'):
+                stop = stops.get(stop_id)
+                if stop:
+                    stop.add_visit(Visit(player.nickname, '2000-01-01'))
+                    ever_visited_stops.add(stop)
+                    player.add_stop(stop)
+                else:
+                    print(f'Stop {stop} not found, remove {player.nickname}\'s entry from her EV file')
+            else:
+                stop_id = stop_id.replace('#', '').lstrip()
+                if stops.get(stop_id):
+                    print(f'Found a commented out {player.nickname}\'s {stop_id} EV file entry, restore it')
 
 if update_map:
 
-    visible_stops = visited_stops if len(visited_stops) > 0 else stops.values()
+    visible_stops = documented_visited_stops if len(documented_visited_stops) > 0 else stops.values()
     avg_lat = (min(float(s.latitude) for s in visible_stops) + max(float(s.latitude) for s in visible_stops)) / 2
     avg_lon = (min(float(s.longitude) for s in visible_stops) + max(float(s.longitude) for s in visible_stops)) / 2
     fmap: folium.Map = folium.Map(location=(avg_lat, avg_lon), zoom_start=12)
@@ -276,10 +292,10 @@ if update_map:
     for stop in stops.values():
         classes = ' '.join(
             [f'visited-{visit.name.lower()}' for visit in stop.visits] +
+            [f'ever-visited-{visit.name.lower()}' for visit in stop.visits if visit.date == '2000-01-01'] +
             [f'region-{region.short_name}' for region in stop.regions])
         visited_label = '<br>'.join(
-            [f'visited by {visit.name.replace('EV', '')} '
-             f'{f'on {visit.date}' if visit.date != '2000-01-01' else 'a long time ago'}'
+            [f'visited by {visit.name} {f'on {visit.date}' if visit.date != '2000-01-01' else 'a long time ago'}'
              for visit in sorted(stop.visits)]) if stop.visits else 'not yet visited'
         icon, scale, style = stop.marker()
         marker = f'<div class="marker {classes}" style="font-size: {scale}em; {style}">{icon}</div>'
@@ -295,8 +311,14 @@ if update_map:
 
     regions[district.short_name] = district
     progress: dict[str, dict[str, float]] = {r.short_name: {
-        p.nickname: round(len(list(filter(lambda s: s in r and s.visited_by(p.nickname), visited_stops))) /
-                          len(list(filter(lambda s: s in r, stops.values()))) * 100, 1) for p in players
+        **{
+            p.nickname: round(len(list(filter(lambda s: s in r and s.visited_by(p.nickname, False), ever_visited_stops))) /
+                              len(list(filter(lambda s: s in r, stops.values()))) * 100, 1) for p in players
+        },
+        **{
+            f'ev-{p.nickname}': round(len(list(filter(lambda s: s in r and s.visited_by(p.nickname), ever_visited_stops))) /
+                                      len(list(filter(lambda s: s in r, stops.values()))) * 100, 1) for p in players
+        },
     } for r in regions.values()}
     with open('static.html', "r") as static:
         content = static.read()
@@ -307,8 +329,9 @@ if update_map:
             f'{' '.join([f'<option value="{r.short_name}">{r.safe_full_name()}</option>'
                          for r in sorted(regions.values(), key=lambda r: r.number)])}</select></label>'
             f'<br><span id="exploration-progress">Exploration progress: <span id="exploration-percentage" '
-            f'{' '.join([f'data-{r.short_name.lower()}-{p.nickname.lower()}={progress[r.short_name][p.nickname]}'
-                         for p in players for r in regions.values()])}>'
+            f'{' '.join([f'data-{r.short_name.lower()}-{nick.lower()}={progress[r.short_name][nick]}'
+                         for nick in [p.nickname for p in players] + [f'ev-{p.nickname}' for p in players]
+                         for r in regions.values()])}>'
             f'{progress['POZ']['Zorie']}</span>%</span></p>')
 
         content += '<div id="achievements">'

@@ -8,17 +8,18 @@
                 <input id="visited-switch" type="checkbox"><span class="slider"></span>
             </label>
         </div>
+        <div style="margin:0;" class="hud-text">Show ever visited</div>
+        <div>
+            <label style="margin:0;" class="toggle-switch" onclick="toggleEV()">
+                <input id="ev-switch" type="checkbox"><span class="slider"></span>
+            </label>
+        </div>
     </div>
     <label id="player-selection">
         <select class="dropdown hud-text" onchange="selectPlayer()">
-            <option disabled>normal</option>
             <option value="Zorie">Zorie</option>
             <option value="Sapphire">Sapphire</option>
             <option value="Camomile">Camomile</option>
-            <option disabled>ever visited</option>
-            <option value="ZorieEV">Zorie/EV</option>
-            <option value="SapphireEV">Sapphire/EV</option>
-            <option value="CamomileEV">Camomile/EV</option>
         </select>
     </label>
 </div>
