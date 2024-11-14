@@ -51,7 +51,7 @@ class Stop:
         return strip_diacritics(self.full_name)
 
     def visited_by(self, name: str) -> str | None:
-        return next((visit.date for visit in self.visits if name in visit.name), None)
+        return next((visit.date for visit in self.visits if name == visit.name), None)
 
     def add_visit(self, visit: Visit):
         if self.visited_by(visit.name):
@@ -204,8 +204,11 @@ def read_stops() -> (dict[str, Stop], dict[str, set[str]]):
 
 players = {
     Player('Zorie', 'caught_zorie.csv'),
+    Player('ZorieEV', 'ever_visited_zorie.csv'),
     Player('Sapphire', 'caught_sapphire.csv'),
+    Player('SapphireEV', 'ever_visited_sapphire.csv'),
     Player('Camomile', 'caught_camomile.csv'),
+    Player('CamomileEV', 'ever_visited_camomile.csv'),
 }
 
 old_stops = {}
@@ -243,9 +246,15 @@ visited_stops: set[Stop] = set()  # this is only needed to determine the center 
 for player in players:
     with open(player.save_file, 'r') as file:
         reader = csv.reader(file)
-        next(reader)
+        try:
+            next(reader)
+        except StopIteration:
+            print(f'{player.nickname}\'s save file is empty')
+            continue
         for row in reader:
-            if not row[0].lstrip().startswith('#'):
+            if len(row) == 0:
+                continue
+            elif not row[0].lstrip().startswith('#'):
                 stop = stops.get(row[0])
                 if stop:
                     stop.add_visit(Visit(player.nickname, row[1]))
@@ -268,8 +277,10 @@ if update_map:
         classes = ' '.join(
             [f'visited-{visit.name.lower()}' for visit in stop.visits] +
             [f'region-{region.short_name}' for region in stop.regions])
-        visited_label = '<br>'.join([f'visited by {visit.name} on {visit.date}' for visit in
-                                     sorted(stop.visits)]) if stop.visits else 'not yet visited'
+        visited_label = '<br>'.join(
+            [f'visited by {visit.name.replace('EV', '')} '
+             f'{f'on {visit.date}' if visit.date != '2000-01-01' else 'a long time ago'}'
+             for visit in sorted(stop.visits)]) if stop.visits else 'not yet visited'
         icon, scale, style = stop.marker()
         marker = f'<div class="marker {classes}" style="font-size: {scale}em; {style}">{icon}</div>'
         popup = folium.Popup(
@@ -308,9 +319,13 @@ if update_map:
                         f'{len(list(filter(lambda s: s.visited == s.total, player.get_achievements())))}'
                         '</p><table><tbody>')
             for achievement in player.get_achievements():
+                time = achievement.completed if achievement.completed != '2000-01-01' \
+                    else '<span class="smaller">a long time ago</span>'
+                achievement_progress = f'<span class="smaller">Completed</span><br>{time}' \
+                    if achievement.completed else f'{achievement.visited}/{achievement.total}'
                 content += (
                     f'<tr><td>{achievement.name}<br><p class="achievement-description">{achievement.description}</p></td>'
-                    f'<td class="achievement-progress">{f'<span class="smaller">Completed</span><br>{achievement.completed}' if achievement.completed else f'{achievement.visited}/{achievement.total}'}</td>')
+                    f'<td class="achievement-progress">{achievement_progress}</td>')
             content += '</tbody></table></div>'
         content += '</div><button id="toggle-achievements" onclick="toggleAchievements()"></button>'
 

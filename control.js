@@ -4,8 +4,11 @@ let activeRegion = 'POZ';
 
 let colors = {
     'Zorie': '#4caf50',
+    'ZorieEV': '#99ff9c',
     'Sapphire': '#8566d9',
+    'SapphireEV': '#b499ff',
     'Camomile': '#ff9800',
+    'CamomileEV': '#ffb84d',
 };
 
 function refreshMap() {
