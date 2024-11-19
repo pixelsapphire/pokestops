@@ -1,5 +1,19 @@
 vehicle_id,kind,brand,model
-225+226,tram,Modertrans,Moderus Alfa HF07
+140+141,tram,Modertrans,Moderus Alfa HF07
+166+165,tram,Modertrans,Moderus Alfa HF07
+168+167,tram,Modertrans,Moderus Alfa HF07
+226+225,tram,Modertrans,Moderus Alfa HF07
+424,tram,Modertrans,Moderus Beta MF02 AC
 522,tram,Solaris,Tramino S105P
+530,tram,Solaris,Tramino S105P
+541,tram,Solaris,Tramino S105P
 545,tram,Solaris,Tramino S105P
 550,tram,Solaris,Tramino S105P
+555,tram,Solaris,Tramino S105P
+604,tram,Modertrans,Moderus Gamma LF02 AC
+928,tram,Modertrans,Moderus Gamma LF03 AC BD
+930,tram,Modertrans,Moderus Gamma LF03 AC BD
+1270,bus,Solaris,Urbino 18 III gen
+1310,bus,Mercedes-Benz,Conecto G
+1313,bus,Mercedes-Benz,Conecto G
+1935,bus,Solaris,Urbino 18 IV gen
