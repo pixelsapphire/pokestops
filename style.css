@@ -1,6 +1,6 @@
 @font-face {
     font-family: "Genshin";
-    src: url("genshin.ttf");
+    src: url("assets/genshin.ttf");
 }
 
 .hud-text {
@@ -148,13 +148,13 @@
     text-align: center;
 }
 
-#achievements {
+.sidebar {
     position: absolute;
     left: 0;
     top: 10vh;
     height: 80vh;
-    width: min(50vh, 50vw);
-    z-index: 1000;
+    width: min(55vh, 55vw);
+    z-index: 1200;
     background-color: rgb(224, 223, 223);
     border: min(0.5vh, 0.5vw) solid black;
     border-left: none;
@@ -166,7 +166,7 @@
     display: none;
 }
 
-#achievements.expanded {
+.sidebar.expanded {
     display: block;
 }
 
@@ -190,6 +190,15 @@
     line-height: 1.25;
 }
 
+.brand-logo {
+    height: min(4vh, 4vw);
+}
+
+.vehicle-icon {
+    height: min(4vh, 4vw);
+    padding-bottom: min(0.75vh, 0.75vw);
+}
+
 .center {
     text-align: center;
 }
@@ -198,9 +207,12 @@
     font-size: min(1.75vh, 1.75vw);
 }
 
-#toggle-achievements {
+.larger {
+    font-size: min(2.5vh, 2.5vw);
+}
+
+.toggle-sidebar {
     position: absolute;
-    top: 50%;
     left: 0;
     transform: translateY(-50%);
     z-index: 1100;
@@ -212,6 +224,24 @@
     width: min(4vh, 4vw);
 }
 
-#toggle-achievements.expanded {
-    left: min(50vh, 50vw);
+.toggle-sidebar.expanded {
+    left: min(55vh, 55vw);
+}
+
+.sidebar-button-label {
+    font-size: min(2vh, 2vw);
+    font-family: Genshin, sans-serif;
+    color: white;
+    transform: translateX(-50%) rotate(-90deg) translateY(min(1vh, 1vw));
+    display: inline-block;
+    -webkit-text-stroke-width: min(0.075vh, 0.075vw);
+    -webkit-text-stroke-color: black;
+}
+
+#toggle-vehicles {
+    top: 38%;
+}
+
+#toggle-achievements {
+    top: 62%;
 }

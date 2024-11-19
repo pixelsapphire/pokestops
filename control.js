@@ -68,6 +68,11 @@ function toggleAchievements() {
     document.querySelector('#toggle-achievements').classList.toggle('expanded');
 }
 
+function toggleVehicles() {
+    document.querySelector('#vehicles').classList.toggle('expanded');
+    document.querySelector('#toggle-vehicles').classList.toggle('expanded');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     activePlayer = localStorage.getItem('activePlayer') || 'Zorie';
     document.querySelector("#player-selection select").value = activePlayer;
