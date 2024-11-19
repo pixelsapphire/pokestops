@@ -205,11 +205,12 @@ def read_stops() -> (dict[str, Stop], dict[str, set[str]]):
     return stops, stop_groups
 
 
-players = {
-    Player('Zorie', 'caught_zorie.csv', 'ever_visited_zorie.csv'),
-    Player('Sapphire', 'caught_sapphire.csv', 'ever_visited_sapphire.csv'),
-    Player('Camomile', 'caught_camomile.csv', 'ever_visited_camomile.csv'),
-}
+players: list[Player] = []
+with open('players.csv', 'r') as file:
+    reader = csv.reader(file)
+    next(reader)
+    for row in reader:
+        players.append(Player(*row))
 
 old_stops = {}
 first_update = not os.path.exists('stops.csv')
@@ -276,7 +277,7 @@ for player in players:
                     ever_visited_stops.add(stop)
                     player.add_stop(stop)
                 else:
-                    print(f'Stop {stop} not found, remove {player.nickname}\'s entry from her EV file')
+                    print(f'Stop {stop_id} not found, remove {player.nickname}\'s entry from her EV file')
             else:
                 stop_id = stop_id.replace('#', '').lstrip()
                 if stops.get(stop_id):

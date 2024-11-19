@@ -1,0 +1,4 @@
+nickname,stops_file,ev_stops_file
+Zorie,playerdata/zorie_stops.csv,playerdata/zorie_ev_stops.txt
+Sapphire,playerdata/sapphire_stops.csv,playerdata/sapphire_ev_stops.txt
+Camomile,playerdata/camomile_stops.csv,playerdata/camomile_ev_stops.txt
