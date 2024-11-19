@@ -10,15 +10,6 @@ update_ztm_stops = '--update' in sys.argv or '-u' in sys.argv
 update_map = '--map' in sys.argv or '-m' in sys.argv
 
 
-def strip_diacritics(s: str) -> str:
-    return (s
-            .replace('ą', 'a').replace('Ą', 'A').replace('ć', 'c').replace('Ć', 'C')
-            .replace('ę', 'e').replace('Ę', 'E').replace('ł', 'l').replace('Ł', 'L')
-            .replace('ń', 'n').replace('Ń', 'N').replace('ó', 'o').replace('Ó', 'O')
-            .replace('ś', 's').replace('Ś', 'S').replace('ź', 'z').replace('Ź', 'Z')
-            .replace('ż', 'z').replace('Ż', 'Z').replace('ō', 'o').replace('Ō', 'O'))
-
-
 class Visit:
     def __init__(self, name: str, date: str):
         self.name: str = name
@@ -46,9 +37,6 @@ class Stop:
 
     def __eq__(self, other):
         return self.short_name == other.short_name
-
-    def safe_full_name(self) -> str:
-        return strip_diacritics(self.full_name)
 
     def in_one_of(self, towns: set[str]) -> bool:
         return '/' in self.full_name and self.full_name[:self.full_name.index('/')] in towns
@@ -94,9 +82,9 @@ class Achievements:
         self.stop_groups: dict[str, set[Stop]] = {}
 
     def add_stop(self, s: Stop) -> None:
-        if s.safe_full_name() not in self.stop_groups:
-            self.stop_groups[s.safe_full_name()] = set()
-        self.stop_groups[s.safe_full_name()].add(s)
+        if s.full_name not in self.stop_groups:
+            self.stop_groups[s.full_name] = set()
+        self.stop_groups[s.full_name].add(s)
 
 
 class Carrier:
@@ -152,7 +140,7 @@ class Player:
             else:
                 prog.append(AchievementProgress(group, visited, total))
             prog[-1].description += ', '.join(
-                sorted(s.short_name for s in stops.values() if s.safe_full_name() == group))
+                sorted(s.short_name for s in stops.values() if s.full_name == group))
         return sorted(prog, key=lambda p: (p.percentage(), p.completed), reverse=True)
 
     @staticmethod
@@ -178,9 +166,6 @@ class Region:
     def add_stop(self, s: Stop) -> None:
         self.stops.add(s)
         s.regions.append(self)
-
-    def safe_full_name(self) -> str:
-        return strip_diacritics(self.full_name)
 
     def __contains__(self, item):
         return self.predicate(item)
@@ -241,9 +226,9 @@ def read_stops() -> (dict[str, Stop], dict[str, set[str]]):
             region.add_stop(stop)
             district.add_stop(stop)
             stops[row[1]] = stop
-            if stop.safe_full_name() not in stop_groups:
-                stop_groups[stop.safe_full_name()] = set()
-            stop_groups[stop.safe_full_name()].add(stop.short_name)
+            if stop.full_name not in stop_groups:
+                stop_groups[stop.full_name] = set()
+            stop_groups[stop.full_name].add(stop.short_name)
     return stops, stop_groups
 
 
@@ -392,7 +377,7 @@ def main() -> None:
             icon, scale, style = stop.marker()
             marker = f'<div class="marker {classes}" style="font-size: {scale}em; {style}">{icon}</div>'
             popup = folium.Popup(
-                f'<span class="stop-popup stop-name"><b>{stop.safe_full_name()}</b> [{stop.short_name}]</span>'
+                f'<span class="stop-popup stop-name"><b>{stop.full_name}</b> [{stop.short_name}]</span>'
                 f'<br><span class="stop-popup stop-visitors">{visited_label}</span>')
             # noinspection PyTypeChecker
             folium.Marker(location=(stop.latitude, stop.longitude), popup=popup,
@@ -419,7 +404,7 @@ def main() -> None:
             content += (
                 '<p id="exploration" class="hud-text"><label id="region-selection">'
                 '<select class="dropdown hud-text" onchange="selectRegion()">'
-                f'{' '.join([f'<option value="{r.short_name}">{r.safe_full_name()}</option>'
+                f'{' '.join([f'<option value="{r.short_name}">{r.full_name}</option>'
                              for r in sorted(regions.values(), key=lambda r: r.number)])}</select></label>'
                 f'<br><span id="exploration-progress">Exploration progress: <span id="exploration-percentage" '
                 f'{' '.join([f'data-{r.short_name.lower()}-{nick.lower()}={progress[r.short_name][nick]}'
@@ -456,7 +441,8 @@ def main() -> None:
                                 f'<td><img class="brand-logo" src="assets/brands/{vehicle.brand.lower()}.webp"></img></td>'
                                 f'<td><span class="smaller">{vehicle.brand}</span><br>'
                                 f'<span{' class="smaller"' if len(vehicle.model) >= 30 else ''}>{vehicle.model}</span><br>'
-                                f'<span class="larger"><b>#{vehicle.vehicle_id}</b></span></td>'
+                                f'<span class="larger"><b>#{vehicle.vehicle_id} </b></span>'
+                                f'<span class="smaller">({vehicle.carrier.name})</span></td>'
                                 f'<td class="achievement-progress">{date}</td>')
                 content += '</tbody></table></div>'
             content += ('</div><button class="toggle-sidebar" id="toggle-vehicles" onclick="toggleVehicles()">'
