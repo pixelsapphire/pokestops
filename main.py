@@ -10,6 +10,15 @@ update_ztm_stops = '--update' in sys.argv or '-u' in sys.argv
 update_map = '--map' in sys.argv or '-m' in sys.argv
 
 
+def strip_diacritics(s: str) -> str:
+    return (s
+            .replace('ą', 'a').replace('Ą', 'A').replace('ć', 'c').replace('Ć', 'C')
+            .replace('ę', 'e').replace('Ę', 'E').replace('ł', 'l').replace('Ł', 'L')
+            .replace('ń', 'n').replace('Ń', 'N').replace('ó', 'o').replace('Ó', 'O')
+            .replace('ś', 's').replace('Ś', 'S').replace('ź', 'z').replace('Ź', 'Z')
+            .replace('ż', 'z').replace('Ż', 'Z').replace('ō', 'o').replace('Ō', 'O'))
+
+
 class Visit:
     def __init__(self, name: str, date: str):
         self.name: str = name
@@ -20,15 +29,6 @@ class Visit:
 
     def __lt__(self, other):
         return self.date < other.date if self.date != other.date else self.name > other.name
-
-
-def strip_diacritics(s: str) -> str:
-    return (s
-            .replace('ą', 'a').replace('Ą', 'A').replace('ć', 'c').replace('Ć', 'C')
-            .replace('ę', 'e').replace('Ę', 'E').replace('ł', 'l').replace('Ł', 'L')
-            .replace('ń', 'n').replace('Ń', 'N').replace('ó', 'o').replace('Ó', 'O')
-            .replace('ś', 's').replace('Ś', 'S').replace('ź', 'z').replace('Ź', 'Z')
-            .replace('ż', 'z').replace('Ż', 'Z').replace('ō', 'o').replace('Ō', 'O'))
 
 
 class Stop:
@@ -99,9 +99,22 @@ class Achievements:
         self.stop_groups[s.safe_full_name()].add(s)
 
 
+class Carrier:
+    def __init__(self, symbol: str, name: str):
+        self.symbol: str = symbol
+        self.name: str = name
+
+    def __hash__(self):
+        return hash(self.symbol)
+
+    def __eq__(self, other):
+        return self.symbol == other.symbol if isinstance(other, type(self)) else False
+
+
 class Vehicle:
-    def __init__(self, vehicle_id: str, kind: str, brand: str, model: str):
+    def __init__(self, vehicle_id: str, carrier: Carrier, kind: str, brand: str, model: str):
         self.vehicle_id: str = vehicle_id
+        self.carrier: Carrier = carrier
         self.kind: str = kind
         self.brand: str = brand
         self.model: str = model
@@ -110,7 +123,7 @@ class Vehicle:
         return hash(self.vehicle_id)
 
     def __eq__(self, other):
-        return self.vehicle_id == other.vehicle_id
+        return self.vehicle_id == other.vehicle_id if isinstance(other, type(self)) else False
 
 
 class Player:
@@ -234,13 +247,23 @@ def read_stops() -> (dict[str, Stop], dict[str, set[str]]):
     return stops, stop_groups
 
 
-def read_vehicles() -> dict[str, Vehicle]:
+def read_carriers() -> dict[str, Carrier]:
+    carriers: dict[str, Carrier] = {}
+    with open('carriers.csv', 'r') as file:
+        reader = csv.reader(file)
+        next(reader)
+        for row in reader:
+            carriers[row[0]] = Carrier(*row)
+    return carriers
+
+
+def read_vehicles(carriers: dict[str, Carrier]) -> dict[str, Vehicle]:
     vehicles: dict[str, Vehicle] = {}
     with open('vehicles.csv', 'r') as file:
         reader = csv.reader(file)
         next(reader)
         for row in reader:
-            vehicles[row[0]] = Vehicle(*row)
+            vehicles[row[0]] = Vehicle(row[0], carriers.get(row[1]), row[2], row[3], row[4])
     return vehicles
 
 
@@ -283,7 +306,8 @@ def main() -> None:
             if not added_stops and not removed_stops:
                 print('No changes')
 
-    vehicles: dict[str, Vehicle] = read_vehicles()
+    carriers: dict[str, Carrier] = read_carriers()
+    vehicles: dict[str, Vehicle] = read_vehicles(carriers)
 
     ever_visited_stops: set[Stop] = set()
     documented_visited_stops: set[Stop] = set()
@@ -370,6 +394,7 @@ def main() -> None:
             popup = folium.Popup(
                 f'<span class="stop-popup stop-name"><b>{stop.safe_full_name()}</b> [{stop.short_name}]</span>'
                 f'<br><span class="stop-popup stop-visitors">{visited_label}</span>')
+            # noinspection PyTypeChecker
             folium.Marker(location=(stop.latitude, stop.longitude), popup=popup,
                           icon=folium.DivIcon(html=marker)).add_to(fmap)
         fmap.save('index.html')
@@ -429,7 +454,8 @@ def main() -> None:
                 for vehicle, date in reversed(player.__vehicles__):
                     content += (f'<tr><td><img class="vehicle-icon" src="assets/vehicles/{vehicle.kind}.webp"></img></td>'
                                 f'<td><img class="brand-logo" src="assets/brands/{vehicle.brand.lower()}.webp"></img></td>'
-                                f'<td><span class="smaller">{vehicle.brand}</span><br>{vehicle.model}<br>'
+                                f'<td><span class="smaller">{vehicle.brand}</span><br>'
+                                f'<span{' class="smaller"' if len(vehicle.model) >= 30 else ''}>{vehicle.model}</span><br>'
                                 f'<span class="larger"><b>#{vehicle.vehicle_id}</b></span></td>'
                                 f'<td class="achievement-progress">{date}</td>')
                 content += '</tbody></table></div>'
