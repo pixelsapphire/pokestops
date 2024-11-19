@@ -337,8 +337,9 @@ def main() -> None:
                     if vehicle:
                         player.add_vehicle(vehicle, row[1])
                     else:
-                        combined: str | None = next(v for v in vehicles.keys()
-                                                    if v.startswith(f'{vehicle_id}+') or v.endswith(f'+{vehicle_id}'))
+                        combined: str | None = next((v for v in vehicles.keys() if
+                                                     v.startswith(f'{vehicle_id}+') or v.endswith(f'+{vehicle_id}') or
+                                                     v == f'{'+'.join(vehicle_id.split('+')[::-1])}'), None)
                         if combined:
                             print(f'Vehicle #{vehicle_id} not found, but there is vehicle #{combined},'
                                   f' modify {player.nickname}\'s entry in her vehicles file')
@@ -425,7 +426,7 @@ def main() -> None:
                 content += (f'<div class="progress-list" data-player="{player.nickname.lower()}"'
                             f'{'style="display:none;"' if player.nickname != 'Zorie' else ''}>'
                             f'<p class="center">Vehicles discovered: {len(player.__vehicles__)}</p><table><tbody>')
-                for vehicle, date in player.__vehicles__:
+                for vehicle, date in reversed(player.__vehicles__):
                     content += (f'<tr><td><img class="vehicle-icon" src="assets/vehicles/{vehicle.kind}.webp"></img></td>'
                                 f'<td><img class="brand-logo" src="assets/brands/{vehicle.brand.lower()}.webp"></img></td>'
                                 f'<td><span class="smaller">{vehicle.brand}</span><br>{vehicle.model}<br>'
