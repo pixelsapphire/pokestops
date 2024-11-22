@@ -364,7 +364,7 @@ def main() -> None:
         visible_stops = documented_visited_stops if len(documented_visited_stops) > 0 else stops.values()
         avg_lat = (min(float(s.latitude) for s in visible_stops) + max(float(s.latitude) for s in visible_stops)) / 2
         avg_lon = (min(float(s.longitude) for s in visible_stops) + max(float(s.longitude) for s in visible_stops)) / 2
-        fmap: folium.Map = folium.Map(location=(avg_lat, avg_lon), zoom_start=12)
+        fmap: folium.Map = folium.Map(location=(avg_lat, avg_lon), zoom_start=12, prefer_canvas=True, zoom_control='bottomleft')
 
         for stop in stops.values():
             classes = ' '.join(
@@ -380,11 +380,10 @@ def main() -> None:
                 f'<span class="stop-popup stop-name"><b>{stop.full_name}</b> [{stop.short_name}]</span>'
                 f'<br><span class="stop-popup stop-visitors">{visited_label}</span>')
             # noinspection PyTypeChecker
-            folium.Marker(location=(stop.latitude, stop.longitude), popup=popup,
-                          icon=folium.DivIcon(html=marker)).add_to(fmap)
+            folium.Marker(location=(stop.latitude, stop.longitude), popup=popup, icon=folium.DivIcon(html=marker)).add_to(fmap)
         fmap.save('index.html')
 
-        with open('index.html', "r") as f:
+        with open('index.html', 'r') as f:
             html_content = f.read()
 
         regions[district.short_name] = district
