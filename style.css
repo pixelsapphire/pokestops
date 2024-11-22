@@ -24,6 +24,10 @@
         -webkit-text-stroke: 4px white;
     }
 
+    .marker.dark {
+        -webkit-text-stroke: 4px black;
+    }
+
     .leaflet-marker-pane {
         font-size: 40px;
     }
@@ -170,6 +174,14 @@
     display: block;
 }
 
+.sidebar.dark {
+    background-color: rgb(56, 56, 56);
+}
+
+.sidebar.dark > * {
+    filter: invert(1);
+}
+
 .progress-list table {
     width: 100%;
     line-height: 1.25;
@@ -244,4 +256,9 @@
 
 #toggle-achievements {
     top: 62%;
+}
+
+#theme-icon {
+    width: 100%;
+    padding: 4px;
 }

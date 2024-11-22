@@ -7,9 +7,6 @@ import sys
 import zipfile
 from typing import Callable
 
-update_ztm_stops = '--update' in sys.argv or '-u' in sys.argv
-update_map = '--map' in sys.argv or '-m' in sys.argv
-
 
 class Visit:
     def __init__(self, name: str, date: str):
@@ -461,11 +458,15 @@ def main() -> None:
 
             closing_head_index = new_content.rfind("</head>")
             title = '<title>Pokestops</title>'
-            new_content = new_content[:closing_head_index] + title + new_content[closing_head_index:]
+            font = ('<link rel="stylesheet" href="https://fonts.googleapis.com/css2'
+                    '?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=light_mode" />')
+            new_content = new_content[:closing_head_index] + title + font + new_content[closing_head_index:]
 
             with open('index.html', "w") as output:
                 output.write(new_content)
 
 
+update_ztm_stops = '--update' in sys.argv or '-u' in sys.argv
+update_map = '--map' in sys.argv or '-m' in sys.argv
 if __name__ == '__main__':
     main()

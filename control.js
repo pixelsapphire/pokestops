@@ -2,6 +2,7 @@ let showUnvisited = false;
 let showEverVisited = false;
 let activePlayer = 'Zorie';
 let activeRegion = 'POZ';
+let darkMode = true;
 
 // EV - fourth tints from color-hex.com
 let colors = {
@@ -9,6 +10,26 @@ let colors = {
     'Sapphire': ['#8566d9', '#b5a3e8'],
     'Camomile': ['#ff9800', '#ffc166'],
 };
+
+function inject() {
+    let zoomControl = document.querySelector('.leaflet-control-zoom');
+    let icon = document.createElement('img');
+    icon.id = 'theme-icon';
+    icon.src = darkMode ? 'assets/light_mode.png' : 'assets/dark_mode.png';
+    let themeSwitch = zoomControl.firstChild.cloneNode(true);
+    themeSwitch.setAttribute('class', 'leaflet-control-theme');
+    themeSwitch.title = 'Toggle theme';
+    themeSwitch.setAttribute('aria-label', 'Toggle theme');
+    themeSwitch.firstChild.remove();
+    themeSwitch.appendChild(icon);
+    themeSwitch.addEventListener('click', () => {
+        darkMode = !darkMode;
+        localStorage.setItem('darkMode', darkMode);
+        icon.src = darkMode ? 'assets/light_mode.png' : 'assets/dark_mode.png';
+        refreshMap();
+    });
+    zoomControl.insertBefore(themeSwitch, zoomControl.firstChild);
+}
 
 function refreshMap() {
 
@@ -39,6 +60,10 @@ function refreshMap() {
         list => list.style.display = list.getAttribute('data-player') === activePlayer.toLowerCase() ? null : 'none');
     const percentage = document.querySelector('#exploration-percentage');
     percentage.innerHTML = percentage.getAttribute(`data-${activeRegion.toLowerCase()}-${showEverVisited ? 'ev-' : ''}${activePlayer.toLowerCase()}`);
+
+    document.querySelectorAll('.leaflet-layer,.leaflet-control-zoom-in,.leaflet-control-zoom-out,.leaflet-control-attribution,.leaflet-control-theme')
+        .forEach(e => e.style.filter = darkMode ? 'invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)' : null);
+    document.querySelectorAll('.marker,.sidebar,.toggle-sidebar').forEach(e => e.classList.toggle('dark', darkMode));
 }
 
 function toggleUnvisited() {
@@ -78,5 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector("#player-selection select").value = activePlayer;
     activeRegion = localStorage.getItem('activeRegion') || 'POZ';
     document.querySelector("#region-selection select").value = activeRegion;
+    darkMode = localStorage.getItem('darkMode') !== 'false';
+    inject();
     refreshMap();
 });
