@@ -28,9 +28,11 @@ vehicle_id,carrier,kind,brand,model
 914,PZ,tram,Modertrans,Moderus Gamma MF22 AC BD
 928,PZ,tram,Modertrans,Moderus Gamma LF03 AC BD
 930,PZ,tram,Modertrans,Moderus Gamma LF03 AC BD
+1006,PZ,bus,Solaris,Urbino 12 electric IV gen
 1270,PZ,bus,Solaris,Urbino 18 III gen
 1310,PZ,bus,Mercedes-Benz,Conecto G
 1313,PZ,bus,Mercedes-Benz,Conecto G
+1315,PZ,bus,Mercedes-Benz,Conecto G
 1474,PZ,bus,Solaris,Urbino 12 III gen
 1613,PZ,bus,Solaris,Urbino 18 hydrogen IV gen
 1617,PZ,bus,Solaris,Urbino 18 hydrogen IV gen
