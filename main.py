@@ -1,10 +1,11 @@
 import csv
 import folium
 import os
-from typing import Callable
 import requests
+import rjsmin
 import sys
 import zipfile
+from typing import Callable
 
 update_ztm_stops = '--update' in sys.argv or '-u' in sys.argv
 update_map = '--map' in sys.argv or '-m' in sys.argv
@@ -353,13 +354,26 @@ def main() -> None:
                             print(f'Vehicle #{vehicle_id} not found, but there is vehicle #{combined},'
                                   f' modify {player.nickname}\'s entry in her vehicles file')
                         else:
-                            print(f'Vehicle #{vehicle_id} not found, remove {player.nickname}\'s entry from her vehicles file')
+                            print(f'Vehicle #{vehicle_id} not found, remove {player.nickname}\'s '
+                                  f'entry from her vehicles file or add a definition to vehicles.csv')
                 else:
                     vehicle_id = row[0].replace('#', '').lstrip()
                     if vehicles.get(vehicle_id):
                         print(f'Found a commented out {player.nickname}\'s {vehicle_id} vehicles file entry, restore it')
 
     if update_map:
+
+        regions[district.short_name] = district
+        progress: dict[str, dict[str, float]] = {r.short_name: {
+            **{
+                p.nickname: round(len(list(filter(lambda s: s in r and s.visited_by(p.nickname, False), ever_visited_stops))) /
+                                  len(list(filter(lambda s: s in r, stops.values()))) * 100, 1) for p in players
+            },
+            **{
+                f'ev-{p.nickname}': round(len(list(filter(lambda s: s in r and s.visited_by(p.nickname), ever_visited_stops))) /
+                                          len(list(filter(lambda s: s in r, stops.values()))) * 100, 1) for p in players
+            },
+        } for r in regions.values()}
 
         visible_stops = documented_visited_stops if len(documented_visited_stops) > 0 else stops.values()
         avg_lat = (min(float(s.latitude) for s in visible_stops) + max(float(s.latitude) for s in visible_stops)) / 2
@@ -381,22 +395,16 @@ def main() -> None:
                 f'<br><span class="stop-popup stop-visitors">{visited_label}</span>')
             # noinspection PyTypeChecker
             folium.Marker(location=(stop.latitude, stop.longitude), popup=popup, icon=folium.DivIcon(html=marker)).add_to(fmap)
-        fmap.save('index.html')
 
-        with open('index.html', 'r') as f:
-            html_content = f.read()
+        html_content: str = fmap.get_root().render()
 
-        regions[district.short_name] = district
-        progress: dict[str, dict[str, float]] = {r.short_name: {
-            **{
-                p.nickname: round(len(list(filter(lambda s: s in r and s.visited_by(p.nickname, False), ever_visited_stops))) /
-                                  len(list(filter(lambda s: s in r, stops.values()))) * 100, 1) for p in players
-            },
-            **{
-                f'ev-{p.nickname}': round(len(list(filter(lambda s: s in r and s.visited_by(p.nickname), ever_visited_stops))) /
-                                          len(list(filter(lambda s: s in r, stops.values()))) * 100, 1) for p in players
-            },
-        } for r in regions.values()}
+        script_begin = html_content.rfind('<script>')
+        script_end = html_content.rfind('</script>')
+        script = rjsmin.jsmin(html_content[script_begin + 8:script_end])
+        with open('map.min.js', 'w') as script_file:
+            script_file.write(script)
+        html_content = html_content[:script_begin] + html_content[script_end + 9:]
+
         with open('static.html', "r") as static:
             content = static.read()
 
@@ -446,6 +454,7 @@ def main() -> None:
                 content += '</tbody></table></div>'
             content += ('</div><button class="toggle-sidebar" id="toggle-vehicles" onclick="toggleVehicles()">'
                         '<span class="sidebar-button-label">Vehicles</span></button>')
+            content += '<script src="map.min.js"></script>'
 
             closing_body_index = html_content.rfind("</body>")
             new_content = html_content[:closing_body_index] + content + html_content[closing_body_index:]
