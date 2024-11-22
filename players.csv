@@ -1,4 +1,4 @@
-nickname,stops_file,ev_stops_file,vehicles_file
-Zorie,playerdata/zorie_stops.csv,playerdata/zorie_ev_stops.txt,playerdata/zorie_vehicles.csv
-Sapphire,playerdata/sapphire_stops.csv,playerdata/sapphire_ev_stops.txt,playerdata/sapphire_vehicles.csv
-Camomile,playerdata/camomile_stops.csv,playerdata/camomile_ev_stops.txt,playerdata/camomile_vehicles.csv
+nickname,primary_color,tint_color,stops_file,ev_stops_file,vehicles_file
+Zorie,#4caf50,#93cf96,playerdata/zorie_stops.csv,playerdata/zorie_ev_stops.txt,playerdata/zorie_vehicles.csv
+Sapphire,#8566d9,#b5a3e8,playerdata/sapphire_stops.csv,playerdata/sapphire_ev_stops.txt,playerdata/sapphire_vehicles.csv
+Camomile,#ff9800,#ffc166,playerdata/camomile_stops.csv,playerdata/camomile_ev_stops.txt,playerdata/camomile_vehicles.csv

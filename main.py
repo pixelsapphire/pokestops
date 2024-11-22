@@ -1,173 +1,10 @@
 import csv
 import folium
-import os
 import requests
 import rjsmin
 import sys
 import zipfile
-from typing import Callable
-
-
-class Visit:
-    def __init__(self, name: str, date: str):
-        self.name: str = name
-        self.date: str = date
-
-    def __hash__(self):
-        return hash(self.name) + hash(self.date)
-
-    def __lt__(self, other):
-        return self.date < other.date if self.date != other.date else self.name > other.name
-
-
-class Stop:
-    def __init__(self, short_name: str, full_name: str, latitude: str, longitude: str, zone: str):
-        self.short_name: str = short_name
-        self.full_name: str = full_name
-        self.latitude: float = float(latitude)
-        self.longitude: float = float(longitude)
-        self.zone: str = zone
-        self.visits: set[Visit] = set()
-        self.regions: list[Region] = []
-
-    def __hash__(self):
-        return hash(self.short_name)
-
-    def __eq__(self, other):
-        return self.short_name == other.short_name
-
-    def in_one_of(self, towns: set[str]) -> bool:
-        return '/' in self.full_name and self.full_name[:self.full_name.index('/')] in towns
-
-    def visited_by(self, name: str, include_ev: bool = True) -> str | None:
-        return next((visit.date for visit in self.visits
-                     if name == visit.name and (visit.date != '2000-01-01' or include_ev)), None)
-
-    def add_visit(self, visit: Visit):
-        if self.visited_by(visit.name):
-            raise ValueError(f'{visit.name} already visited {self.short_name}, '
-                             f'remove the entry from {visit.date if visit.date != '2000-01-01' else 'her EV file'}')
-        self.visits.add(visit)
-
-    def marker(self) -> tuple[str, float, str | None]:
-        number = int(self.short_name[-2:])
-        if 0 < number < 20:
-            return '●', 1.1, None
-        elif 20 < number < 40:
-            return '★', 1, None
-        elif 40 < number < 70:
-            return '■', 0.9, 'transform: rotate(45deg);'
-        elif 70 < number < 90:
-            return '■', 0.9, None
-        else:
-            return '▲', 0.8, None
-
-
-class AchievementProgress:
-    def __init__(self, name: str, visited: int, total: int, completed: str | None = None):
-        self.name: str = name
-        self.description: str = 'Collect all of the following: '
-        self.visited: int = visited
-        self.total: int = total
-        self.completed: str | None = completed
-
-    def percentage(self) -> int:
-        return int(round(self.visited / self.total * 100))
-
-
-class Achievements:
-    def __init__(self):
-        self.stop_groups: dict[str, set[Stop]] = {}
-
-    def add_stop(self, s: Stop) -> None:
-        if s.full_name not in self.stop_groups:
-            self.stop_groups[s.full_name] = set()
-        self.stop_groups[s.full_name].add(s)
-
-
-class Carrier:
-    def __init__(self, symbol: str, name: str):
-        self.symbol: str = symbol
-        self.name: str = name
-
-    def __hash__(self):
-        return hash(self.symbol)
-
-    def __eq__(self, other):
-        return self.symbol == other.symbol if isinstance(other, type(self)) else False
-
-
-class Vehicle:
-    def __init__(self, vehicle_id: str, carrier: Carrier, kind: str, brand: str, model: str):
-        self.vehicle_id: str = vehicle_id
-        self.carrier: Carrier = carrier
-        self.kind: str = kind
-        self.brand: str = brand
-        self.model: str = model
-
-    def __hash__(self):
-        return hash(self.vehicle_id)
-
-    def __eq__(self, other):
-        return self.vehicle_id == other.vehicle_id if isinstance(other, type(self)) else False
-
-
-class Player:
-    def __init__(self, nickname: str, stops_file: str, ev_file: str, vehicles_file: str):
-        self.nickname: str = nickname
-        self.stops_file: str = stops_file
-        self.ev_file: str = ev_file
-        self.vehicles_file: str = vehicles_file
-        self.__achievements__: Achievements = Achievements()
-        self.__vehicles__: list[(Vehicle, str)] = []
-
-    def add_stop(self, s: Stop) -> None:
-        self.__achievements__.add_stop(s)
-
-    def add_vehicle(self, v: Vehicle, date: str) -> None:
-        self.__vehicles__.append((v, date))
-
-    def get_achievements(self, stops: dict[str, Stop], stop_groups: dict[str, set[str]]) -> list[AchievementProgress]:
-        prog = []
-        for group in self.__achievements__.stop_groups:
-            visited = len(self.__achievements__.stop_groups[group])
-            total = len(stop_groups[group])
-            if visited == total:
-                date = max(s.visited_by(self.nickname) for s in self.__achievements__.stop_groups[group])
-                prog.append(AchievementProgress(group, visited, total, date))
-            else:
-                prog.append(AchievementProgress(group, visited, total))
-            prog[-1].description += ', '.join(
-                sorted(s.short_name for s in stops.values() if s.full_name == group))
-        return sorted(prog, key=lambda p: (p.percentage(), p.completed), reverse=True)
-
-    @staticmethod
-    def init_file(path: str, initial_content: str = '') -> None:
-        if not os.path.exists(path):
-            with open(path, 'x') as new_file:
-                new_file.write(initial_content)
-
-    def init_files(self) -> None:
-        self.init_file(self.stops_file, 'stop_id,date_visited\n')
-        self.init_file(self.ev_file)
-        self.init_file(self.vehicles_file, 'vehicle_id,date_discovered\n')
-
-
-class Region:
-    def __init__(self, number: int, short_name: str, full_name: str, predicate: Callable[[Stop], bool]):
-        self.number: int = number
-        self.short_name: str = short_name
-        self.full_name: str = full_name
-        self.predicate: Callable[[Stop], bool] = predicate
-        self.stops: set[Stop] = set()
-
-    def add_stop(self, s: Stop) -> None:
-        self.stops.add(s)
-        s.regions.append(self)
-
-    def __contains__(self, item):
-        return self.predicate(item)
-
+from uibuilder import *
 
 district = Region(0, 'PZD', 'Poznań', lambda s: True)
 regions: dict[str, Region] = {r.short_name: r for r in {
@@ -393,77 +230,14 @@ def main() -> None:
             # noinspection PyTypeChecker
             folium.Marker(location=(stop.latitude, stop.longitude), popup=popup, icon=folium.DivIcon(html=marker)).add_to(fmap)
 
-        html_content: str = fmap.get_root().render()
-
-        script_begin = html_content.rfind('<script>')
-        script_end = html_content.rfind('</script>')
-        script = rjsmin.jsmin(html_content[script_begin + 8:script_end])
+        folium_html: str = fmap.get_root().render()
         with open('map.min.js', 'w') as script_file:
-            script_file.write(script)
-        html_content = html_content[:script_begin] + html_content[script_end + 9:]
+            script_file.write(rjsmin.jsmin(folium_html[folium_html.rfind('<script>') + 8:folium_html.rfind('</script>')]))
 
-        with open('static.html', "r") as static:
-            content = static.read()
-
-            content += (
-                '<p id="exploration" class="hud-text"><label id="region-selection">'
-                '<select class="dropdown hud-text" onchange="selectRegion()">'
-                f'{' '.join([f'<option value="{r.short_name}">{r.full_name}</option>'
-                             for r in sorted(regions.values(), key=lambda r: r.number)])}</select></label>'
-                f'<br><span id="exploration-progress">Exploration progress: <span id="exploration-percentage" '
-                f'{' '.join([f'data-{r.short_name.lower()}-{nick.lower()}={progress[r.short_name][nick]}'
-                             for nick in [p.nickname for p in players] + [f'ev-{p.nickname}' for p in players]
-                             for r in regions.values()])}>'
-                f'{progress['POZ']['Zorie']}</span>%</span></p>')
-
-            content += '<div class="sidebar" id="achievements">'
-            for player in players:
-                content += (f'<div class="progress-list" data-player="{player.nickname.lower()}"'
-                            f'{'style="display:none;"' if player.nickname != 'Zorie' else ''}>'
-                            f'<p class="center">Achievements completed: '
-                            f'{len(list(filter(lambda s: s.visited == s.total, player.get_achievements(stops, stop_groups))))}'
-                            '</p><table><tbody>')
-                for achievement in player.get_achievements(stops, stop_groups):
-                    time = achievement.completed if achievement.completed != '2000-01-01' \
-                        else '<span class="smaller">a long time ago</span>'
-                    achievement_progress = f'<span class="smaller">Completed</span><br>{time}' \
-                        if achievement.completed else f'{achievement.visited}/{achievement.total}'
-                    content += (f'<tr><td>{achievement.name}<br>'
-                                f'<p class="achievement-description">{achievement.description}</p></td>'
-                                f'<td class="achievement-progress">{achievement_progress}</td>')
-                content += '</tbody></table></div>'
-            content += ('</div><button class="toggle-sidebar" id="toggle-achievements" onclick="toggleAchievements()">'
-                        '<span class="sidebar-button-label">Achievements</span></button>')
-
-            content += '<div class="sidebar" id="vehicles">'
-            for player in players:
-                content += (f'<div class="progress-list" data-player="{player.nickname.lower()}"'
-                            f'{'style="display:none;"' if player.nickname != 'Zorie' else ''}>'
-                            f'<p class="center">Vehicles discovered: {len(player.__vehicles__)}</p><table><tbody>')
-                for vehicle, date in reversed(player.__vehicles__):
-                    content += (f'<tr><td><img class="vehicle-icon" src="assets/vehicles/{vehicle.kind}.webp"></img></td>'
-                                f'<td><img class="brand-logo" src="assets/brands/{vehicle.brand.lower()}.webp"></img></td>'
-                                f'<td><span class="smaller">{vehicle.brand}</span><br>'
-                                f'<span{' class="smaller"' if len(vehicle.model) >= 30 else ''}>{vehicle.model}</span><br>'
-                                f'<span class="larger"><b>#{vehicle.vehicle_id} </b></span>'
-                                f'<span class="smaller">({vehicle.carrier.name})</span></td>'
-                                f'<td class="achievement-progress">{date}</td>')
-                content += '</tbody></table></div>'
-            content += ('</div><button class="toggle-sidebar" id="toggle-vehicles" onclick="toggleVehicles()">'
-                        '<span class="sidebar-button-label">Vehicles</span></button>')
-            content += '<script src="map.min.js"></script>'
-
-            closing_body_index = html_content.rfind("</body>")
-            new_content = html_content[:closing_body_index] + content + html_content[closing_body_index:]
-
-            closing_head_index = new_content.rfind("</head>")
-            title = '<title>Pokestops</title>'
-            font = ('<link rel="stylesheet" href="https://fonts.googleapis.com/css2'
-                    '?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=light_mode" />')
-            new_content = new_content[:closing_head_index] + title + font + new_content[closing_head_index:]
-
-            with open('index.html', "w") as output:
-                output.write(new_content)
+        accessor: DataAccessor = DataAccessor(players, stops, stop_groups, regions, district, progress)
+        html_application = create_application(folium_html, accessor)
+        with open('index.html', 'w') as file:
+            file.write(html_application.render(True, True))
 
 
 update_ztm_stops = '--update' in sys.argv or '-u' in sys.argv

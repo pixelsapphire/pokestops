@@ -4,14 +4,10 @@ let activePlayer = 'Zorie';
 let activeRegion = 'POZ';
 let darkMode = true;
 
-// EV - fourth tints from color-hex.com
-let colors = {
-    'Zorie': ['#4caf50', '#93cf96'],
-    'Sapphire': ['#8566d9', '#b5a3e8'],
-    'Camomile': ['#ff9800', '#ffc166'],
-};
+const primary = 0;
+const tint = 1;
 
-function inject() {
+function injectThemeSwitcher() {
     let zoomControl = document.querySelector('.leaflet-control-zoom');
     let icon = document.createElement('img');
     icon.id = 'theme-icon';
@@ -34,13 +30,13 @@ function inject() {
 function refreshMap() {
 
     document.querySelectorAll(`.marker.visited-${activePlayer.toLowerCase()}.region-${activeRegion}:not(.ever-visited-${activePlayer.toLowerCase()})`).forEach(m => {
-        m.style.color = colors[activePlayer][0];
+        m.style.color = colors[activePlayer][primary];
         m.parentElement.style.display = null;
     });
     const everVisitedMarkers = document.querySelectorAll(`.marker.ever-visited-${activePlayer.toLowerCase()}.region-${activeRegion}`);
     if (showEverVisited)
         everVisitedMarkers.forEach(m => {
-            m.style.color = colors[activePlayer][1];
+            m.style.color = colors[activePlayer][tint];
             m.parentElement.style.display = null;
         });
     else
@@ -104,6 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
     activeRegion = localStorage.getItem('activeRegion') || 'POZ';
     document.querySelector("#region-selection select").value = activeRegion;
     darkMode = localStorage.getItem('darkMode') !== 'false';
-    inject();
+    injectThemeSwitcher();
     refreshMap();
 });
