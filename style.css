@@ -4,13 +4,30 @@
 }
 
 .hud-text {
-    -webkit-text-stroke-width: min(0.25vh, 0.25vw);
-    -webkit-text-stroke-color: black;
     color: white;
     font-family: Genshin, sans-serif;
     font-size: min(6vh, 6vw);
     z-index: 1000;
     text-align: right;
+}
+
+@supports (-webkit-text-stroke: min(0.25vh, 0.25vw) black) {
+    .hud-text {
+        -webkit-text-stroke: min(0.25vh, 0.25vw) black;
+    }
+}
+
+@supports not (-webkit-text-stroke: min(0.25vh, 0.25vw) black) {
+    .hud-text {
+        text-shadow: min(0.18vh, 0.18vw) min(0.18vh, 0.18vw) black,
+        max(-0.18vh, -0.18vw) min(0.18vh, 0.18vw) black,
+        min(0.18vh, 0.18vw) max(-0.18vh, -0.18vw) black,
+        max(-0.18vh, -0.18vw) max(-0.18vh, -0.18vw) black,
+        0 min(0.25vh, 0.25vw) black,
+        0 max(-0.25vh, -0.25vw) black,
+        min(0.25vh, 0.25vw) 0 black,
+        max(-0.25vh, -0.25vw) 0 black;
+    }
 }
 
 .marker {
@@ -36,6 +53,10 @@
 @supports not (-webkit-text-stroke: 4px white) {
     .marker {
         text-shadow: 3px 3px white, -3px 3px white, 3px -3px white, -3px -3px white, 0 4px white, 0 -4px white, 4px 0 white, -4px 0 white;
+    }
+
+    .marker.dark {
+        text-shadow: 3px 3px black, -3px 3px black, 3px -3px black, -3px -3px black, 0 4px black, 0 -4px black, 4px 0 black, -4px 0 black;
     }
 
     .leaflet-marker-pane {
@@ -80,8 +101,25 @@
 
 #exploration-progress {
     font-size: min(4.5vh, 4.5vw);
-    -webkit-text-stroke-width: min(0.2vh, 0.2vw);
-    -webkit-text-stroke-color: black;
+}
+
+@supports (-webkit-text-stroke: min(0.2vh, 0.2vw) black) {
+    #exploration-progress {
+        -webkit-text-stroke: min(0.2vh, 0.2vw) black
+    }
+}
+
+@supports not (-webkit-text-stroke: min(0.2vh, 0.2vw) black) {
+    #exploration-progress {
+        text-shadow: min(0.14vh, 0.14vw) min(0.14vh, 0.14vw) black,
+        max(-0.14vh, -0.14vw) min(0.14vh, 0.14vw) black,
+        min(0.14vh, 0.14vw) max(-0.14vh, -0.14vw) black,
+        max(-0.14vh, -0.14vw) max(-0.14vh, -0.14vw) black,
+        0 min(0.2vh, 0.2vw) black,
+        0 max(-0.2vh, -0.2vw) black,
+        min(0.2vh, 0.2vw) 0 black,
+        max(-0.2vh, -0.2vw) 0 black;
+    }
 }
 
 #compass {
@@ -94,7 +132,6 @@
 }
 
 /* toggle switch implementation styles */
-
 .toggle-switch {
     position: relative;
     display: inline-block;
@@ -142,7 +179,6 @@
 }
 
 /* end of toggle switch implementation styles  */
-
 .dropdown {
     background-color: rgb(112, 112, 112);
     border-radius: min(2vh, 2vw) min(2vh, 2vw);
@@ -246,8 +282,25 @@
     color: white;
     transform: translateX(-50%) rotate(-90deg) translateY(min(1vh, 1vw));
     display: inline-block;
-    -webkit-text-stroke-width: min(0.075vh, 0.075vw);
-    -webkit-text-stroke-color: black;
+}
+
+@supports (-webkit-text-stroke: min(0.075vh, 0.075vw) black) {
+    .sidebar-button-label {
+        -webkit-text-stroke: min(0.075vh, 0.075vw) black;
+    }
+}
+
+@supports not (-webkit-text-stroke: min(0.075vh, 0.075vw) black) {
+    .sidebar-button-label {
+        text-shadow: min(0.05vh, 0.05vw) min(0.05vh, 0.05vw) black,
+        max(-0.05vh, -0.05vw) min(0.05vh, 0.05vw) black,
+        min(0.05vh, 0.05vw) max(-0.05vh, -0.05vw) black,
+        max(-0.05vh, -0.05vw) max(-0.05vh, -0.05vw) black,
+        0 min(0.075vh, 0.075vw) black,
+        0 max(-0.075vh, -0.075vw) black,
+        min(0.075vh, 0.075vw) 0 black,
+        max(-0.075vh, -0.075vw) 0 black;
+    }
 }
 
 #toggle-vehicles {
