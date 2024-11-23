@@ -172,3 +172,6 @@ class Region:
 
     def __contains__(self, item):
         return self.predicate(item)
+
+    def __lt__(self, other):
+        return self.number < other.number

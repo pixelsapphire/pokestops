@@ -1,9 +1,9 @@
 import csv
 import folium
 import requests
-import rjsmin
 import sys
 import zipfile
+from postprocess import *
 from uibuilder import *
 
 district = Region(0, 'PZD', 'Poznań', lambda s: True)
@@ -47,7 +47,7 @@ regions: dict[str, Region] = {r.short_name: r for r in {
 }}
 
 
-def read_stops() -> (dict[str, Stop], dict[str, set[str]]):
+def read_stops() -> tuple[dict[str, Stop], dict[str, set[str]]]:
     stops: dict[str, Stop] = {}
     stop_groups: dict[str, set[str]] = {}
     with open('stops.csv', 'r', encoding='utf-8') as file:
@@ -215,29 +215,31 @@ def main() -> None:
         fmap: folium.Map = folium.Map(location=(avg_lat, avg_lon), zoom_start=12, prefer_canvas=True, zoom_control='bottomleft')
 
         for stop in stops.values():
+            stop_visits = sorted(stop.visits)
             classes = ' '.join(
-                [f'visited-{visit.name.lower()}' for visit in stop.visits] +
-                [f'ever-visited-{visit.name.lower()}' for visit in stop.visits if visit.date == '2000-01-01'] +
+                [f'visited-{visit.name.lower()}' for visit in stop_visits] +
+                [f'ever-visited-{visit.name.lower()}' for visit in stop_visits if visit.date == '2000-01-01'] +
                 [f'region-{region.short_name}' for region in stop.regions])
             visited_label = '<br>'.join(
                 [f'visited by {visit.name} {f'on {visit.date}' if visit.date != '2000-01-01' else 'a long time ago'}'
                  for visit in sorted(stop.visits)]) if stop.visits else 'not yet visited'
             icon, scale, style = stop.marker()
             marker = f'<div class="marker {classes}" style="font-size: {scale}em; {style}">{icon}</div>'
-            popup = folium.Popup(
-                f'<span class="stop-popup stop-name"><b>{stop.full_name}</b> [{stop.short_name}]</span>'
-                f'<br><span class="stop-popup stop-visitors">{visited_label}</span>')
+            popup = folium.Popup(f'<span class="stop-name">{stop.full_name} [{stop.short_name}]</span>'
+                                 f'<br><span class="stop-visitors">{visited_label}</span>')
             # noinspection PyTypeChecker
             folium.Marker(location=(stop.latitude, stop.longitude), popup=popup, icon=folium.DivIcon(html=marker)).add_to(fmap)
 
         folium_html: str = fmap.get_root().render()
+        map_script: str = folium_html[folium_html.rfind('<script>') + 8:folium_html.rfind('</script>')]
         with open('map.min.js', 'w') as script_file:
-            script_file.write(rjsmin.jsmin(folium_html[folium_html.rfind('<script>') + 8:folium_html.rfind('</script>')]))
+            script_file.write(clean_js(map_script))
 
         accessor: DataAccessor = DataAccessor(players, stops, stop_groups, regions, district, progress)
-        html_application = create_application(folium_html, accessor)
+        html_application: Html = create_application(folium_html, accessor)
+        rendered_html: str = html_application.render(True, True)
         with open('index.html', 'w') as file:
-            file.write(html_application.render(True, True))
+            file.write(clean_html(rendered_html))
 
 
 update_ztm_stops = '--update' in sys.argv or '-u' in sys.argv

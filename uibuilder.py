@@ -99,7 +99,7 @@ def create_region_exploration_section(db: DataAccessor) -> (P, Img):
                                                            f'{db.progress[r.short_name][nick]}')
                                     for nick in
                                     [p.nickname for p in db.players] + [f'ev-{p.nickname}' for p in db.players]
-                                    for r in db.regions.values()
+                                    for r in sorted(db.regions.values())
                                 ]
                             ],
                             f'{db.progress[db.district.short_name][db.players[0].nickname]}',
