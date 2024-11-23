@@ -59,7 +59,7 @@ function refreshMap() {
 
     document.querySelectorAll('.leaflet-layer,.leaflet-control-zoom-in,.leaflet-control-zoom-out,.leaflet-control-attribution,.leaflet-control-theme')
         .forEach(e => e.style.filter = darkMode ? 'invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)' : null);
-    document.querySelectorAll('.marker,.sidebar,.toggle-sidebar').forEach(e => e.classList.toggle('dark', darkMode));
+    document.querySelectorAll('.folium-map,.marker,.sidebar,.toggle-sidebar').forEach(e => e.classList.toggle('dark', darkMode));
 }
 
 function toggleUnvisited() {

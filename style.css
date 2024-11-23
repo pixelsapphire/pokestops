@@ -3,6 +3,10 @@
     src: url("assets/genshin.ttf");
 }
 
+.folium-map.dark {
+    background-color: #181818;
+}
+
 .hud-text {
     color: white;
     font-family: Genshin, sans-serif;
@@ -64,9 +68,17 @@
     }
 }
 
-.stop-popup {
+.leaflet-popup {
     white-space: nowrap;
     font-family: Genshin, sans-serif;
+}
+
+.folium-map.dark .leaflet-popup {
+    filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
+
+.folium-map.dark .leaflet-popup-content-wrapper {
+    box-shadow: 0 3px 14px rgba(255, 255, 255, 0.4); /* style copied from leaflet default, with white color to compensate for the invert filter */
 }
 
 .stop-name {
