@@ -237,9 +237,9 @@ def main() -> None:
 
         accessor: DataAccessor = DataAccessor(players, stops, stop_groups, regions, district, progress)
         html_application: Html = create_application(folium_html, accessor)
-        rendered_html: str = html_application.render(True, True)
+        rendered_application: str = html_application.render(True, True)
         with open('index.html', 'w') as file:
-            file.write(clean_html(rendered_html))
+            file.write(clean_html(rendered_application))
 
 
 update_ztm_stops = '--update' in sys.argv or '-u' in sys.argv

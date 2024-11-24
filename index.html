@@ -31,7 +31,8 @@
                 .leaflet-container { font-size: 1rem; }</style>
     <title>Pokestops</title>
     <link rel='stylesheet' type='text/css' href='https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0'/>
-    <link rel='stylesheet' type='text/css' href='style.css'/>
+    <link rel='stylesheet' type='text/css' href='style_common.css'/>
+    <link rel='stylesheet' type='text/css' href='style_map.css'/>
     <script>let colors={
 'Zorie':['#4caf50','#93cf96'],
 'Sapphire':['#8566d9','#b5a3e8'],
@@ -40,7 +41,6 @@
   </head>
   <body>
     <div class="folium-map" id="m" ></div>
-    <script src='map.min.js'></script>
     <div id='control'>
       <div style='display:table-cell;vertical-align:middle;'>
         <div style='margin:0;' class='hud-text'>Show unvisited</div>
@@ -2325,7 +2325,7 @@
         </table>
       </div>
     </div>
-    <button class='toggle-sidebar' id='toggle-achievements' onclick='toggleAchievements()'>
+    <button class='toggle-sidebar' id='toggle-achievements' onclick='toggleSidebar("achievements")'>
       <span class='sidebar-button-label'>Achievements</span>
     </button>
     <div class='sidebar' id='vehicles'>
@@ -2926,8 +2926,9 @@
         </table>
       </div>
     </div>
-    <button class='toggle-sidebar' id='toggle-vehicles' onclick='toggleVehicles()'>
+    <button class='toggle-sidebar' id='toggle-vehicles' onclick='toggleSidebar("vehicles")'>
       <span class='sidebar-button-label'>Vehicles</span>
     </button>
+    <script src='map.min.js'></script>
   </body>
 </html>

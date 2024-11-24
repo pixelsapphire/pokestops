@@ -5,7 +5,9 @@ from htmlBuilder.tags import *
 
 
 class CustomHtmlTagAttribute(HtmlTagAttribute):
-    def __init__(self, name: str, value: str):
+    def __init__(self, name: str, value: str | bool):
+        if isinstance(value, bool):
+            value = 'true' if value else 'false'
         super().__init__(value)
         self._name = name
 
@@ -36,8 +38,7 @@ def create_control_section(db: DataAccessor) -> Div:
                     Div(
                         [],
                         Label(
-                            [InlineStyle('margin:0;'), Class('toggle-switch'),
-                             Onclick('toggleUnvisited()')],
+                            [InlineStyle('margin:0;'), Class('toggle-switch'), Onclick('toggleUnvisited()')],
                             [
                                 Input([Id('visited-switch'), Type('checkbox')]),
                                 Span([Class('slider')]),
@@ -173,7 +174,7 @@ def create_achievements_sidebar(db: DataAccessor) -> (Div, Button):
             ],
         ),
         Button(
-            [Class('toggle-sidebar'), Id('toggle-achievements'), Onclick('toggleAchievements()')],
+            [Class('toggle-sidebar'), Id('toggle-achievements'), Onclick('toggleSidebar("achievements")')],
             [Span([Class('sidebar-button-label')], 'Achievements')],
         ),
     )
@@ -243,7 +244,7 @@ def create_vehicle_sidebar(db: DataAccessor) -> (Div, Button):
             ],
         ),
         Button(
-            [Class('toggle-sidebar'), Id('toggle-vehicles'), Onclick('toggleVehicles()')],
+            [Class('toggle-sidebar'), Id('toggle-vehicles'), Onclick('toggleSidebar("vehicles")')],
             [Span([Class('sidebar-button-label')], 'Vehicles')],
         ),
     )
@@ -261,7 +262,8 @@ def create_application(initial_html: str, db: DataAccessor) -> Html:
                     Link([Rel('stylesheet'), Type('text/css'),
                           Href('https://fonts.googleapis.com/css2'
                                '?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0')]),
-                    Link([Rel('stylesheet'), Type('text/css'), Href('style.css')]),
+                    Link([Rel('stylesheet'), Type('text/css'), Href('style_common.css')]),
+                    Link([Rel('stylesheet'), Type('text/css'), Href('style_map.css')]),
                     Script([], f'let colors={{\n{",\n".join(f'\'{p.nickname}\':[\'{p.primary_color}\',\'{p.tint_color}\']'
                                                             for p in db.players)}}};'),
                     Script([Src('control.js')]),
@@ -271,11 +273,11 @@ def create_application(initial_html: str, db: DataAccessor) -> Html:
                 [],
                 [
                     (initial_html[initial_html.find('<body>') + 6:initial_html.find('</body>')]).strip(),
-                    Script([Src('map.min.js')]),
                     create_control_section(db),
                     *create_region_exploration_section(db),
                     *create_achievements_sidebar(db),
                     *create_vehicle_sidebar(db),
+                    Script([Src('map.min.js')]),
                 ],
             ),
         ],

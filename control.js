@@ -84,14 +84,9 @@ function selectRegion() {
     refreshMap();
 }
 
-function toggleAchievements() {
-    document.querySelector('#achievements').classList.toggle('expanded');
-    document.querySelector('#toggle-achievements').classList.toggle('expanded');
-}
-
-function toggleVehicles() {
-    document.querySelector('#vehicles').classList.toggle('expanded');
-    document.querySelector('#toggle-vehicles').classList.toggle('expanded');
+function toggleSidebar(sidebar) {
+    document.querySelector(`#${sidebar}`).classList.toggle('expanded');
+    document.querySelector(`#toggle-${sidebar}`).classList.toggle('expanded');
 }
 
 document.addEventListener('DOMContentLoaded', () => {

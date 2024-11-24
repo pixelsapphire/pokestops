@@ -1,0 +1,8 @@
+@font-face {
+    font-family: "Genshin";
+    src: url("assets/genshin.ttf");
+}
+
+.hidden {
+    display: none;
+}

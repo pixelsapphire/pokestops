@@ -1,8 +1,3 @@
-@font-face {
-    font-family: "Genshin";
-    src: url("assets/genshin.ttf");
-}
-
 .folium-map.dark {
     background-color: #181818;
 }
@@ -10,27 +5,27 @@
 .hud-text {
     color: white;
     font-family: Genshin, sans-serif;
-    font-size: min(6vh, 6vw);
+    font-size: min(6dvh, 6dvw);
     z-index: 1000;
     text-align: right;
 }
 
-@supports (-webkit-text-stroke: min(0.25vh, 0.25vw) black) {
+@supports (-webkit-text-stroke: min(0.25dvh, 0.25dvw) black) {
     .hud-text {
-        -webkit-text-stroke: min(0.25vh, 0.25vw) black;
+        -webkit-text-stroke: min(0.25dvh, 0.25dvw) black;
     }
 }
 
-@supports not (-webkit-text-stroke: min(0.25vh, 0.25vw) black) {
+@supports not (-webkit-text-stroke: min(0.25dvh, 0.25dvw) black) {
     .hud-text {
-        text-shadow: min(0.18vh, 0.18vw) min(0.18vh, 0.18vw) black,
-        max(-0.18vh, -0.18vw) min(0.18vh, 0.18vw) black,
-        min(0.18vh, 0.18vw) max(-0.18vh, -0.18vw) black,
-        max(-0.18vh, -0.18vw) max(-0.18vh, -0.18vw) black,
-        0 min(0.25vh, 0.25vw) black,
-        0 max(-0.25vh, -0.25vw) black,
-        min(0.25vh, 0.25vw) 0 black,
-        max(-0.25vh, -0.25vw) 0 black;
+        text-shadow: min(0.18dvh, 0.18dvw) min(0.18dvh, 0.18dvw) black,
+        max(-0.18dvh, -0.18dvw) min(0.18dvh, 0.18dvw) black,
+        min(0.18dvh, 0.18dvw) max(-0.18dvh, -0.18dvw) black,
+        max(-0.18dvh, -0.18dvw) max(-0.18dvh, -0.18dvw) black,
+        0 min(0.25dvh, 0.25dvw) black,
+        0 max(-0.25dvh, -0.25dvw) black,
+        min(0.25dvh, 0.25dvw) 0 black,
+        max(-0.25dvh, -0.25dvw) 0 black;
     }
 }
 
@@ -82,29 +77,25 @@
 }
 
 .stop-name {
-    font-size: min(2vh, 2vw);
+    font-size: min(2dvh, 2dvw);
 }
 
 .stop-visitors {
-    font-size: min(1.5vh, 1.5vw);
-}
-
-.hidden {
-    displaY: none;
+    font-size: min(1.5dvh, 1.5dvw);
 }
 
 #control {
     position: absolute;
-    top: min(3vh, 3vw);
-    right: min(5vh, 5vw);
+    top: min(3dvh, 3dvw);
+    right: min(5dvh, 5dvw);
     z-index: 1000;
     text-align: right;
 }
 
 #exploration {
     position: absolute;
-    bottom: min(3vh, 3vw);
-    right: min(17vh, 17vw);
+    bottom: min(3dvh, 3dvw);
+    right: min(17dvh, 17dvw);
 }
 
 #exploration {
@@ -112,34 +103,34 @@
 }
 
 #exploration-progress {
-    font-size: min(4.5vh, 4.5vw);
+    font-size: min(4.5dvh, 4.5dvw);
 }
 
-@supports (-webkit-text-stroke: min(0.2vh, 0.2vw) black) {
+@supports (-webkit-text-stroke: min(0.2dvh, 0.2dvw) black) {
     #exploration-progress {
-        -webkit-text-stroke: min(0.2vh, 0.2vw) black
+        -webkit-text-stroke: min(0.2dvh, 0.2dvw) black
     }
 }
 
-@supports not (-webkit-text-stroke: min(0.2vh, 0.2vw) black) {
+@supports not (-webkit-text-stroke: min(0.2dvh, 0.2dvw) black) {
     #exploration-progress {
-        text-shadow: min(0.14vh, 0.14vw) min(0.14vh, 0.14vw) black,
-        max(-0.14vh, -0.14vw) min(0.14vh, 0.14vw) black,
-        min(0.14vh, 0.14vw) max(-0.14vh, -0.14vw) black,
-        max(-0.14vh, -0.14vw) max(-0.14vh, -0.14vw) black,
-        0 min(0.2vh, 0.2vw) black,
-        0 max(-0.2vh, -0.2vw) black,
-        min(0.2vh, 0.2vw) 0 black,
-        max(-0.2vh, -0.2vw) 0 black;
+        text-shadow: min(0.14dvh, 0.14dvw) min(0.14dvh, 0.14dvw) black,
+        max(-0.14dvh, -0.14dvw) min(0.14dvh, 0.14dvw) black,
+        min(0.14dvh, 0.14dvw) max(-0.14dvh, -0.14dvw) black,
+        max(-0.14dvh, -0.14dvw) max(-0.14dvh, -0.14dvw) black,
+        0 min(0.2dvh, 0.2dvw) black,
+        0 max(-0.2dvh, -0.2dvw) black,
+        min(0.2dvh, 0.2dvw) 0 black,
+        max(-0.2dvh, -0.2dvw) 0 black;
     }
 }
 
 #compass {
     position: absolute;
-    bottom: min(5vh, 5vw);
-    right: min(5vh, 5vw);
-    width: min(10vh, 10vw);
-    height: min(10vh, 10vw);
+    bottom: min(5dvh, 5dvw);
+    right: min(5dvh, 5dvw);
+    width: min(10dvh, 10dvw);
+    height: min(10dvh, 10dvw);
     z-index: 1000;
 }
 
@@ -147,8 +138,8 @@
 .toggle-switch {
     position: relative;
     display: inline-block;
-    width: min(12vh, 12vw);
-    height: min(6vh, 6vw);
+    width: min(12dvh, 12dvw);
+    height: min(6dvh, 6dvw);
 }
 
 .toggle-switch input {
@@ -166,8 +157,8 @@
     bottom: 0;
     background-color: #aaa;
     transition: linear 0.5s;
-    border: min(0.5vh, 0.5vw) solid black;
-    border-radius: min(3vh, 3vw);
+    border: min(0.5dvh, 0.5dvw) solid black;
+    border-radius: min(3dvh, 3dvw);
 }
 
 .toggle-switch input:checked + .slider {
@@ -177,44 +168,44 @@
 .slider:before {
     content: "";
     position: absolute;
-    width: min(4.5vh, 4.5vw);
-    height: min(4.5vh, 4.5vw);
-    left: min(0.75vh, 0.75vw);
-    top: min(0.375vh, 0.375vw);
+    width: min(4.5dvh, 4.5dvw);
+    height: min(4.5dvh, 4.5dvw);
+    left: min(0.75dvh, 0.75dvw);
+    top: min(0.375dvh, 0.375dvw);
     background-color: white;
-    border-radius: min(2.25vh, 2.25vw);
+    border-radius: min(2.25dvh, 2.25dvw);
     transition: cubic-bezier(0, 0.67, 0.67, 1) 0.5s;
 }
 
 .toggle-switch input:checked + .slider:before {
-    transform: translateX(min(4.875vh, 4.875vw));
+    transform: translateX(min(4.875dvh, 4.875dvw));
 }
 
 /* end of toggle switch implementation styles  */
 .dropdown {
     background-color: rgb(112, 112, 112);
-    border-radius: min(2vh, 2vw) min(2vh, 2vw);
-    border: min(0.5vh, 0.5vw) solid black;
-    padding: 0 min(2vh, 2vw);
-    margin-top: min(1vh, 1vw);
+    border-radius: min(2dvh, 2dvw) min(2dvh, 2dvw);
+    border: min(0.5dvh, 0.5dvw) solid black;
+    padding: 0 min(2dvh, 2dvw);
+    margin-top: min(1dvh, 1dvw);
     text-align: center;
 }
 
 .sidebar {
     position: absolute;
     left: 0;
-    top: 10vh;
-    height: 80vh;
-    width: min(60vh, 60vw);
+    top: 2dvh;
+    height: 86dvh;
+    width: min(60dvh, 60dvw);
     z-index: 1200;
     background-color: rgb(224, 223, 223);
-    border: min(0.5vh, 0.5vw) solid black;
+    border: min(0.5dvh, 0.5dvw) solid black;
     border-left: none;
-    border-radius: 0 min(2vh, 2vw) min(2vh, 2vw) 0;
-    padding: min(2vh, 2vw);
+    border-radius: 0 min(2dvh, 2dvw) min(2dvh, 2dvw) 0;
+    padding: min(2dvh, 2dvw);
     overflow: scroll;
     font-family: Genshin, sans-serif;
-    font-size: min(2vh, 2vw);
+    font-size: min(2dvh, 2dvw);
     display: none;
 }
 
@@ -236,7 +227,7 @@
 }
 
 .progress-list table td {
-    padding-bottom: min(0.5vh, 0.5vw);
+    padding-bottom: min(0.5dvh, 0.5dvw);
 }
 
 .achievement-progress {
@@ -246,17 +237,17 @@
 
 .achievement-description {
     color: gray;
-    font-size: min(1.25vh, 1.25vw);
+    font-size: min(1.25dvh, 1.25dvw);
     line-height: 1.25;
 }
 
 .brand-logo {
-    height: min(4vh, 4vw);
+    height: min(4dvh, 4dvw);
 }
 
 .vehicle-icon {
-    height: min(4vh, 4vw);
-    padding-bottom: min(0.75vh, 0.75vw);
+    height: min(4dvh, 4dvw);
+    padding-bottom: min(0.75dvh, 0.75dvw);
 }
 
 .center {
@@ -264,11 +255,11 @@
 }
 
 .smaller {
-    font-size: min(1.75vh, 1.75vw);
+    font-size: min(1.75dvh, 1.75dvw);
 }
 
 .larger {
-    font-size: min(2.5vh, 2.5vw);
+    font-size: min(2.5dvh, 2.5dvw);
 }
 
 .toggle-sidebar {
@@ -277,41 +268,41 @@
     transform: translateY(-50%);
     z-index: 1100;
     background-color: rgb(112, 112, 112);
-    border-radius: 0 min(2vh, 2vw) min(2vh, 2vw) 0;
-    border: min(0.5vh, 0.5vw) solid black;
+    border-radius: 0 min(2dvh, 2dvw) min(2dvh, 2dvw) 0;
+    border: min(0.5dvh, 0.5dvw) solid black;
     border-left: none;
-    height: min(20vh, 20vw);
-    width: min(4vh, 4vw);
+    height: min(20dvh, 20dvw);
+    width: min(4dvh, 4dvw);
 }
 
 .toggle-sidebar.expanded {
-    left: min(60vh, 60vw);
+    left: min(60dvh, 60dvw);
 }
 
 .sidebar-button-label {
-    font-size: min(2vh, 2vw);
+    font-size: min(2dvh, 2dvw);
     font-family: Genshin, sans-serif;
     color: white;
-    transform: translateX(-50%) rotate(-90deg) translateY(min(1vh, 1vw));
+    transform: translateX(-50%) rotate(-90deg) translateY(min(1dvh, 1dvw));
     display: inline-block;
 }
 
-@supports (-webkit-text-stroke: min(0.075vh, 0.075vw) black) {
+@supports (-webkit-text-stroke: min(0.075dvh, 0.075dvw) black) {
     .sidebar-button-label {
-        -webkit-text-stroke: min(0.075vh, 0.075vw) black;
+        -webkit-text-stroke: min(0.075dvh, 0.075dvw) black;
     }
 }
 
-@supports not (-webkit-text-stroke: min(0.075vh, 0.075vw) black) {
+@supports not (-webkit-text-stroke: min(0.075dvh, 0.075dvw) black) {
     .sidebar-button-label {
-        text-shadow: min(0.05vh, 0.05vw) min(0.05vh, 0.05vw) black,
-        max(-0.05vh, -0.05vw) min(0.05vh, 0.05vw) black,
-        min(0.05vh, 0.05vw) max(-0.05vh, -0.05vw) black,
-        max(-0.05vh, -0.05vw) max(-0.05vh, -0.05vw) black,
-        0 min(0.075vh, 0.075vw) black,
-        0 max(-0.075vh, -0.075vw) black,
-        min(0.075vh, 0.075vw) 0 black,
-        max(-0.075vh, -0.075vw) 0 black;
+        text-shadow: min(0.05dvh, 0.05dvw) min(0.05dvh, 0.05dvw) black,
+        max(-0.05dvh, -0.05dvw) min(0.05dvh, 0.05dvw) black,
+        min(0.05dvh, 0.05dvw) max(-0.05dvh, -0.05dvw) black,
+        max(-0.05dvh, -0.05dvw) max(-0.05dvh, -0.05dvw) black,
+        0 min(0.075dvh, 0.075dvw) black,
+        0 max(-0.075dvh, -0.075dvw) black,
+        min(0.075dvh, 0.075dvw) 0 black,
+        max(-0.075dvh, -0.075dvw) 0 black;
     }
 }
 
