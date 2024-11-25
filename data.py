@@ -107,6 +107,12 @@ class Vehicle:
     def __eq__(self, other):
         return self.vehicle_id == other.vehicle_id if isinstance(other, type(self)) else False
 
+    def __cmp_key__(self):
+        return int(self.vehicle_id) if self.vehicle_id.isdigit() else int(self.vehicle_id[:self.vehicle_id.index('+')])
+
+    def __lt__(self, other):
+        return self.__cmp_key__() < other.__cmp_key__() if isinstance(other, type(self)) else False
+
 
 class Player:
     def __init__(self, nickname: str, primary_color: str, tint_color: str, stops_file: str, ev_file: str, vehicles_file: str):

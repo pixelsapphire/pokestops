@@ -15,13 +15,15 @@ class CustomHtmlTagAttribute(HtmlTagAttribute):
 
 class DataAccessor:
     def __init__(self, players: list[Player], stops: dict[str, Stop], stop_groups: dict[str, set[str]],
-                 regions: dict[str, Region], district: Region, progress: dict[str, dict[str, float]]):
+                 regions: dict[str, Region], district: Region, progress: dict[str, dict[str, float]],
+                 vehicles: dict[str, Vehicle]):
         self.players: list[Player] = players
         self.stops: dict[str, Stop] = stops
         self.stop_groups: dict[str, set[str]] = stop_groups
         self.regions: dict[str, Region] = regions
         self.district: Region = district
         self.progress: dict[str, dict[str, float]] = progress
+        self.vehicles: dict[str, Vehicle] = vehicles
         self.__stars__: dict[tuple[int, int], int] = {(1, 1): 1, (2, 2): 2, (3, 4): 3, (5, 7): 4, (8, 100): 5}
 
     def get_stars_for_group(self, size: int):
@@ -339,17 +341,6 @@ def create_navigation() -> Div:
     )
 
 
-def create_stop_preview(stop: Stop) -> Div:
-    icon = stop.marker()[0]
-    return Div(
-        [Class('stop-preview'), CustomHtmlTagAttribute('data-stop-id', stop.short_name)],
-        [
-            Img([Class('marker'), Src(f'assets/markers/{icon}.svg')]),
-            Span([Class('stop-id')], stop.short_name),
-        ],
-    )
-
-
 def create_stop_group_view(db: DataAccessor, group: str, stop_names: set[str]) -> Div:
     stops: list[Stop] = list(sorted((db.stops[stop] for stop in stop_names), key=lambda s: s.short_name))
     region: Region = next(iter(set(db.stops[next(iter(stop_names))].regions) - {db.district}))
@@ -370,7 +361,19 @@ def create_stop_group_view(db: DataAccessor, group: str, stop_names: set[str]) -
                     Div([Class('expand-icon material-symbols-outlined')], 'add'),
                 ],
             ),
-            Div([Class('group-stops')], [create_stop_preview(stop) for stop in stops]),
+            Div(
+                [Class('group-stops')],
+                [
+                    Div(
+                        [Class('stop-preview'), CustomHtmlTagAttribute('data-stop-id', stop.short_name)],
+                        [
+                            Img([Class('marker'), Src(f'assets/markers/{stop.marker()[0]}.svg')]),
+                            Span([Class('stop-id')], stop.short_name),
+                        ],
+                    )
+                    for stop in stops
+                ],
+            ),
         ],
     )
 
@@ -384,11 +387,11 @@ def create_stops_page(db: DataAccessor) -> Div:
                 [create_stop_group_view(db, group, stops) for group, stops in sorted(db.stop_groups.items())],
             ),
             Div(
-                [Class('content-section'), Id('stop-view')],
+                [Class('content-section object-view'), Id('stop-view')],
                 [
-                    Div([Id('stop-name')]),
+                    Div([Id('stop-name'), Class('name-label')]),
                     Table(
-                        [Id('stop-details'), Class('hidden')],
+                        [Id('stop-details'), Class('details-table hidden')],
                         [
                             Tr(
                                 [],
@@ -412,7 +415,8 @@ def create_stops_page(db: DataAccessor) -> Div:
                                                 [Id('street-view-link'), Href('#'), Target('_blank')],
                                                 [
                                                     Span([], 'view the location'),
-                                                    Span([Class('material-icon material-symbols-outlined')], 'arrow_forward_ios'),
+                                                    Span([Class('material-icon material-symbols-outlined')],
+                                                         'arrow_forward_ios'),
                                                 ],
                                             ),
                                         ],
@@ -428,14 +432,60 @@ def create_stops_page(db: DataAccessor) -> Div:
     )
 
 
-def create_vehicles_page() -> Div:
+def create_vehicle_preview(vehicle: Vehicle) -> Div:
+    return Div(
+        [Class('vehicle-preview'), CustomHtmlTagAttribute('data-vehicle-id', vehicle.vehicle_id)],
+        [
+            Img([Class('vehicle-icon'), Src(f'assets/vehicles/{vehicle.kind}.webp')]),
+            Img([Class('vehicle-brand'), Src(f'assets/brands/{vehicle.brand.lower()}.webp')]),
+            Div([Class('vehicle-id')], f'#{vehicle.vehicle_id}'),
+        ],
+    )
+
+
+def create_vehicles_page(db: DataAccessor) -> Div:
     return Div(
         [
             Class('content-container'),
             Id('container-vehicles'),
         ],
         [
-            'Here be dragons',
+            Div(
+                [Class('content-section'), Id('vehicles-index')],
+                [create_vehicle_preview(vehicle) for vehicle in sorted(db.vehicles.values())],
+            ),
+            Div(
+                [Class('content-section object-view'), Id('vehicle-view')],
+                [
+                    Div([Id('vehicle-name'), Class('name-label')]),
+                    Table(
+                        [Id('vehicle-details'), Class('details-table hidden')],
+                        [
+                            Tr(
+                                [],
+                                [
+                                    Td([Class('nowrap')], 'brand:'),
+                                    Td([Id('vehicle-brand')]),
+                                ],
+                            ),
+                            Tr(
+                                [],
+                                [
+                                    Td([Class('nowrap')], 'model:'),
+                                    Td([Id('vehicle-model')]),
+                                ],
+                            ),
+                            Tr(
+                                [],
+                                [
+                                    Td([Class('nowrap')], 'carrier:'),
+                                    Td([Id('vehicle-carrier')]),
+                                ],
+                            ),
+                        ],
+                    )
+                ],
+            ),
         ],
     )
 
@@ -454,6 +504,7 @@ def create_archive(db: DataAccessor) -> Html:
                     Link([Rel('stylesheet'), Type('text/css'), Href('style_common.css')]),
                     Link([Rel('stylesheet'), Type('text/css'), Href('style_archive.css')]),
                     Script([Src('stops_data.min.js')]),
+                    Script([Src('vehicles_data.min.js')]),
                     Script([Src('control_archive.js')]),
                 ],
             ),
@@ -466,7 +517,7 @@ def create_archive(db: DataAccessor) -> Html:
                         [
                             create_navigation(),
                             create_stops_page(db),
-                            create_vehicles_page(),
+                            create_vehicles_page(db),
                         ],
                     ),
                 ],

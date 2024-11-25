@@ -138,6 +138,14 @@ def make_stop_entry(stop: Stop) -> str:
             f'}},')
 
 
+def make_vehicle_entry(vehicle: Vehicle) -> str:
+    return (f'"{vehicle.vehicle_id}":{{'
+            f'b:"{vehicle.brand}",'
+            f'm:"{vehicle.model}",'
+            f'c:"{vehicle.carrier.name}",'
+            f'}},')
+
+
 def main() -> None:
     players: list[Player] = []
     with open('players.csv', 'r') as file:
@@ -290,7 +298,7 @@ def main() -> None:
         with open('map.min.js', 'w') as script_file:
             script_file.write(clean_js(map_script))
 
-        accessor: DataAccessor = DataAccessor(players, stops, stop_groups, regions, district, progress)
+        accessor: DataAccessor = DataAccessor(players, stops, stop_groups, regions, district, progress, vehicles)
         html_application: Html = create_application(folium_html, accessor)
         rendered_application: str = clean_html(html_application.render(True, True))
         with open('index.html', 'w') as file:
@@ -298,6 +306,9 @@ def main() -> None:
 
         with open('stops_data.min.js', 'w') as file:
             file.write(f'const stops = {{\n{'\n'.join(map(make_stop_entry, stops.values()))}\n}};')
+
+        with open('vehicles_data.min.js', 'w') as file:
+            file.write(f'const vehicles = {{\n{'\n'.join(map(make_vehicle_entry, vehicles.values()))}\n}};')
 
         html_archive: Html = create_archive(accessor)
         rendered_archive: str = clean_html(html_archive.render(True, True))
