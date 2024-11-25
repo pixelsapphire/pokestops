@@ -12,6 +12,8 @@ vehicle_id,carrier,kind,brand,model
 437,PZ,tram,Modertrans,Moderus Beta MF02 AC
 446,PZ,tram,Modertrans,Moderus Beta MF20 AC
 500,PZ,tram,Modertrans,Moderus Gamma LF01 AC
+507,PZ,tram,Siemens,Combino Classic
+512,PZ,tram,Siemens,Combino Classic
 518,PZ,tram,Solaris,Tramino S105P
 522,PZ,tram,Solaris,Tramino S105P
 530,PZ,tram,Solaris,Tramino S105P
@@ -36,6 +38,7 @@ vehicle_id,carrier,kind,brand,model
 1313,PZ,bus,Mercedes-Benz,Conecto G
 1315,PZ,bus,Mercedes-Benz,Conecto G
 1318,PZ,bus,Mercedes-Benz,Conecto G
+1460,PZ,bus,Solaris,Urbino 12 III gen
 1474,PZ,bus,Solaris,Urbino 12 III gen
 1613,PZ,bus,Solaris,Urbino 18 hydrogen IV gen
 1617,PZ,bus,Solaris,Urbino 18 hydrogen IV gen
