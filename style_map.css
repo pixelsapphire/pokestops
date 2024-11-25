@@ -209,6 +209,10 @@
     display: none;
 }
 
+.sidebar::-webkit-scrollbar {
+    display: none;
+}
+
 .sidebar.expanded {
     display: block;
 }
