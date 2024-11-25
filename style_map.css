@@ -306,12 +306,16 @@
     }
 }
 
+#open-archive {
+    top: 21%;
+}
+
 #toggle-vehicles {
-    top: 38%;
+    top: 45%;
 }
 
 #toggle-achievements {
-    top: 62%;
+    top: 69%;
 }
 
 #theme-icon {

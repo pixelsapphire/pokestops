@@ -29,10 +29,10 @@ def clean_html(html: str) -> str:
         return f'{match.group(1)}{match.group(2).strip()}' if match.group(2).count('\n') <= 2 else match.group(0)
 
     html: str = re.sub(r'map_[0-9a-f]{32}', map_name, html)
-    html = re.sub(r'(<[a-zA-Z][^/>]*>)([^<]*)(</[a-zA-Z]+>)', fold_tag, html)  # fold trivial tags
-    html = re.sub(r'([^<\s]*)\s*<br\s*/?>\s*(<[a-zA-Z][^/>]*>)', strip_whitespace_around_br, html)  # text<br><tag[stuff]>
-    html = re.sub(r'(</[a-zA-Z]*>)\s*<br\s*/?>\s*([^<\s]*)', strip_whitespace_around_br, html)  # </tag><br>text
-    html = re.sub(r'( *)((<[a-zA-Z]+ )[a-zA-Z][^/>]*(data-[a-zA-Z][^/>]*)+>)([^<]*)(</[a-zA-Z]+>)', data_on_new_lines, html)
+    html = re.sub(r'(<[a-zA-Z0-9][^/>]*>)([^<]*)(</[a-zA-Z0-9]+>)', fold_tag, html)  # fold trivial tags
+    html = re.sub(r'([^<\s]*)\s*<br\s*/?>\s*(<[a-zA-Z0-9][^/>]*>)', strip_whitespace_around_br, html)  # text<br><tag[stuff]>
+    html = re.sub(r'(</[a-zA-Z0-9]*>)\s*<br\s*/?>\s*([^<\s]*)', strip_whitespace_around_br, html)  # </tag><br>text
+    html = re.sub(r'( *)((<[a-zA-Z0-9]+ )[a-zA-Z][^/>]*(data-[a-zA-Z][^/>]*)+>)([^<]*)(</[a-zA-Z0-9]+>)', data_on_new_lines, html)
     html = re.sub(r'(<td[^>]*>)([\s\S]*?)(?=</td>)', fold_table_cell, html)
     return html
 

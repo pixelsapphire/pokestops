@@ -15,7 +15,7 @@ class Visit:
 
 
 class Stop:
-    def __init__(self, short_name: str, full_name: str, latitude: str, longitude: str, zone: str):
+    def __init__(self, short_name: str, full_name: str, latitude: str, longitude: str, zone: str, routes: str):
         self.short_name: str = short_name
         self.full_name: str = full_name
         self.latitude: float = float(latitude)
@@ -23,6 +23,8 @@ class Stop:
         self.zone: str = zone
         self.visits: set[Visit] = set()
         self.regions: list[Region] = []
+        self.lines: list[tuple[int, str]] = list(map(lambda e: (int(e[:e.index(':')]), e[e.index(':') + 1:]),
+                                                     routes.split('&')))
 
     def __hash__(self):
         return hash(self.short_name)
@@ -43,18 +45,18 @@ class Stop:
                   f'remove the entry from {visit.date if visit.date != '2000-01-01' else 'her EV file'}')
         self.visits.add(visit)
 
-    def marker(self) -> tuple[str, float, str | None]:
+    def marker(self) -> tuple[str, str, float, str | None]:
         number = int(self.short_name[-2:])
         if 0 < number < 20:
-            return '●', 1.1, None
+            return 'circle', '●', 1.1, None
         elif 20 < number < 40:
-            return '★', 1, None
+            return 'star', '★', 1, None
         elif 40 < number < 70:
-            return '■', 0.9, 'transform: rotate(45deg);'
+            return 'diamond', '■', 0.9, 'transform: rotate(45deg);'
         elif 70 < number < 90:
-            return '■', 0.9, None
+            return 'square', '■', 0.9, None
         else:
-            return '▲', 0.8, None
+            return 'triangle', '▲', 0.8, None
 
 
 class AchievementProgress:

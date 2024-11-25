@@ -1,3 +1,4 @@
+import util
 from data import *
 from htmlBuilder.attributes import *
 from htmlBuilder.attributes import Style as InlineStyle
@@ -5,7 +6,7 @@ from htmlBuilder.tags import *
 
 
 class CustomHtmlTagAttribute(HtmlTagAttribute):
-    def __init__(self, name: str, value: str | bool):
+    def __init__(self, name: str, value: str | bool | None):
         if isinstance(value, bool):
             value = 'true' if value else 'false'
         super().__init__(value)
@@ -21,6 +22,10 @@ class DataAccessor:
         self.regions: dict[str, Region] = regions
         self.district: Region = district
         self.progress: dict[str, dict[str, float]] = progress
+        self.__stars__: dict[tuple[int, int], int] = {(1, 1): 1, (2, 2): 2, (3, 4): 3, (5, 7): 4, (8, 100): 5}
+
+    def get_stars_for_group(self, size: int):
+        return next((stars for ((min_size, max_size), stars) in self.__stars__.items() if min_size <= size <= max_size), 0)
 
 
 def create_control_section(db: DataAccessor) -> Div:
@@ -250,6 +255,13 @@ def create_vehicle_sidebar(db: DataAccessor) -> (Div, Button):
     )
 
 
+def create_archive_button() -> Button:
+    return Button(
+        [Class('toggle-sidebar'), Id('open-archive'), Onclick('window.location.href = "archive.html";')],
+        [Span([Class('sidebar-button-label')], 'Archive')],
+    )
+
+
 def create_application(initial_html: str, db: DataAccessor) -> Html:
     return Html(
         [Lang('en')],
@@ -266,7 +278,7 @@ def create_application(initial_html: str, db: DataAccessor) -> Html:
                     Link([Rel('stylesheet'), Type('text/css'), Href('style_map.css')]),
                     Script([], f'let colors={{\n{",\n".join(f'\'{p.nickname}\':[\'{p.primary_color}\',\'{p.tint_color}\']'
                                                             for p in db.players)}}};'),
-                    Script([Src('control.js')]),
+                    Script([Src('control_map.js')]),
                 ],
             ),
             Body(
@@ -277,7 +289,186 @@ def create_application(initial_html: str, db: DataAccessor) -> Html:
                     *create_region_exploration_section(db),
                     *create_achievements_sidebar(db),
                     *create_vehicle_sidebar(db),
+                    create_archive_button(),
                     Script([Src('map.min.js')]),
+                ],
+            ),
+        ],
+    )
+
+
+def create_title() -> Div:
+    return Div(
+        [Id('title-container')],
+        [
+            Div(
+                [
+                    Id('back-icon'),
+                    Class('material-icon material-symbols-outlined'),
+                    Onclick('window.location.href = "index.html";'),
+                ],
+                'arrow_back_ios'
+            ),
+            Div([Id('title-icon'), Class('material-icon material-symbols-outlined')], 'auto_stories'),
+            Div([Id('title')], 'Pokestops Archive'),
+        ],
+    )
+
+
+def create_navigation() -> Div:
+    return Div(
+        [
+            Id('navigation'),
+        ],
+        [
+            Div(
+                [Class('navigation-tile selected'), Onclick('openTab(this, "stops")')],
+                [
+                    Span([Class('material-icon material-symbols-outlined')], 'pin_drop'),
+                    Span([], ['Stops'])
+                ],
+            ),
+            Div(
+                [Class('navigation-tile'), Onclick('openTab(this, "vehicles")')],
+                [
+                    Span([Class('material-icon material-symbols-outlined')], 'tram'),
+                    Span([], ['Vehicles'])
+                ],
+            ),
+        ],
+    )
+
+
+def create_stop_preview(stop: Stop) -> Div:
+    icon = stop.marker()[0]
+    return Div(
+        [Class('stop-preview'), CustomHtmlTagAttribute('data-stop-id', stop.short_name)],
+        [
+            Img([Class('marker'), Src(f'assets/markers/{icon}.svg')]),
+            Span([Class('stop-id')], stop.short_name),
+        ],
+    )
+
+
+def create_stop_group_view(db: DataAccessor, group: str, stop_names: set[str]) -> Div:
+    stops: list[Stop] = list(sorted((db.stops[stop] for stop in stop_names), key=lambda s: s.short_name))
+    region: Region = next(iter(set(db.stops[next(iter(stop_names))].regions) - {db.district}))
+    return Div(
+        [Class('stop-group-view')],
+        [
+            Div(
+                [Class('stop-header')],
+                [
+                    Div([Class('roman-numeral')], [util.roman_numeral(region.number)]),
+                    Div(
+                        [Class('name-and-stars')],
+                        [
+                            Div([Class('stop-group-name')], group),
+                            Div([Class('stars')], [db.get_stars_for_group(len(stops)) * '★']),
+                        ],
+                    ),
+                    Div([Class('expand-icon material-symbols-outlined')], 'add'),
+                ],
+            ),
+            Div([Class('group-stops')], [create_stop_preview(stop) for stop in stops]),
+        ],
+    )
+
+
+def create_stops_page(db: DataAccessor) -> Div:
+    return Div(
+        [Class('content-container selected'), Id('container-stops')],
+        [
+            Div(
+                [Class('content-section'), Id('stops-index')],
+                [create_stop_group_view(db, group, stops) for group, stops in sorted(db.stop_groups.items())],
+            ),
+            Div(
+                [Class('content-section'), Id('stop-view')],
+                [
+                    Div([Id('stop-name')]),
+                    Table(
+                        [Id('stop-details'), Class('hidden')],
+                        [
+                            Tr(
+                                [],
+                                [
+                                    Td([Class('nowrap')], 'served by:'),
+                                    Td([Id('stop-lines')]),
+                                ],
+                            ),
+                            Tr(
+                                [],
+                                [
+                                    Td([Class('nowrap')], 'location:'),
+                                    Td(
+                                        [Id('stop-location')],
+                                        [
+                                            Span([Id('stop-address')]),
+                                            Br(),
+                                            Span([Id('stop-coordinates')]),
+                                            Br(),
+                                            A(
+                                                [Id('street-view-link'), Href('#'), Target('_blank')],
+                                                [
+                                                    Span([], 'view the location'),
+                                                    Span([Class('material-icon material-symbols-outlined')], 'arrow_forward_ios'),
+                                                ],
+                                            ),
+                                        ],
+                                    ),
+                                ],
+                            )
+                        ],
+                    ),
+                    Div([Id('street-view-pane'), Class('hidden')]),
+                ],
+            ),
+        ],
+    )
+
+
+def create_vehicles_page() -> Div:
+    return Div(
+        [
+            Class('content-container'),
+            Id('container-vehicles'),
+        ],
+        [
+            'Here be dragons',
+        ],
+    )
+
+
+def create_archive(db: DataAccessor) -> Html:
+    return Html(
+        [Lang('en')],
+        [
+            Head(
+                [],
+                [
+                    Title([], 'Pokestops Archive'),
+                    Link([Rel('stylesheet'), Type('text/css'),
+                          Href('https://fonts.googleapis.com/css2'
+                               '?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0')]),
+                    Link([Rel('stylesheet'), Type('text/css'), Href('style_common.css')]),
+                    Link([Rel('stylesheet'), Type('text/css'), Href('style_archive.css')]),
+                    Script([Src('stops_data.min.js')]),
+                    Script([Src('control_archive.js')]),
+                ],
+            ),
+            Body(
+                [],
+                [
+                    create_title(),
+                    Div(
+                        [Id('container')],
+                        [
+                            create_navigation(),
+                            create_stops_page(db),
+                            create_vehicles_page(),
+                        ],
+                    ),
                 ],
             ),
         ],
