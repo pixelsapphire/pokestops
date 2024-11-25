@@ -50,7 +50,7 @@ regions: dict[str, Region] = {r.short_name: r for r in {
 def read_stops() -> tuple[dict[str, Stop], dict[str, set[str]]]:
     stops: dict[str, Stop] = {}
     stop_groups: dict[str, set[str]] = {}
-    with open('stops.csv', 'r', encoding='utf-8') as file:
+    with open('data/csv/stops.csv', 'r', encoding='utf-8') as file:
         reader = csv.reader(file)
         next(reader)
         for row in reader:
@@ -69,7 +69,7 @@ def read_stops() -> tuple[dict[str, Stop], dict[str, set[str]]]:
 
 def read_carriers() -> dict[str, Carrier]:
     carriers: dict[str, Carrier] = {}
-    with open('carriers.csv', 'r') as file:
+    with open('data/csv/carriers.csv', 'r') as file:
         reader = csv.reader(file)
         next(reader)
         for row in reader:
@@ -79,7 +79,7 @@ def read_carriers() -> dict[str, Carrier]:
 
 def read_vehicles(carriers: dict[str, Carrier]) -> dict[str, Vehicle]:
     vehicles: dict[str, Vehicle] = {}
-    with open('vehicles.csv', 'r') as file:
+    with open('data/csv/vehicles.csv', 'r') as file:
         reader = csv.reader(file)
         next(reader)
         for row in reader:
@@ -90,7 +90,7 @@ def read_vehicles(carriers: dict[str, Carrier]) -> dict[str, Vehicle]:
 def attach_stop_routes() -> None:
     gtfs_db: sqlite3.Connection = sqlite3.connect(':memory:')
 
-    with open('stops.csv', 'r') as file:
+    with open('data/csv/stops.csv', 'r') as file:
         reader = csv.reader(file)
         header_row = next(reader)
         stops_header_row = header_row
@@ -123,7 +123,7 @@ def attach_stop_routes() -> None:
                    'SELECT stops.*, routes '
                    'FROM stops JOIN stop_routes_groupped USING(stop_id)')
 
-    with open('stops.csv', 'w') as file:
+    with open('data/csv/stops.csv', 'w') as file:
         writer = csv.writer(file)
         writer.writerow([*stops_header_row, 'routes'])
         writer.writerows(cursor.fetchall())
@@ -148,29 +148,29 @@ def make_vehicle_entry(vehicle: Vehicle) -> str:
 
 def main() -> None:
     players: list[Player] = []
-    with open('players.csv', 'r') as file:
+    with open('data/csv/players.csv', 'r') as file:
         reader = csv.reader(file)
         next(reader)
         for row in reader:
             players.append(Player(*row))
 
     old_stops = {}
-    first_update = not os.path.exists('stops.csv')
+    first_update = not os.path.exists('data/csv/stops.csv')
     if update_ztm_stops:
         if not first_update:
             old_stops, _ = read_stops()
         response: requests.Response = requests.get('https://www.ztm.poznan.pl/pl/dla-deweloperow/getGTFSFile')
-        with open('gtfs.zip', 'wb') as file:
+        with open('data/gtfs.zip', 'wb') as file:
             file.write(response.content)
-        with util.zip_file('gtfs.zip', 'r') as zip_ref:
-            zip_ref.extract_as('stops.txt', 'stops.csv')
-            zip_ref.extract_as('stop_times.txt', 'stop_times.csv')
-            zip_ref.extract_as('trips.txt', 'trips.csv')
-        os.remove('gtfs.zip')
+        with util.zip_file('data/gtfs.zip', 'r') as zip_ref:
+            zip_ref.extract_as('stops.txt', 'data/csv/stops.csv')
+            zip_ref.extract_as('stop_times.txt', 'data/csv/stop_times.csv')
+            zip_ref.extract_as('trips.txt', 'data/csv/trips.csv')
+        os.remove('data/gtfs.zip')
         attach_stop_routes()
-        os.remove('stop_times.csv')
-        os.remove('trips.csv')
-    elif not os.path.exists('stops.csv'):
+        os.remove('data/csv/stop_times.csv')
+        os.remove('data/csv/trips.csv')
+    elif not os.path.exists('data/csv/stops.csv'):
         raise FileNotFoundError('stops.csv not found. Run the script with the --update flag to download the latest data.')
 
     stops, stop_groups = read_stops()
@@ -295,7 +295,7 @@ def main() -> None:
 
         folium_html: str = fmap.get_root().render()
         map_script: str = folium_html[folium_html.rfind('<script>') + 8:folium_html.rfind('</script>')]
-        with open('map.min.js', 'w') as script_file:
+        with open('data/js/map.min.js', 'w') as script_file:
             script_file.write(clean_js(map_script))
 
         accessor: DataAccessor = DataAccessor(players, stops, stop_groups, regions, district, progress, vehicles)
@@ -304,10 +304,10 @@ def main() -> None:
         with open('index.html', 'w') as file:
             file.write(rendered_application)
 
-        with open('stops_data.min.js', 'w') as file:
+        with open('data/js/stops_data.min.js', 'w') as file:
             file.write(f'const stops = {{\n{'\n'.join(map(make_stop_entry, stops.values()))}\n}};')
 
-        with open('vehicles_data.min.js', 'w') as file:
+        with open('data/js/vehicles_data.min.js', 'w') as file:
             file.write(f'const vehicles = {{\n{'\n'.join(map(make_vehicle_entry, vehicles.values()))}\n}};')
 
         html_archive: Html = create_archive(accessor)
