@@ -37,15 +37,16 @@ function select_vehicle(vehiclePreview, ctrl) {
     const vehicleId = vehiclePreview.getAttribute('data-vehicle-id');
     const vehicle = vehicles[vehicleId];
     const model = vehicle_models[vehicle.m];
+    const carrier = carriers[vehicle.c];
     ctrl.vehicleNameLabel.innerHTML = `#${vehicleId}`;
-    ctrl.vehicleCarrierLabel.innerHTML = vehicle.c;
+    ctrl.vehicleCarrierLabel.innerHTML = carrier.n;
     ctrl.vehicleKindLabel.innerHTML = model.k;
     ctrl.vehicleBrandLabel.innerHTML = model.b;
     ctrl.vehicleModelLabel.innerHTML = model.m;
     ctrl.vehicleSeatsLabel.innerHTML = model.s ? `${model.s}` : '?';
     ctrl.vehicleLoreLabel.innerHTML = ''
-    if (model.l) ctrl.vehicleLoreLabel.innerHTML += `${model.l}<br>`;
-    if (vehicle.l) ctrl.vehicleLoreLabel.innerHTML += `${vehicle.l}`;
+    if (model.l) ctrl.vehicleLoreLabel.innerHTML += `<p>${model.l}</p>`;
+    if (vehicle.l) ctrl.vehicleLoreLabel.innerHTML += `<p>${vehicle.l}</p>`;
 }
 
 document.addEventListener('DOMContentLoaded', () => {

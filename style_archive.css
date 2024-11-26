@@ -246,5 +246,9 @@ a {
 .lore-label {
     font-style: italic;
     opacity: 0.8;
-    line-height: 1.75;
+    line-height: 1.25;
+}
+
+.lore-label > p {
+    margin-bottom: min(1vh, 1dvw);
 }

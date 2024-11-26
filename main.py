@@ -71,21 +71,24 @@ def read_carriers() -> dict[str, Carrier]:
     with open('data/csv/carriers.csv', 'r') as file:
         reader = csv.reader(file)
         next(reader)
-        return {row[0]: Carrier(*row) for row in reader}
+        return {row[0]: Carrier(*row)
+                for row in reader if row and not row[0].lstrip().startswith('#')}
 
 
 def read_models() -> dict[str, VehicleModel]:
     with open('data/csv/vehicle_models.csv', 'r') as file:
         reader = csv.reader(file)
         next(reader)
-        return {row[0]: VehicleModel(*row) for row in reader}
+        return {row[0]: VehicleModel(*row)
+                for row in reader if row and not row[0].lstrip().startswith('#')}
 
 
 def read_vehicles(carriers: dict[str, Carrier], models: dict[str, VehicleModel]) -> dict[str, Vehicle]:
     with open('data/csv/vehicles.csv', 'r') as file:
         reader = csv.reader(file)
         next(reader)
-        return {row[0]: Vehicle(row[0], carriers.get(row[1]), models.get(row[2]), row[3]) for row in reader}
+        return {row[0]: Vehicle(row[0], carriers.get(row[1]), models.get(row[2]), row[3])
+                for row in reader if row and not row[0].lstrip().startswith('#')}
 
 
 def attach_stop_routes() -> None:
@@ -149,10 +152,16 @@ def make_vehicle_model_entry(model: VehicleModel) -> str:
             f'}},')
 
 
+def make_carrier_entry(carrier: Carrier) -> str:
+    return (f'"{carrier.symbol}":{{'
+            f'n:"{carrier.full_name}",'
+            f'}},')
+
+
 def make_vehicle_entry(vehicle: Vehicle) -> str:
     return (f'"{vehicle.vehicle_id}":{{'
             f'm:"{vehicle.model.model_id}",'
-            f'c:"{vehicle.carrier.name}",'
+            f'c:"{vehicle.carrier.symbol}",'
             f'l:"{vehicle.lore}",'
             f'}},')
 
@@ -321,6 +330,7 @@ def main() -> None:
 
         with open('data/js/vehicles_data.min.js', 'w') as file:
             file.write(f'const vehicle_models = {{\n{'\n'.join(map(make_vehicle_model_entry, models.values()))}\n}};\n')
+            file.write(f'const carriers = {{\n{'\n'.join(map(make_carrier_entry, carriers.values()))}\n}};\n')
             file.write(f'const vehicles = {{\n{'\n'.join(map(make_vehicle_entry, vehicles.values()))}\n}};')
 
         html_archive: Html = create_archive(accessor)

@@ -1,29 +1,30 @@
 id,kind,kind_detailed,brand,model,seats,lore
-MTMA04,tram,high-floor tram,Modertrans,Moderus Alfa HF04 AC,32,Moderus Alfa trams were rebuilt from former Konstal 105Na trams.
-MTMA07,tram,high-floor tram,Modertrans,Moderus Alfa 105N HF07,32,Moderus Alfa trams were rebuilt from former Konstal 105Na trams.
-MTMB02,tram,low-entry tram,Modertrans,Moderus Beta MF02 AC,39,
-MTMB20,tram,low-entry tram,Modertrans,Moderus Beta MF20 AC,39,
-MTMB22,tram,low-entry tram,Modertrans,Moderus Beta MF22 AC BD,38,
-MTMG01,tram,low-floor tram,Modertrans,Moderus Gamma LF01 AC,56,
-MTMG02,tram,low-floor tram,Modertrans,Moderus Gamma LF02 AC,56,
-MTMG03,tram,low-floor tram,Modertrans,Moderus Gamma LF03 AC BD,56,
-MTMG05,tram,low-floor tram,Modertrans,Moderus Gamma LF05 AC,?,
-KN105N,tram,high-floor tram,Konstal,105Na+105NaD,40,These trams operate in pairs with one Konstal 105Na and one Konstal 105NaD trailer. Some of them have been taken out of service and rebuilt as Moderus trams.
-KN105K,tram,high-floor tram,Konstal,105Na+105NaDK,40,These trams operate in pairs with one Konstal 105Na and one Konstal 105NaDK trailer.
-CKT606,tram,low-entry tram,ČKD,Tatra RT6 MF06 AC,46,Original Tatra RT6 trams were modernised by Modertrans in 2012-2016.
-SMCMCL,tram,low-floor tram,Siemens,Combino Classic,57,Siemens Combino trams were modernised by Modertrans in 2022-2024.
-SLT105,tram,low-floor tram,Solaris,Tramino S105P,53,
-DUGT08,tram,high-floor tram,Düwag,GT8,?,
-DUGT8Z,tram,high-floor tram,Düwag,GT8ZR,62,"Bi-directional trams from Frankfurt, purchased by Poznań in 2005."
-SL386D,bus,diesel bus,Solaris,"Alpino 8,6 III gen",?,
-SL312D,bus,diesel bus,Solaris,Urbino 12 III gen,?,
-SL312H,bus,hybrid bus,Solaris,Urbino 12 hybrid III gen,?,
-SL318D,bus,diesel bus,Solaris,Urbino 18 III gen,?,
-SL412D,bus,diesel bus,Solaris,Urbino 12 IV gen,?,
-SL412E,bus,electric bus,Solaris,Urbino 12 electric IV gen,?,
-SL418D,bus,diesel bus,Solaris,Urbino 18 IV gen,?,
-SL418H,bus,hydrogen bus,Solaris,Urbino 18 hydrogen IV gen,?,
-MBCNTG,bus,diesel bus,Mercedes-Benz,Conecto G,?,
-MBO532,bus,diesel bus,Mercedes-Benz,O530 II,?,
-MNNG36,bus,diesel bus,MAN,Lion's City G NG363,?,
-MNNL28,bus,hybrid bus,MAN,Lion's City 12 EfficientHybrid NL280,?,
+MTMA04,tram,high-floor tram,Modertrans,Moderus Alfa HF04 AC,32,"Moderus Alfa trams were rebuilt in 2008-2010 from former Konstal 105Na trams."
+MTMA07,tram,high-floor tram,Modertrans,Moderus Alfa 105N HF07,32,"Moderus Alfa trams were rebuilt in 2008-2010 from former Konstal 105Na trams."
+MTMB02,tram,low-entry tram,Modertrans,Moderus Beta MF02 AC,39,"Moderus Beta are the first trams built from scratch by Modertrans. This is a three-part, low-entry model, in production since 2011. The design is based on the previous generation, Moderus Alfa."
+MTMB20,tram,low-entry tram,Modertrans,Moderus Beta MF20 AC,39,"Moderus Beta are the first trams built from scratch by Modertrans. This is a three-part, low-entry model, in production since 2016. The design is based on the previous generation, Moderus Alfa."
+MTMB22,tram,low-entry tram,Modertrans,Moderus Beta MF22 AC BD,38,"Moderus Beta are the first trams built from scratch by Modertrans. This is a three-part, low-entry model, in production since 2017. The design is based on the previous generation, Moderus Alfa."
+MTMG01,tram,low-floor tram,Modertrans,Moderus Gamma LF01 AC,50,"Moderus Gramma is the first fully low-floor Moderus tram, in production since 2016. Developed from scratch in cooperation with Poznań University of Technology."
+MTMG02,tram,low-floor tram,Modertrans,Moderus Gamma LF02 AC,66,"Moderus Gramma is the first fully low-floor Moderus tram, in production since 2016. Developed from scratch in cooperation with Poznań University of Technology."
+MTMG03,tram,low-floor tram,Modertrans,Moderus Gamma LF03 AC BD,63,"Moderus Gramma is the first fully low-floor Moderus tram, in production since 2016. Developed from scratch in cooperation with Poznań University of Technology."
+MTMG05,tram,low-floor tram,Modertrans,Moderus Gamma LF05 AC,20,"Moderus Gramma is the first fully low-floor Moderus tram, in production since 2016. Developed from scratch in cooperation with Poznań University of Technology. This model is a short, one-part version of Moderus Gamma."
+KN105N,tram,high-floor tram,Konstal,105Na+105NaD,40,"These trams operate in pairs with one Konstal 105Na and one Konstal 105NaD trailer. Produced in the '70s and '80s by Konstal. Some of them have been taken out of service and rebuilt as Moderus trams."
+KN105K,tram,high-floor tram,Konstal,105Na+105NaDK,40,"These trams operate in pairs with one Konstal 105Na and one Konstal 105NaDK trailer. Produced in the '70s and '80s by Konstal."
+CKT606,tram,low-entry tram,ČKD,Tatra RT6 MF06 AC,46,"Produced between 1997 and 1998 Tatra trams were have been purchased primarily to operate the Poznań Fast Tramway. Original Tatra RT6 trams were modernised by Modertrans in 2012-2016."
+SMCMCL,tram,low-floor tram,Siemens,Combino Classic,60,"Siemens Combino trams were produced in 2003-2004 and later modernised by Modertrans in 2022-2024. They are the first low-floor trams in Poznań."
+SLT105,tram,low-floor tram,Solaris,Tramino S105P,48,"A five-part tram produced between 2011 and 2012. The width of the double doors is as wide as 1.5 meters, which is the widest that can be found in today's trams."
+DUGT08,tram,high-floor tram,Düwag,GT8,60,"The oldest model still in service in Poznań, produced between 1957 and 1969 in Düsseldorf. Due to a lack of funds to purchase new units, Poznań had been buying Düwag trams as used ones from Germany since 1997 up until 2011 (when they became the most used model in the city)."
+DUGT8Z,tram,high-floor tram,Düwag,GT8ZR,60,"The oldest model still in service in Poznań, produced between 1957 and 1969 in Düsseldorf. Due to a lack of funds to purchase new units, Poznań had been buying Düwag trams as used ones from Germany since 1997 up until 2011 (when they became the most used model in the city). GT8ZR is the first bi-directional model in Poznań."
+SL386D,bus,diesel bus,Solaris,"Alpino 8,6 III gen",13,"The smallest bus in the Solaris range with a length of 8.6 meters, produced since 2006."
+SL312D,bus,diesel bus,Solaris,Urbino 12 III gen,30,"The third generation of the Urbino 12-meter model, produced since 2005."
+SL312H,bus,hybrid bus,Solaris,Urbino 12 hybrid III gen,30,"A hybrid version of the III-gen Urbino 12 model, produced since 2010."
+SL318D,bus,diesel bus,Solaris,Urbino 18 III gen,40,"The third generation of the Urbino 18-meter model, produced since 2005."
+SL412D,bus,diesel bus,Solaris,Urbino 12 IV gen,30,"The fourth generation of the Urbino 12-meter model, produced since 2015."
+SL412E,bus,electric bus,Solaris,Urbino 12 electric IV gen,29,"An electric version of the IV-gen Urbino 12 model, produced since 2015."
+SL418D,bus,diesel bus,Solaris,Urbino 18 IV gen,40,"The fourth generation of the Urbino 18-meter model, produced since 2015."
+SL418E,bus,hydrogen bus,Solaris,Urbino 18 electric IV gen,40,"An electric version of the IV-gen Urbino 18 model, produced since 2015."
+SL418H,bus,hydrogen bus,Solaris,Urbino 18 hydrogen IV gen,40,"A hydrogen version of the IV-gen Urbino 18 model, produced since 2022."
+MBC345,bus,diesel bus,Mercedes-Benz,Conecto G O345,40,"O345 is a Turkish 18-meter bus produced since 1997. Bought by Poznań to replace older vehicles that didn't meet European combustion standards."
+MBC530,bus,diesel bus,Mercedes-Benz,Citaro O530 II,30,"O530 is a Turkish 12-meter bus produced since 1997."
+MNNG36,bus,diesel bus,MAN,Lion's City G NG363,43,"NG363 is a German 18-meter bus produced since 2004."
+MNNL28,bus,hybrid bus,MAN,Lion's City 12 EfficientHybrid NL280,37,"NL280 is a german 12-meter hybrid bus produced since 2019."

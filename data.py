@@ -1,5 +1,5 @@
 import os
-from typing import Callable, Iterable
+from typing import Callable, Iterable, Self
 
 
 class Visit:
@@ -10,8 +10,9 @@ class Visit:
     def __hash__(self):
         return hash(self.name) + hash(self.date)
 
-    def __lt__(self, other):
-        return self.date < other.date if self.date != other.date else self.name > other.name
+    def __lt__(self, other: Self):
+        return (self.date < other.date if self.date != other.date else self.name > other.name) if isinstance(
+            other, type(self)) else False
 
 
 class Stop:
@@ -29,8 +30,8 @@ class Stop:
     def __hash__(self):
         return hash(self.short_name)
 
-    def __eq__(self, other):
-        return self.short_name == other.short_name
+    def __eq__(self, other: Self):
+        return self.short_name == other.short_name if isinstance(other, type(self)) else False
 
     def in_one_of(self, towns: set[str]) -> bool:
         return '/' in self.full_name and self.full_name[:self.full_name.index('/')] in towns
@@ -82,9 +83,10 @@ class Achievements:
 
 
 class Carrier:
-    def __init__(self, symbol: str, name: str):
+    def __init__(self, symbol: str, short_name: str, full_name: str):
         self.symbol: str = symbol
-        self.name: str = name
+        self.short_name: str = short_name
+        self.full_name: str = full_name
 
     def __hash__(self):
         return hash(self.symbol)

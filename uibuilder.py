@@ -208,7 +208,7 @@ def create_vehicle_row(vehicle: Vehicle, date: str) -> Tr:
                     Span([Class('smaller' if len(vehicle.model.model) >= 30 else '')], vehicle.model.model),
                     Br(),
                     Span([Class('larger')], f'#{vehicle.vehicle_id} '),
-                    Span([Class('smaller')], f'({vehicle.carrier.name})'),
+                    Span([Class('smaller')], f'({vehicle.carrier.short_name})'),
                 ],
             ),
             Td(

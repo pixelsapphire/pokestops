@@ -1,6 +1,12 @@
-symbol,name
-PZ,MPK Poznań
-KZ,Transkom Koziegłowy
-SW,SPK Swarzędz
-KL,ZK Kleszczewo
-KR,Kombus Kórnik
+symbol,name,full_name
+PZ,MPK Poznań,Miejskie Przedsiębiorstwo Komunikacyjne Sp. z o.o. w Poznaniu
+KR,Kombus Kórnik,Kórnickie Przedsiębiorstwo Autobusowe KOMBUS Sp. z o.o.
+KZ,Transkom Koziegłowy,Przedsiębiorstwo Wielobranżowe TRANSKOM Sp. z o.o.
+LB,Translub Luboń,Przedsiębiorstwo Transportowe Translub Sp. z o.o.
+KM,PUK Komorniki,Przedsiębiorstwo Usług Komunalnych Komorniki sp. z o.o.
+RK,Rokbus Rokietnica,Zakład Usług Komunikacyjnych ROKBUS Sp. z o.o.
+SL,ZKP Suchy Las,Zakład Komunikacji Publicznej Suchy Las Sp. z o.o.
+TP,TPbus Tarnowo Pdg.,Komunikacja Gminy Tarnowo Podgórne TPBUS Sp. z o.o.
+SW,SPK Swarzędz,Swarzędzkie Przedsiębiorstwo Komunalne Sp. z o.o.
+KL,ZK Kleszczewo,Zakład Komunalny w Kleszczewie Sp. z o.o.
+DP,UG Dopiewo,Urząd Gminy Dopiewo
