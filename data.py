@@ -93,13 +93,26 @@ class Carrier:
         return self.symbol == other.symbol if isinstance(other, type(self)) else False
 
 
-class Vehicle:
-    def __init__(self, vehicle_id: str, carrier: Carrier, kind: str, brand: str, model: str):
-        self.vehicle_id: str = vehicle_id
-        self.carrier: Carrier = carrier
+class VehicleModel:
+    def __init__(self, model_id: str, kind: str, kind_detailed: str, brand: str, model: str):
+        self.model_id: str = model_id
         self.kind: str = kind
+        self.kind_detailed: str = kind_detailed
         self.brand: str = brand
         self.model: str = model
+
+    def __hash__(self):
+        return hash(self.model_id)
+
+    def __eq__(self, other):
+        return self.model_id == other.model_id if isinstance(other, type(self)) else False
+
+
+class Vehicle:
+    def __init__(self, vehicle_id: str, carrier: Carrier, model: VehicleModel):
+        self.vehicle_id: str = vehicle_id
+        self.carrier: Carrier = carrier
+        self.model: VehicleModel = model
 
     def __hash__(self):
         return hash(self.vehicle_id)

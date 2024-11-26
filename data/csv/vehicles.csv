@@ -1,68 +1,68 @@
-vehicle_id,carrier,kind,brand,model
-84+83,PZ,tram,Modertrans,Moderus Alfa HF07
-140+141,PZ,tram,Modertrans,Moderus Alfa HF07
-166+165,PZ,tram,Modertrans,Moderus Alfa HF07
-168+167,PZ,tram,Modertrans,Moderus Alfa HF07
-206+205,PZ,tram,Konstal,105Na+105NaD
-226+225,PZ,tram,Modertrans,Moderus Alfa HF07
-402,PZ,tram,ČKD,Tatra RT6 MF06 AC
-424,PZ,tram,Modertrans,Moderus Beta MF02 AC
-432,PZ,tram,Modertrans,Moderus Beta MF02 AC
-436,PZ,tram,Modertrans,Moderus Beta MF02 AC
-437,PZ,tram,Modertrans,Moderus Beta MF02 AC
-446,PZ,tram,Modertrans,Moderus Beta MF20 AC
-500,PZ,tram,Modertrans,Moderus Gamma LF01 AC
-507,PZ,tram,Siemens,Combino Classic
-512,PZ,tram,Siemens,Combino Classic
-518,PZ,tram,Solaris,Tramino S105P
-522,PZ,tram,Solaris,Tramino S105P
-530,PZ,tram,Solaris,Tramino S105P
-532,PZ,tram,Solaris,Tramino S105P
-536,PZ,tram,Solaris,Tramino S105P
-541,PZ,tram,Solaris,Tramino S105P
-545,PZ,tram,Solaris,Tramino S105P
-550,PZ,tram,Solaris,Tramino S105P
-555,PZ,tram,Solaris,Tramino S105P
-604,PZ,tram,Modertrans,Moderus Gamma LF02 AC
-607,PZ,tram,Modertrans,Moderus Gamma LF02 AC
-616,PZ,tram,Modertrans,Moderus Gamma LF02 AC
-655,PZ,tram,Düwag,GT8
-907,PZ,tram,Düwag,GT8ZR
-914,PZ,tram,Modertrans,Moderus Gamma MF22 AC BD
-928,PZ,tram,Modertrans,Moderus Gamma LF03 AC BD
-930,PZ,tram,Modertrans,Moderus Gamma LF03 AC BD
-1006,PZ,bus,Solaris,Urbino 12 electric IV gen
-1265,PZ,bus,Solaris,Urbino 18 III gen
-1270,PZ,bus,Solaris,Urbino 18 III gen
-1310,PZ,bus,Mercedes-Benz,Conecto G
-1313,PZ,bus,Mercedes-Benz,Conecto G
-1315,PZ,bus,Mercedes-Benz,Conecto G
-1318,PZ,bus,Mercedes-Benz,Conecto G
-1460,PZ,bus,Solaris,Urbino 12 III gen
-1474,PZ,bus,Solaris,Urbino 12 III gen
-1613,PZ,bus,Solaris,Urbino 18 hydrogen IV gen
-1617,PZ,bus,Solaris,Urbino 18 hydrogen IV gen
-1631,PZ,bus,Solaris,Urbino 12 III gen
-1656,PZ,bus,Solaris,Urbino 12 III gen
-1658,PZ,bus,Solaris,Urbino 12 III gen
-1663,PZ,bus,Solaris,Urbino 12 III gen
-1668,PZ,bus,Solaris,Urbino 12 IV gen
-1673,PZ,bus,Solaris,Urbino 12 IV gen
-1676,PZ,bus,Solaris,Urbino 12 IV gen
-1770,PZ,bus,Solaris,"Alpino 8,6"
-1773,PZ,bus,Solaris,"Alpino 8,6"
-1861,PZ,bus,Solaris,Urbino 18 III gen
-1874,PZ,bus,Solaris,Urbino 18 III gen
-1880,PZ,bus,Solaris,Urbino 18 III gen
-1886,PZ,bus,Solaris,Urbino 18 III gen
-1919,PZ,bus,Solaris,Urbino 18 IV gen
-1935,PZ,bus,Solaris,Urbino 18 IV gen
-3012,KZ,bus,Solaris,Urbino 12 III gen
-3015,KZ,bus,MAN,Lion's City 12 EfficientHybrid NL280
-3019,KZ,bus,MAN,Lion's City G NG363
-3022,KZ,bus,Solaris,Urbino 12 IV gen
-4049,SW,bus,Solaris,Urbino 12 hybrid III gen
-4051,SW,bus,Solaris,Urbino 12 hybrid III gen
-4202,SW,bus,Solaris,Urbino 18 III gen
-4316,KL,bus,Solaris,Urbino 12 IV gen
-5008,KR,bus,Mercedes-Benz,O530 II
+vehicle_id,carrier,model_id
+84+83,PZ,MTMA07
+140+141,PZ,MTMA07
+166+165,PZ,MTMA07
+168+167,PZ,MTMA07
+206+205,PZ,KN105N
+226+225,PZ,MTMA07
+402,PZ,CKT606
+424,PZ,MTMB02
+432,PZ,MTMB02
+436,PZ,MTMB02
+437,PZ,MTMB02
+446,PZ,MTMB20
+500,PZ,MTMG01
+507,PZ,SMCMCL
+512,PZ,SMCMCL
+518,PZ,SLT105
+522,PZ,SLT105
+530,PZ,SLT105
+532,PZ,SLT105
+536,PZ,SLT105
+541,PZ,SLT105
+545,PZ,SLT105
+550,PZ,SLT105
+555,PZ,SLT105
+604,PZ,MTMG02
+607,PZ,MTMG02
+616,PZ,MTMG02
+655,PZ,DUGT08
+907,PZ,DUGT8Z
+914,PZ,MTMG22
+928,PZ,MTMG03
+930,PZ,MTMG03
+1006,PZ,SL412E
+1265,PZ,SL318D
+1270,PZ,SL318D
+1310,PZ,MBCNTG
+1313,PZ,MBCNTG
+1315,PZ,MBCNTG
+1318,PZ,MBCNTG
+1460,PZ,SL312D
+1474,PZ,SL312D
+1613,PZ,SL418H
+1617,PZ,SL418H
+1631,PZ,SL312D
+1656,PZ,SL312D
+1658,PZ,SL312D
+1663,PZ,SL312D
+1668,PZ,SL412D
+1673,PZ,SL412D
+1676,PZ,SL412D
+1770,PZ,SL386D
+1773,PZ,SL386D
+1861,PZ,SL318D
+1874,PZ,SL318D
+1880,PZ,SL318D
+1886,PZ,SL318D
+1919,PZ,SL418D
+1935,PZ,SL418D
+3012,KZ,SL312D
+3015,KZ,MNNL28
+3019,KZ,MNNG36
+3022,KZ,SL412D
+4049,SW,SL312H
+4051,SW,SL312H
+4202,SW,SL318D
+4316,KL,SL412D
+5008,KR,MBO532

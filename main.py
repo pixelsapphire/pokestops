@@ -68,23 +68,24 @@ def read_stops() -> tuple[dict[str, Stop], dict[str, set[str]]]:
 
 
 def read_carriers() -> dict[str, Carrier]:
-    carriers: dict[str, Carrier] = {}
     with open('data/csv/carriers.csv', 'r') as file:
         reader = csv.reader(file)
         next(reader)
-        for row in reader:
-            carriers[row[0]] = Carrier(*row)
-    return carriers
+        return {row[0]: Carrier(*row) for row in reader}
 
 
-def read_vehicles(carriers: dict[str, Carrier]) -> dict[str, Vehicle]:
-    vehicles: dict[str, Vehicle] = {}
+def read_models() -> dict[str, VehicleModel]:
+    with open('data/csv/vehicle_models.csv', 'r') as file:
+        reader = csv.reader(file)
+        next(reader)
+        return {row[0]: VehicleModel(*row) for row in reader}
+
+
+def read_vehicles(carriers: dict[str, Carrier], models: dict[str, VehicleModel]) -> dict[str, Vehicle]:
     with open('data/csv/vehicles.csv', 'r') as file:
         reader = csv.reader(file)
         next(reader)
-        for row in reader:
-            vehicles[row[0]] = Vehicle(row[0], carriers.get(row[1]), row[2], row[3], row[4])
-    return vehicles
+        return {row[0]: Vehicle(row[0], carriers.get(row[1]), models.get(row[2])) for row in reader}
 
 
 def attach_stop_routes() -> None:
@@ -138,10 +139,17 @@ def make_stop_entry(stop: Stop) -> str:
             f'}},')
 
 
+def make_vehicle_model_entry(model: VehicleModel) -> str:
+    return (f'"{model.model_id}":{{'
+            f'k:"{model.kind_detailed}",'
+            f'b:"{model.brand}",'
+            f'm:"{model.model}"'
+            f'}},')
+
+
 def make_vehicle_entry(vehicle: Vehicle) -> str:
     return (f'"{vehicle.vehicle_id}":{{'
-            f'b:"{vehicle.brand}",'
-            f'm:"{vehicle.model}",'
+            f'm:"{vehicle.model.model_id}",'
             f'c:"{vehicle.carrier.name}",'
             f'}},')
 
@@ -190,7 +198,8 @@ def main() -> None:
                 print('No changes')
 
     carriers: dict[str, Carrier] = read_carriers()
-    vehicles: dict[str, Vehicle] = read_vehicles(carriers)
+    models: dict[str, VehicleModel] = read_models()
+    vehicles: dict[str, Vehicle] = read_vehicles(carriers, models)
 
     ever_visited_stops: set[Stop] = set()
     documented_visited_stops: set[Stop] = set()
@@ -308,6 +317,7 @@ def main() -> None:
             file.write(f'const stops = {{\n{'\n'.join(map(make_stop_entry, stops.values()))}\n}};')
 
         with open('data/js/vehicles_data.min.js', 'w') as file:
+            file.write(f'const vehicle_models = {{\n{'\n'.join(map(make_vehicle_model_entry, models.values()))}\n}};\n')
             file.write(f'const vehicles = {{\n{'\n'.join(map(make_vehicle_entry, vehicles.values()))}\n}};')
 
         html_archive: Html = create_archive(accessor)

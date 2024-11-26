@@ -193,20 +193,19 @@ def create_vehicle_row(vehicle: Vehicle, date: str) -> Tr:
         [
             Td(
                 [],
-                Img([Class('vehicle-icon'), Src(f'assets/vehicles/{vehicle.kind}.webp')]),
+                Img([Class('vehicle-icon'), Src(f'assets/vehicles/{vehicle.model.kind}.webp')]),
             ),
             Td(
                 [],
                 Img([Class('brand-logo'),
-                     Src(f'assets/brands/{vehicle.brand.lower()}.webp')]),
+                     Src(f'assets/brands/{vehicle.model.brand.lower()}.webp')]),
             ),
             Td(
                 [],
                 [
-                    Span([Class('smaller')], vehicle.brand),
+                    Span([Class('smaller')], vehicle.model.brand),
                     Br(),
-                    Span([Class('smaller' if len(vehicle.model) >= 30 else '')],
-                         vehicle.model),
+                    Span([Class('smaller' if len(vehicle.model.model) >= 30 else '')], vehicle.model.model),
                     Br(),
                     Span([Class('larger')], f'#{vehicle.vehicle_id} '),
                     Span([Class('smaller')], f'({vehicle.carrier.name})'),
@@ -436,8 +435,8 @@ def create_vehicle_preview(vehicle: Vehicle) -> Div:
     return Div(
         [Class('vehicle-preview'), CustomHtmlTagAttribute('data-vehicle-id', vehicle.vehicle_id)],
         [
-            Img([Class('vehicle-icon'), Src(f'assets/vehicles/{vehicle.kind}.webp')]),
-            Img([Class('vehicle-brand'), Src(f'assets/brands/{vehicle.brand.lower()}.webp')]),
+            Img([Class('vehicle-icon'), Src(f'assets/vehicles/{vehicle.model.kind}.webp')]),
+            Img([Class('vehicle-brand'), Src(f'assets/brands/{vehicle.model.brand.lower()}.webp')]),
             Div([Class('vehicle-id')], f'#{vehicle.vehicle_id}'),
         ],
     )
@@ -461,27 +460,10 @@ def create_vehicles_page(db: DataAccessor) -> Div:
                     Table(
                         [Id('vehicle-details'), Class('details-table hidden')],
                         [
-                            Tr(
-                                [],
-                                [
-                                    Td([Class('nowrap')], 'brand:'),
-                                    Td([Id('vehicle-brand')]),
-                                ],
-                            ),
-                            Tr(
-                                [],
-                                [
-                                    Td([Class('nowrap')], 'model:'),
-                                    Td([Id('vehicle-model')]),
-                                ],
-                            ),
-                            Tr(
-                                [],
-                                [
-                                    Td([Class('nowrap')], 'carrier:'),
-                                    Td([Id('vehicle-carrier')]),
-                                ],
-                            ),
+                            Tr([], [Td([Class('nowrap')], 'type:'), Td([Id('vehicle-kind')])]),
+                            Tr([], [Td([Class('nowrap')], 'brand:'), Td([Id('vehicle-brand')])]),
+                            Tr([], [Td([Class('nowrap')], 'model:'), Td([Id('vehicle-model')])]),
+                            Tr([], [Td([Class('nowrap')], 'carrier:'), Td([Id('vehicle-carrier')])]),
                         ],
                     )
                 ],

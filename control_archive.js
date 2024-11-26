@@ -36,9 +36,11 @@ function select_vehicle(vehiclePreview, ctrl) {
     ctrl.vehicleDetails.classList.remove('hidden');
     const vehicleId = vehiclePreview.getAttribute('data-vehicle-id');
     const vehicle = vehicles[vehicleId];
+    const model = vehicle_models[vehicle.m];
     ctrl.vehicleNameLabel.innerHTML = `#${vehicleId}`;
-    ctrl.vehicleBrandLabel.innerHTML = vehicle.b;
-    ctrl.vehicleModelLabel.innerHTML = vehicle.m;
+    ctrl.vehicleKindLabel.innerHTML = model.k;
+    ctrl.vehicleBrandLabel.innerHTML = model.b;
+    ctrl.vehicleModelLabel.innerHTML = model.m;
     ctrl.vehicleCarrierLabel.innerHTML = vehicle.c;
 }
 
@@ -66,6 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let vehicleViewControls = {
         vehicleDetails: vehicleView.querySelector('#vehicle-details'),
         vehicleNameLabel: vehicleView.querySelector('#vehicle-name'),
+        vehicleKindLabel: vehicleView.querySelector('#vehicle-kind'),
         vehicleBrandLabel: vehicleView.querySelector('#vehicle-brand'),
         vehicleModelLabel: vehicleView.querySelector('#vehicle-model'),
         vehicleCarrierLabel: vehicleView.querySelector('#vehicle-carrier')
