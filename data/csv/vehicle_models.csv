@@ -1,26 +1,29 @@
-id,kind,kind_detailed,brand,model
-MTMA07,tram,high-floor tram,Modertrans,Moderus Alfa HF07
-MTMB02,tram,low-entry tram,Modertrans,Moderus Beta MF02 AC
-MTMB20,tram,low-entry tram,Modertrans,Moderus Beta MF20 AC
-MTMG01,tram,low-floor tram,Modertrans,Moderus Gamma LF01 AC
-MTMG02,tram,low-floor tram,Modertrans,Moderus Gamma LF02 AC
-MTMG22,tram,low-floor tram,Modertrans,Moderus Gamma MF22 AC BD
-MTMG03,tram,low-floor tram,Modertrans,Moderus Gamma LF03 AC BD
-KN105N,tram,high-floor tram,Konstal,105Na+105NaD
-CKT606,tram,low-entry tram,ČKD,Tatra RT6 MF06 AC
-SMCMCL,tram,low-floor tram,Siemens,Combino Classic
-SLT105,tram,low-floor tram,Solaris,Tramino S105P
-DUGT08,tram,high-floor tram,Düwag,GT8
-DUGT8Z,tram,high-floor tram,Düwag,GT8ZR
-SL386D,bus,diesel bus,Solaris,"Alpino 8,6"
-SL312D,bus,diesel bus,Solaris,Urbino 12 III gen
-SL312H,bus,hybrid bus,Solaris,Urbino 12 hybrid III gen
-SL318D,bus,diesel bus,Solaris,Urbino 18 III gen
-SL412D,bus,diesel bus,Solaris,Urbino 12 IV gen
-SL412E,bus,electric bus,Solaris,Urbino 12 electric IV gen
-SL418D,bus,diesel bus,Solaris,Urbino 18 IV gen
-SL418H,bus,hydrogen bus,Solaris,Urbino 18 hydrogen IV gen
-MBCNTG,bus,diesel bus,Mercedes-Benz,Conecto G
-MBO532,bus,diesel bus,Mercedes-Benz,O530 II
-MNNG36,bus,diesel bus,MAN,Lion's City G NG363
-MNNL28,bus,hybrid bus,MAN,Lion's City 12 EfficientHybrid NL280
+id,kind,kind_detailed,brand,model,seats,lore
+MTMA04,tram,high-floor tram,Modertrans,Moderus Alfa HF04 AC,32,Moderus Alfa trams were rebuilt from former Konstal 105Na trams.
+MTMA07,tram,high-floor tram,Modertrans,Moderus Alfa 105N HF07,32,Moderus Alfa trams were rebuilt from former Konstal 105Na trams.
+MTMB02,tram,low-entry tram,Modertrans,Moderus Beta MF02 AC,39,
+MTMB20,tram,low-entry tram,Modertrans,Moderus Beta MF20 AC,39,
+MTMB22,tram,low-entry tram,Modertrans,Moderus Beta MF22 AC BD,38,
+MTMG01,tram,low-floor tram,Modertrans,Moderus Gamma LF01 AC,56,
+MTMG02,tram,low-floor tram,Modertrans,Moderus Gamma LF02 AC,56,
+MTMG03,tram,low-floor tram,Modertrans,Moderus Gamma LF03 AC BD,56,
+MTMG05,tram,low-floor tram,Modertrans,Moderus Gamma LF05 AC,?,
+KN105N,tram,high-floor tram,Konstal,105Na+105NaD,40,These trams operate in pairs with one Konstal 105Na and one Konstal 105NaD trailer. Some of them have been taken out of service and rebuilt as Moderus trams.
+KN105K,tram,high-floor tram,Konstal,105Na+105NaDK,40,These trams operate in pairs with one Konstal 105Na and one Konstal 105NaDK trailer.
+CKT606,tram,low-entry tram,ČKD,Tatra RT6 MF06 AC,46,Original Tatra RT6 trams were modernised by Modertrans in 2012-2016.
+SMCMCL,tram,low-floor tram,Siemens,Combino Classic,57,Siemens Combino trams were modernised by Modertrans in 2022-2024.
+SLT105,tram,low-floor tram,Solaris,Tramino S105P,53,
+DUGT08,tram,high-floor tram,Düwag,GT8,?,
+DUGT8Z,tram,high-floor tram,Düwag,GT8ZR,62,"Bi-directional trams from Frankfurt, purchased by Poznań in 2005."
+SL386D,bus,diesel bus,Solaris,"Alpino 8,6 III gen",?,
+SL312D,bus,diesel bus,Solaris,Urbino 12 III gen,?,
+SL312H,bus,hybrid bus,Solaris,Urbino 12 hybrid III gen,?,
+SL318D,bus,diesel bus,Solaris,Urbino 18 III gen,?,
+SL412D,bus,diesel bus,Solaris,Urbino 12 IV gen,?,
+SL412E,bus,electric bus,Solaris,Urbino 12 electric IV gen,?,
+SL418D,bus,diesel bus,Solaris,Urbino 18 IV gen,?,
+SL418H,bus,hydrogen bus,Solaris,Urbino 18 hydrogen IV gen,?,
+MBCNTG,bus,diesel bus,Mercedes-Benz,Conecto G,?,
+MBO532,bus,diesel bus,Mercedes-Benz,O530 II,?,
+MNNG36,bus,diesel bus,MAN,Lion's City G NG363,?,
+MNNL28,bus,hybrid bus,MAN,Lion's City 12 EfficientHybrid NL280,?,

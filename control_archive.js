@@ -38,10 +38,14 @@ function select_vehicle(vehiclePreview, ctrl) {
     const vehicle = vehicles[vehicleId];
     const model = vehicle_models[vehicle.m];
     ctrl.vehicleNameLabel.innerHTML = `#${vehicleId}`;
+    ctrl.vehicleCarrierLabel.innerHTML = vehicle.c;
     ctrl.vehicleKindLabel.innerHTML = model.k;
     ctrl.vehicleBrandLabel.innerHTML = model.b;
     ctrl.vehicleModelLabel.innerHTML = model.m;
-    ctrl.vehicleCarrierLabel.innerHTML = vehicle.c;
+    ctrl.vehicleSeatsLabel.innerHTML = model.s ? `${model.s}` : '?';
+    ctrl.vehicleLoreLabel.innerHTML = ''
+    if (model.l) ctrl.vehicleLoreLabel.innerHTML += `${model.l}<br>`;
+    if (vehicle.l) ctrl.vehicleLoreLabel.innerHTML += `${vehicle.l}`;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -71,7 +75,9 @@ document.addEventListener('DOMContentLoaded', () => {
         vehicleKindLabel: vehicleView.querySelector('#vehicle-kind'),
         vehicleBrandLabel: vehicleView.querySelector('#vehicle-brand'),
         vehicleModelLabel: vehicleView.querySelector('#vehicle-model'),
-        vehicleCarrierLabel: vehicleView.querySelector('#vehicle-carrier')
+        vehicleCarrierLabel: vehicleView.querySelector('#vehicle-carrier'),
+        vehicleSeatsLabel: vehicleView.querySelector('#vehicle-seats'),
+        vehicleLoreLabel: vehicleView.querySelector('#vehicle-lore')
     };
     document.querySelectorAll('.vehicle-preview').forEach(preview => preview.addEventListener('click', () => select_vehicle(preview, vehicleViewControls)));
 });

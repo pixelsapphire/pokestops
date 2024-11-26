@@ -85,7 +85,7 @@ def read_vehicles(carriers: dict[str, Carrier], models: dict[str, VehicleModel])
     with open('data/csv/vehicles.csv', 'r') as file:
         reader = csv.reader(file)
         next(reader)
-        return {row[0]: Vehicle(row[0], carriers.get(row[1]), models.get(row[2])) for row in reader}
+        return {row[0]: Vehicle(row[0], carriers.get(row[1]), models.get(row[2]), row[3]) for row in reader}
 
 
 def attach_stop_routes() -> None:
@@ -143,7 +143,9 @@ def make_vehicle_model_entry(model: VehicleModel) -> str:
     return (f'"{model.model_id}":{{'
             f'k:"{model.kind_detailed}",'
             f'b:"{model.brand}",'
-            f'm:"{model.model}"'
+            f'm:"{model.model}",'
+            f's:{model.seats if model.seats else 'undefined'},'
+            f'l:"{model.lore}",'
             f'}},')
 
 
@@ -151,6 +153,7 @@ def make_vehicle_entry(vehicle: Vehicle) -> str:
     return (f'"{vehicle.vehicle_id}":{{'
             f'm:"{vehicle.model.model_id}",'
             f'c:"{vehicle.carrier.name}",'
+            f'l:"{vehicle.lore}",'
             f'}},')
 
 

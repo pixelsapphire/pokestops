@@ -94,12 +94,14 @@ class Carrier:
 
 
 class VehicleModel:
-    def __init__(self, model_id: str, kind: str, kind_detailed: str, brand: str, model: str):
+    def __init__(self, model_id: str, kind: str, kind_detailed: str, brand: str, model: str, seats: str, lore: str):
         self.model_id: str = model_id
         self.kind: str = kind
         self.kind_detailed: str = kind_detailed
         self.brand: str = brand
         self.model: str = model
+        self.seats: int | None = int(seats) if seats.isdigit() else None
+        self.lore: str = lore
 
     def __hash__(self):
         return hash(self.model_id)
@@ -109,10 +111,11 @@ class VehicleModel:
 
 
 class Vehicle:
-    def __init__(self, vehicle_id: str, carrier: Carrier, model: VehicleModel):
+    def __init__(self, vehicle_id: str, carrier: Carrier, model: VehicleModel, lore: str):
         self.vehicle_id: str = vehicle_id
         self.carrier: Carrier = carrier
         self.model: VehicleModel = model
+        self.lore: str = lore
 
     def __hash__(self):
         return hash(self.vehicle_id)

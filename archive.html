@@ -27856,10 +27856,25 @@
             <img class='vehicle-brand' src='assets/brands/modertrans.webp'/>
             <div class='vehicle-id'>#84+83</div>
           </div>
+          <div class='vehicle-preview' data-vehicle-id='118+117'>
+            <img class='vehicle-icon' src='assets/vehicles/tram.webp'/>
+            <img class='vehicle-brand' src='assets/brands/konstal.webp'/>
+            <div class='vehicle-id'>#118+117</div>
+          </div>
           <div class='vehicle-preview' data-vehicle-id='140+141'>
             <img class='vehicle-icon' src='assets/vehicles/tram.webp'/>
             <img class='vehicle-brand' src='assets/brands/modertrans.webp'/>
             <div class='vehicle-id'>#140+141</div>
+          </div>
+          <div class='vehicle-preview' data-vehicle-id='150+151'>
+            <img class='vehicle-icon' src='assets/vehicles/tram.webp'/>
+            <img class='vehicle-brand' src='assets/brands/modertrans.webp'/>
+            <div class='vehicle-id'>#150+151</div>
+          </div>
+          <div class='vehicle-preview' data-vehicle-id='152+153'>
+            <img class='vehicle-icon' src='assets/vehicles/tram.webp'/>
+            <img class='vehicle-brand' src='assets/brands/modertrans.webp'/>
+            <div class='vehicle-id'>#152+153</div>
           </div>
           <div class='vehicle-preview' data-vehicle-id='166+165'>
             <img class='vehicle-icon' src='assets/vehicles/tram.webp'/>
@@ -27880,6 +27895,16 @@
             <img class='vehicle-icon' src='assets/vehicles/tram.webp'/>
             <img class='vehicle-brand' src='assets/brands/modertrans.webp'/>
             <div class='vehicle-id'>#226+225</div>
+          </div>
+          <div class='vehicle-preview' data-vehicle-id='399'>
+            <img class='vehicle-icon' src='assets/vehicles/tram.webp'/>
+            <img class='vehicle-brand' src='assets/brands/čkd.webp'/>
+            <div class='vehicle-id'>#399</div>
+          </div>
+          <div class='vehicle-preview' data-vehicle-id='400'>
+            <img class='vehicle-icon' src='assets/vehicles/tram.webp'/>
+            <img class='vehicle-brand' src='assets/brands/čkd.webp'/>
+            <div class='vehicle-id'>#400</div>
           </div>
           <div class='vehicle-preview' data-vehicle-id='402'>
             <img class='vehicle-icon' src='assets/vehicles/tram.webp'/>
@@ -27905,6 +27930,11 @@
             <img class='vehicle-icon' src='assets/vehicles/tram.webp'/>
             <img class='vehicle-brand' src='assets/brands/modertrans.webp'/>
             <div class='vehicle-id'>#437</div>
+          </div>
+          <div class='vehicle-preview' data-vehicle-id='438'>
+            <img class='vehicle-icon' src='assets/vehicles/tram.webp'/>
+            <img class='vehicle-brand' src='assets/brands/modertrans.webp'/>
+            <div class='vehicle-id'>#438</div>
           </div>
           <div class='vehicle-preview' data-vehicle-id='446'>
             <img class='vehicle-icon' src='assets/vehicles/tram.webp'/>
@@ -27971,6 +28001,16 @@
             <img class='vehicle-brand' src='assets/brands/solaris.webp'/>
             <div class='vehicle-id'>#555</div>
           </div>
+          <div class='vehicle-preview' data-vehicle-id='560'>
+            <img class='vehicle-icon' src='assets/vehicles/tram.webp'/>
+            <img class='vehicle-brand' src='assets/brands/solaris.webp'/>
+            <div class='vehicle-id'>#560</div>
+          </div>
+          <div class='vehicle-preview' data-vehicle-id='600'>
+            <img class='vehicle-icon' src='assets/vehicles/tram.webp'/>
+            <img class='vehicle-brand' src='assets/brands/modertrans.webp'/>
+            <div class='vehicle-id'>#600</div>
+          </div>
           <div class='vehicle-preview' data-vehicle-id='604'>
             <img class='vehicle-icon' src='assets/vehicles/tram.webp'/>
             <img class='vehicle-brand' src='assets/brands/modertrans.webp'/>
@@ -27990,6 +28030,31 @@
             <img class='vehicle-icon' src='assets/vehicles/tram.webp'/>
             <img class='vehicle-brand' src='assets/brands/düwag.webp'/>
             <div class='vehicle-id'>#655</div>
+          </div>
+          <div class='vehicle-preview' data-vehicle-id='901'>
+            <img class='vehicle-icon' src='assets/vehicles/tram.webp'/>
+            <img class='vehicle-brand' src='assets/brands/düwag.webp'/>
+            <div class='vehicle-id'>#901</div>
+          </div>
+          <div class='vehicle-preview' data-vehicle-id='903'>
+            <img class='vehicle-icon' src='assets/vehicles/tram.webp'/>
+            <img class='vehicle-brand' src='assets/brands/düwag.webp'/>
+            <div class='vehicle-id'>#903</div>
+          </div>
+          <div class='vehicle-preview' data-vehicle-id='904'>
+            <img class='vehicle-icon' src='assets/vehicles/tram.webp'/>
+            <img class='vehicle-brand' src='assets/brands/düwag.webp'/>
+            <div class='vehicle-id'>#904</div>
+          </div>
+          <div class='vehicle-preview' data-vehicle-id='905'>
+            <img class='vehicle-icon' src='assets/vehicles/tram.webp'/>
+            <img class='vehicle-brand' src='assets/brands/düwag.webp'/>
+            <div class='vehicle-id'>#905</div>
+          </div>
+          <div class='vehicle-preview' data-vehicle-id='906'>
+            <img class='vehicle-icon' src='assets/vehicles/tram.webp'/>
+            <img class='vehicle-brand' src='assets/brands/düwag.webp'/>
+            <div class='vehicle-id'>#906</div>
           </div>
           <div class='vehicle-preview' data-vehicle-id='907'>
             <img class='vehicle-icon' src='assets/vehicles/tram.webp'/>
@@ -28191,6 +28256,10 @@
           <div id='vehicle-name' class='name-label'></div>
           <table id='vehicle-details' class='details-table hidden'>
             <tr>
+              <td class='nowrap'>carrier:</td>
+              <td id='vehicle-carrier'></td>
+            </tr>
+            <tr>
               <td class='nowrap'>type:</td>
               <td id='vehicle-kind'></td>
             </tr>
@@ -28203,10 +28272,11 @@
               <td id='vehicle-model'></td>
             </tr>
             <tr>
-              <td class='nowrap'>carrier:</td>
-              <td id='vehicle-carrier'></td>
+              <td class='nowrap'>seats:</td>
+              <td id='vehicle-seats'></td>
             </tr>
           </table>
+          <div id='vehicle-lore' class='lore-label'></div>
         </div>
       </div>
     </div>

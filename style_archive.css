@@ -160,6 +160,7 @@ a {
 
 .details-table {
     width: auto;
+    margin: min(1vh, 1dvw) 0 min(2vh, 2dvw);
 }
 
 .details-table td {
@@ -240,4 +241,10 @@ a {
 .vehicle-id {
     margin-top: min(0.5vh, 0.5dvw);
     font-size: min(1.75vh, 1.75dvw);
+}
+
+.lore-label {
+    font-style: italic;
+    opacity: 0.8;
+    line-height: 1.75;
 }

@@ -460,12 +460,14 @@ def create_vehicles_page(db: DataAccessor) -> Div:
                     Table(
                         [Id('vehicle-details'), Class('details-table hidden')],
                         [
+                            Tr([], [Td([Class('nowrap')], 'carrier:'), Td([Id('vehicle-carrier')])]),
                             Tr([], [Td([Class('nowrap')], 'type:'), Td([Id('vehicle-kind')])]),
                             Tr([], [Td([Class('nowrap')], 'brand:'), Td([Id('vehicle-brand')])]),
                             Tr([], [Td([Class('nowrap')], 'model:'), Td([Id('vehicle-model')])]),
-                            Tr([], [Td([Class('nowrap')], 'carrier:'), Td([Id('vehicle-carrier')])]),
+                            Tr([], [Td([Class('nowrap')], 'seats:'), Td([Id('vehicle-seats')])]),
                         ],
-                    )
+                    ),
+                    Div([Id('vehicle-lore'), Class('lore-label')]),
                 ],
             ),
         ],
