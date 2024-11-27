@@ -141,7 +141,7 @@ class Player:
         self.ev_file: str = ev_file
         self.vehicles_file: str = vehicles_file
         self.__achievements__: Achievements = Achievements()
-        self.__vehicles__: list[(Vehicle, str)] = []
+        self.__vehicles__: list[tuple[Vehicle, str]] = []
 
     def add_stop(self, s: Stop) -> None:
         self.__achievements__.add_stop(s)
@@ -166,7 +166,7 @@ class Player:
     def get_n_achievements(self, stops: dict[str, Stop], stop_groups: dict[str, set[str]]) -> int:
         return len(list(filter(lambda s: s.visited == s.total, self.get_achievements(stops, stop_groups))))
 
-    def get_vehicles(self) -> Iterable:
+    def get_vehicles(self) -> Iterable[tuple[Vehicle, str]]:
         return reversed(self.__vehicles__)
 
     def get_n_vehicles(self) -> int:

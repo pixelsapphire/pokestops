@@ -489,6 +489,7 @@ def create_archive(db: DataAccessor) -> Html:
                     Link([Rel('stylesheet'), Type('text/css'), Href('style_archive.css')]),
                     Script([Src('data/js/stops_data.min.js')]),
                     Script([Src('data/js/vehicles_data.min.js')]),
+                    Script([Src('data/js/players_data.min.js')]),
                     Script([Src('control_archive.js')]),
                 ],
             ),

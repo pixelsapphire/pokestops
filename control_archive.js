@@ -49,6 +49,18 @@ function select_vehicle(vehiclePreview, ctrl) {
     if (vehicle.l) ctrl.vehicleLoreLabel.innerHTML += `<p>${vehicle.l}</p>`;
 }
 
+Array.prototype.containsBS = function (target) {
+    let left = 0;
+    let right = this.length - 1;
+    while (left <= right) {
+        const mid = Math.floor((left + right) / 2);
+        if (this[mid] === target) return true;
+        if (this[mid] < target) left = mid + 1;
+        else right = mid - 1;
+    }
+    return false;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.stop-header').forEach(header => header.addEventListener('click', () => {
@@ -81,4 +93,19 @@ document.addEventListener('DOMContentLoaded', () => {
         vehicleLoreLabel: vehicleView.querySelector('#vehicle-lore')
     };
     document.querySelectorAll('.vehicle-preview').forEach(preview => preview.addEventListener('click', () => select_vehicle(preview, vehicleViewControls)));
+
+    const activePlayer = players[localStorage.getItem('activePlayer') || 'Zorie'];
+    document.querySelectorAll('.stop-group-view').forEach(group => {
+        let groupDiscovered = false;
+        group.querySelectorAll('.stop-preview').forEach(stop => {
+            const id = stop.querySelector('.stop-id').innerHTML;
+            if (activePlayer.s.containsBS(id)) groupDiscovered = true;
+            else stop.classList.add('undiscovered');
+        });
+        if (!groupDiscovered) group.classList.add('undiscovered');
+    });
+    document.querySelectorAll('.vehicle-preview').forEach(preview => {
+        const id = preview.getAttribute('data-vehicle-id');
+        if (!activePlayer.v.containsBS(id)) preview.classList.add('undiscovered');
+    });
 });

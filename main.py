@@ -166,6 +166,13 @@ def make_vehicle_entry(vehicle: Vehicle) -> str:
             f'}},')
 
 
+def make_player_entry(player: Player, stops: dict[str, Stop]) -> str:
+    return (f'"{player.nickname}":{{'
+            f'v:[{','.join(sorted(f'"{v[0].vehicle_id}"' for v in player.get_vehicles()))}],'
+            f's:[{','.join(sorted(f'"{s.short_name}"' for s in stops.values() if s.visited_by(player.nickname)))}],'
+            f'}},')
+
+
 def main() -> None:
     players: list[Player] = []
     with open('data/csv/players.csv', 'r') as file:
@@ -332,6 +339,9 @@ def main() -> None:
             file.write(f'const vehicle_models = {{\n{'\n'.join(map(make_vehicle_model_entry, models.values()))}\n}};\n')
             file.write(f'const carriers = {{\n{'\n'.join(map(make_carrier_entry, carriers.values()))}\n}};\n')
             file.write(f'const vehicles = {{\n{'\n'.join(map(make_vehicle_entry, vehicles.values()))}\n}};')
+
+        with open('data/js/players_data.min.js', 'w') as file:
+            file.write(f'const players = {{\n{'\n'.join(map(lambda p: make_player_entry(p, stops), players))}\n}};')
 
         html_archive: Html = create_archive(accessor)
         rendered_archive: str = clean_html(html_archive.render(True, True))
