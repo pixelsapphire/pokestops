@@ -247,6 +247,12 @@ a {
     font-size: min(1.75vh, 1.75dvw);
 }
 
+#vehicle-image > img {
+    width: 50%;
+    margin-top: min(2vh, 2dvw);
+    cursor: pointer;
+}
+
 .lore-label {
     font-style: italic;
     opacity: 0.8;

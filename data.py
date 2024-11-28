@@ -113,10 +113,11 @@ class VehicleModel:
 
 
 class Vehicle:
-    def __init__(self, vehicle_id: str, carrier: Carrier, model: VehicleModel, lore: str):
+    def __init__(self, vehicle_id: str, carrier: Carrier, model: VehicleModel, image_url: str, lore: str):
         self.vehicle_id: str = vehicle_id
         self.carrier: Carrier = carrier
         self.model: VehicleModel = model
+        self.image_url: str | None = image_url if image_url else None
         self.lore: str = lore
 
     def __hash__(self):

@@ -87,7 +87,7 @@ def read_vehicles(carriers: dict[str, Carrier], models: dict[str, VehicleModel])
     with open('data/csv/vehicles.csv', 'r') as file:
         reader = csv.reader(file)
         next(reader)
-        return {row[0]: Vehicle(row[0], carriers.get(row[1]), models.get(row[2]), row[3])
+        return {row[0]: Vehicle(row[0], carriers.get(row[1]), models.get(row[2]), row[3], row[4])
                 for row in reader if row and not row[0].lstrip().startswith('#')}
 
 
@@ -147,7 +147,7 @@ def make_vehicle_model_entry(model: VehicleModel) -> str:
             f'k:"{model.kind_detailed}",'
             f'b:"{model.brand}",'
             f'm:"{model.model}",'
-            f's:{model.seats if model.seats else 'undefined'},'
+            f'{f's:{model.seats},' if model.seats else ''}'
             f'l:"{model.lore}",'
             f'}},')
 
@@ -162,6 +162,7 @@ def make_vehicle_entry(vehicle: Vehicle) -> str:
     return (f'"{vehicle.vehicle_id}":{{'
             f'm:"{vehicle.model.model_id}",'
             f'c:"{vehicle.carrier.symbol}",'
+            f'{f'i:{f'"{vehicle.image_url}"'},' if vehicle.image_url else ''}'
             f'l:"{vehicle.lore}",'
             f'}},')
 

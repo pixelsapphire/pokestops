@@ -47,6 +47,10 @@ function select_vehicle(vehiclePreview, ctrl) {
     ctrl.vehicleLoreLabel.innerHTML = ''
     if (model.l) ctrl.vehicleLoreLabel.innerHTML += `<p>${model.l}</p>`;
     if (vehicle.l) ctrl.vehicleLoreLabel.innerHTML += `<p>${vehicle.l}</p>`;
+    if (vehicle.i) {
+        ctrl.vehicleImage.innerHTML = `<img src="${vehicle.i}" alt="${model.b} ${model.m} #${vehicleId}">`;
+        ctrl.vehicleImage.firstChild.addEventListener('click', () => window.open(vehicle.i, '_blank'));
+    } else ctrl.vehicleImage.innerHTML = '';
 }
 
 Array.prototype.containsBS = function (target) {
@@ -77,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
         stopLinesField: stopView.querySelector('#stop-lines'),
         stopAddressLabel: stopView.querySelector('#stop-address'),
         stopCoordinatesLabel: stopView.querySelector('#stop-coordinates'),
-        stopLocationViewButton: stopView.querySelector('#street-view-link')
+        stopLocationViewButton: stopView.querySelector('#street-view-link'),
     };
     document.querySelectorAll('.stop-preview').forEach(preview => preview.addEventListener('click', () => select_stop(preview, stopViewControls)));
 
@@ -90,7 +94,8 @@ document.addEventListener('DOMContentLoaded', () => {
         vehicleModelLabel: vehicleView.querySelector('#vehicle-model'),
         vehicleCarrierLabel: vehicleView.querySelector('#vehicle-carrier'),
         vehicleSeatsLabel: vehicleView.querySelector('#vehicle-seats'),
-        vehicleLoreLabel: vehicleView.querySelector('#vehicle-lore')
+        vehicleLoreLabel: vehicleView.querySelector('#vehicle-lore'),
+        vehicleImage: vehicleView.querySelector('#vehicle-image'),
     };
     document.querySelectorAll('.vehicle-preview').forEach(preview => preview.addEventListener('click', () => select_vehicle(preview, vehicleViewControls)));
 

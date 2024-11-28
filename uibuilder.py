@@ -457,6 +457,7 @@ def create_vehicles_page(db: DataAccessor) -> Div:
                 [Class('content-section object-view'), Id('vehicle-view')],
                 [
                     Div([Id('vehicle-name'), Class('name-label')]),
+                    Div([Id('vehicle-image')]),
                     Table(
                         [Id('vehicle-details'), Class('details-table hidden')],
                         [
