@@ -4,7 +4,7 @@ __pycache__/
 changes.pages
 changelog.txt
 deploy.sh
-data/csv/stops.csv
+data/raw/stops.csv
 test.py
 1gen_vs_2gen.jpg
 useful_links.md

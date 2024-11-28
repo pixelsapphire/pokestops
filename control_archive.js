@@ -36,7 +36,7 @@ function select_vehicle(vehiclePreview, ctrl) {
     ctrl.vehicleDetails.classList.remove('hidden');
     const vehicleId = vehiclePreview.getAttribute('data-vehicle-id');
     const vehicle = vehicles[vehicleId];
-    const model = vehicle_models[vehicle.m];
+    const model = vehicle.m ? vehicle_models[vehicle.m] : {k: 'bus', b: '?', m: '?'};
     const carrier = carriers[vehicle.c];
     ctrl.vehicleNameLabel.innerHTML = `#${vehicleId}`;
     ctrl.vehicleCarrierLabel.innerHTML = carrier.n;

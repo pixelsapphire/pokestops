@@ -1,5 +1,7 @@
+import csv
+import json
 import os
-from typing import Callable, Iterable, Self
+from typing import Any, Callable, Iterable, Self
 
 
 class Visit:
@@ -25,7 +27,7 @@ class Stop:
         self.visits: set[Visit] = set()
         self.regions: list[Region] = []
         self.lines: list[tuple[int, str]] = list(map(lambda e: (int(e[:e.index(':')]), e[e.index(':') + 1:]),
-                                                     routes.split('&')))
+                                                     routes.split('&'))) if routes else []
 
     def __hash__(self):
         return hash(self.short_name)
@@ -33,7 +35,7 @@ class Stop:
     def __eq__(self, other: Self):
         return self.short_name == other.short_name if isinstance(other, type(self)) else False
 
-    def in_one_of(self, towns: set[str]) -> bool:
+    def in_any_of(self, towns: set[str]) -> bool:
         return '/' in self.full_name and self.full_name[:self.full_name.index('/')] in towns
 
     def visited_by(self, name: str, include_ev: bool = True) -> str | None:
@@ -58,6 +60,36 @@ class Stop:
             return 'square', '■', 0.9, None
         else:
             return 'triangle', '▲', 0.8, None
+
+    @staticmethod
+    def read_dicts(source: str,
+                   district: 'Region', regions: dict[str, 'Region']) -> tuple[dict[str, 'Stop'], dict[str, set[str]]]:
+        stops: dict[str, Stop] = {}
+        stop_groups: dict[str, set[str]] = {}
+        with open(source, 'r', encoding='utf-8') as file:
+            reader = csv.reader(file)
+            next(reader)
+            for row in reader:
+                stop = Stop(row[1], row[2], row[3], row[4], row[5], row[6])
+                region = next((r for r in regions.values() if stop in r), None)
+                if not region:
+                    raise ValueError(f'Stop {stop.full_name} [{stop.short_name}] not in any region')
+                region.add_stop(stop)
+                district.add_stop(stop)
+                stops[row[1]] = stop
+                if stop.full_name not in stop_groups:
+                    stop_groups[stop.full_name] = set()
+                stop_groups[stop.full_name].add(stop.short_name)
+        return stops, stop_groups
+
+    @staticmethod  # the annotation is a temporary fix to Pycharm issue PY-70668
+    def json_entry(self) -> str:
+        return (f'"{self.short_name}":{{'
+                f'n:"{self.full_name}",'
+                f'lt:{self.latitude},'
+                f'ln:{self.longitude},'
+                f'l:[{','.join(f'[{line},"{destination}"]' for line, destination in self.lines)}]'
+                f'}},')
 
 
 class AchievementProgress:
@@ -94,15 +126,29 @@ class Carrier:
     def __eq__(self, other):
         return self.symbol == other.symbol if isinstance(other, type(self)) else False
 
+    @staticmethod
+    def read_dict(source: str) -> dict[str, 'Carrier']:
+        with open(source, 'r') as file:
+            reader = csv.reader(file)
+            next(reader)
+            return {row[0]: Carrier(*row)
+                    for row in reader if row and not row[0].lstrip().startswith('#')}
+
+    @staticmethod  # the annotation is a temporary fix to Pycharm issue PY-70668@
+    def json_entry(self) -> str:
+        return (f'"{self.symbol}":{{'
+                f'n:"{self.full_name}",'
+                f'}},')
+
 
 class VehicleModel:
-    def __init__(self, model_id: str, kind: str, kind_detailed: str, brand: str, model: str, seats: str, lore: str):
+    def __init__(self, model_id: str, kind: str, kind_detailed: str, brand: str, model: str, seats: str | int, lore: str):
         self.model_id: str = model_id
         self.kind: str = kind
         self.kind_detailed: str = kind_detailed
         self.brand: str = brand
         self.model: str = model
-        self.seats: int | None = int(seats) if seats.isdigit() else None
+        self.seats: int | None = int(seats) if (isinstance(seats, str) and seats.isdigit()) or isinstance(seats, int) else None
         self.lore: str = lore
 
     def __hash__(self):
@@ -110,6 +156,24 @@ class VehicleModel:
 
     def __eq__(self, other):
         return self.model_id == other.model_id if isinstance(other, type(self)) else False
+
+    @staticmethod
+    def read_dict(source: str) -> dict[str, 'VehicleModel']:
+        with open(source, 'r') as file:
+            reader = csv.reader(file)
+            next(reader)
+            return {row[0]: VehicleModel(*row)
+                    for row in reader if row and not row[0].lstrip().startswith('#')}
+
+    @staticmethod  # the annotation is a temporary fix to Pycharm issue PY-70668
+    def json_entry(self) -> str:
+        return (f'"{self.model_id}":{{'
+                f'k:"{self.kind_detailed}",'
+                f'b:"{self.brand}",'
+                f'm:"{self.model}",'
+                f'{f's:{self.seats},' if self.seats else ''}'
+                f'l:"{self.lore}",'
+                f'}},')
 
 
 class Vehicle:
@@ -131,6 +195,23 @@ class Vehicle:
 
     def __lt__(self, other):
         return self.__cmp_key__() < other.__cmp_key__() if isinstance(other, type(self)) else False
+
+    @staticmethod
+    def read_dict(source: str, carriers: dict[str, Carrier], models: dict[str, VehicleModel]) -> dict[str, 'Vehicle']:
+        with open(source, 'r') as file:
+            reader = csv.reader(file)
+            next(reader)
+            return {row[0]: Vehicle(row[0], carriers.get(row[1]), models.get(row[2]), row[3], row[4])
+                    for row in reader if row and not row[0].lstrip().startswith('#')}
+
+    @staticmethod  # the annotation is a temporary fix to Pycharm issue PY-70668
+    def json_entry(self) -> str:
+        return (f'"{self.vehicle_id}":{{'
+                f'{f'm:"{self.model.model_id}", ' if self.model else ''}'
+                f'c:"{self.carrier.symbol}",'
+                f'{f'i:{f'"{self.image_url}"'},' if self.image_url else ''}'
+                f'l:"{self.lore}",'
+                f'}},')
 
 
 class Player:
@@ -184,6 +265,19 @@ class Player:
         self.init_file(self.ev_file)
         self.init_file(self.vehicles_file, 'vehicle_id,date_discovered\n')
 
+    @staticmethod
+    def read_list(source: str) -> list['Player']:
+        with open(source, 'r') as file:
+            reader = csv.reader(file)
+            next(reader)
+            return [Player(*row) for row in reader if row and not row[0].lstrip().startswith('#')]
+
+    def json_entry(self, stops: dict[str, Stop]) -> str:
+        return (f'"{self.nickname}":{{'
+                f'v:[{','.join(sorted(f'"{v[0].vehicle_id}"' for v in self.get_vehicles()))}],'
+                f's:[{','.join(sorted(f'"{s.short_name}"' for s in stops.values() if s.visited_by(self.nickname)))}],'
+                f'}},')
+
 
 class Region:
     def __init__(self, number: int, short_name: str, full_name: str, predicate: Callable[[Stop], bool]):
@@ -197,8 +291,40 @@ class Region:
         self.stops.add(s)
         s.regions.append(self)
 
-    def __contains__(self, item):
-        return self.predicate(item)
+    def __contains__(self, stop: Stop) -> bool:
+        return self.predicate(stop)
 
-    def __lt__(self, other):
-        return self.number < other.number
+    def __lt__(self, other) -> bool:
+        return self.number < other.number if isinstance(other, type(self)) else False
+
+    def __hash__(self):
+        return hash(self.short_name)
+
+    def __eq__(self, other):
+        return self.short_name == other.short_name if isinstance(other, type(self)) else False
+
+    @staticmethod
+    def __resolve_predicate__(predicate_object: dict[str, Any]) -> Callable[[Stop], bool]:
+        predicate_type = predicate_object['type']
+        if predicate_type == 'true':
+            return lambda _: True
+        elif predicate_type == 'or':
+            return lambda s: any(Region.__resolve_predicate__(operand)(s) for operand in predicate_object['operands'])
+        elif predicate_type == 'equals':
+            return lambda s: getattr(s, predicate_object['field']) == predicate_object['value']
+        elif predicate_type == 'does_not_contain':
+            return lambda s: predicate_object['value'] not in getattr(s, predicate_object['field'])
+        elif predicate_type == 'in_any_of':
+            return lambda s: s.in_any_of(predicate_object['towns'])
+        else:
+            raise ValueError(f'Unknown predicate type: {predicate_type}')
+
+    @staticmethod
+    def read_regions(source: str) -> tuple['Region', dict[str, 'Region']]:
+        with (open(source, 'r') as file):
+            index = json.load(file)
+            regions = [Region(region['number'], region['short_name'], region['full_name'],
+                              Region.__resolve_predicate__(region['predicate']))
+                       for region in index['regions']]
+            district: Region = next(filter(lambda r: r.short_name == index['district'], regions))
+            return district, {region.short_name: region for region in regions if region != district}

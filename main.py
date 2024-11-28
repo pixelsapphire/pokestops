@@ -1,4 +1,3 @@
-import csv
 import folium
 import requests
 import sqlite3
@@ -6,95 +5,12 @@ import sys
 from postprocess import *
 from uibuilder import *
 
-district = Region(0, 'PZD', 'Poznań', lambda s: True)
-regions: dict[str, Region] = {r.short_name: r for r in {
-    Region(1, 'POZ', 'Poznań City', lambda s: s.zone == 'A' or '/' not in s.full_name),
-    Region(3, 'SAR', 'San Region', lambda s: s.in_one_of({
-        'Annowo', 'Biedrusko', 'Bolechowo', 'Bolechowo-Os.', 'Bolechówko', 'Czerwonak', 'Dębogóra', 'Karłowice',
-        'Kicin', 'Kliny', 'Koziegłowy', 'Mielno', 'Miękowo', 'M. Goślina', 'Owińska', 'Potasze', 'Promnice',
-        'Przebędowo', 'Szlachęcin', 'Trzaskowo', 'Tuczno', 'Wierzonka'
-    })),
-    Region(4, 'YOR', 'Yon Region', lambda s: s.in_one_of({
-        'Biskupice', 'Bogucin', 'Bugaj', 'Bylin', 'Gortatowo', 'Gowarzewo', 'Garby Małe', 'Garby Wielkie', 'Gruszczyn',
-        'Janikowo', 'Jankowo', 'Jasin', 'Jerzykowo', 'Kleszczewo', 'Kobylnica', 'Komorniki gm.Kleszczewo',
-        'Krerowo', 'Kruszewnia', 'Krzyżowniki', 'Lipowiec', 'Łowęcin', 'Markowice', 'Nagradowice', 'Paczkowo',
-        'Pobiedziska', 'Poklatki', 'Promno', 'Rabowice', 'Sarbinowo', 'Siekierki Wielkie', 'Sokolniki Gwiazdowskie',
-        'Swarzędz', 'Szewce', 'Śródka', 'Tanibórz', 'Trzek', 'Tulce', 'Uzarzewo', 'Wierzenica', 'Zalasewo', 'Zimin'
-    })),
-    Region(5, 'GOR', 'Go Region', lambda s: s.in_one_of({
-        'Babki', 'Biernatki', 'Błażejewko', 'Błażejewo', 'Borówiec', 'Czapury', 'Dachowa', 'Daszewice', 'Dziećmierowo',
-        'Gądki', 'Jaryszki', 'Jeziory Małe', 'Jeziory Wielkie', 'Kamionki', 'Koninko', 'Kórnik', 'Łękno', 'Prusinowo',
-        'Robakowo', 'Skrzynki', 'Szczodrzykowo', 'Szczytniki', 'Świątniczki', 'Wiórek', 'Zaniemyśl', 'Żerniki'
-    })),
-    Region(6, 'ROR', 'Roku Region', lambda s: s.in_one_of({
-        'Luboń', 'Łęczyca', 'Mosina', 'Puszczykowo'
-    })),
-    Region(7, 'SHR', 'Shichi Region', lambda s: s.in_one_of({
-        'Chomęcice', 'Dąbrowa', 'Dąbrówka', 'Dopiewiec', 'Dopiewo', 'Fiałkowo', 'Głuchowo', 'Gołuski', 'Komorniki',
-        'Konarzewo', 'Lisówki', 'Palędzie', 'Plewiska', 'Pokrzywnica', 'Rosnowo', 'Rosnówko', 'Skórzewo', 'Szreniawa',
-        'Trzcielin', 'Walerianowo', 'Więckowice', 'Wiry', 'Zakrzewo', 'Zborowo'
-    })),
-    Region(8, 'HAR', 'Hachi Region', lambda s: s.in_one_of({
-        'Baranowo', 'Batorowo', 'Brzezno', 'Bytkowo', 'Bytyń', 'Ceradz Dolny', 'Ceradz Kościelny', 'Cerekwica', 'Chyby',
-        'Dalekie', 'Gaj Wielki', 'Góra', 'Grzebienisko', 'Jankowice', 'Kaźmierz', 'Kiekrz', 'Kobylniki', 'Kokoszczyn',
-        'Krzyszkowo', 'Lusowo', 'Lusówko', 'Młodasko', 'Mrowino', 'Napachanie', 'Otowo', 'Pawłowice', 'Piersko',
-        'Pólko', 'Przecław', 'Przeźmierowo', 'Przybroda', 'Rogierówko', 'Rokietnica', 'Rostworowo', 'Rumianek', 'Sady',
-        'Sierosław', 'Sobota', 'Starzyny', 'Swadzim', 'Tarnowo Pdg', 'Witkowice', 'Wysogotowo', 'Żydowo'
-    })),
-    Region(9, 'KYR', 'Kyuu Region', lambda s: s.in_one_of({
-        'Chludowo', 'Golęczewo', 'Jelonek', 'Suchy Las', 'Zielątkowo', 'Złotniki', 'Złotkowo'
-    })),
-}}
 
-
-def read_stops() -> tuple[dict[str, Stop], dict[str, set[str]]]:
-    stops: dict[str, Stop] = {}
-    stop_groups: dict[str, set[str]] = {}
-    with open('data/csv/stops.csv', 'r', encoding='utf-8') as file:
-        reader = csv.reader(file)
-        next(reader)
-        for row in reader:
-            stop = Stop(row[1], row[2], row[3], row[4], row[5], row[6])
-            region = next((r for r in regions.values() if stop in r), None)
-            if not region:
-                raise ValueError(f'Stop {stop.full_name} [{stop.short_name}] not in any region')
-            region.add_stop(stop)
-            district.add_stop(stop)
-            stops[row[1]] = stop
-            if stop.full_name not in stop_groups:
-                stop_groups[stop.full_name] = set()
-            stop_groups[stop.full_name].add(stop.short_name)
-    return stops, stop_groups
-
-
-def read_carriers() -> dict[str, Carrier]:
-    with open('data/csv/carriers.csv', 'r') as file:
-        reader = csv.reader(file)
-        next(reader)
-        return {row[0]: Carrier(*row)
-                for row in reader if row and not row[0].lstrip().startswith('#')}
-
-
-def read_models() -> dict[str, VehicleModel]:
-    with open('data/csv/vehicle_models.csv', 'r') as file:
-        reader = csv.reader(file)
-        next(reader)
-        return {row[0]: VehicleModel(*row)
-                for row in reader if row and not row[0].lstrip().startswith('#')}
-
-
-def read_vehicles(carriers: dict[str, Carrier], models: dict[str, VehicleModel]) -> dict[str, Vehicle]:
-    with open('data/csv/vehicles.csv', 'r') as file:
-        reader = csv.reader(file)
-        next(reader)
-        return {row[0]: Vehicle(row[0], carriers.get(row[1]), models.get(row[2]), row[3], row[4])
-                for row in reader if row and not row[0].lstrip().startswith('#')}
-
-
+# noinspection SqlNoDataSourceInspection
 def attach_stop_routes() -> None:
     gtfs_db: sqlite3.Connection = sqlite3.connect(':memory:')
 
-    with open('data/csv/stops.csv', 'r') as file:
+    with open('data/raw/stops.csv', 'r') as file:
         reader = csv.reader(file)
         header_row = next(reader)
         stops_header_row = header_row
@@ -127,81 +43,36 @@ def attach_stop_routes() -> None:
                    'SELECT stops.*, routes '
                    'FROM stops JOIN stop_routes_groupped USING(stop_id)')
 
-    with open('data/csv/stops.csv', 'w') as file:
+    with open('data/raw/stops.csv', 'w') as file:
         writer = csv.writer(file)
         writer.writerow([*stops_header_row, 'routes'])
         writer.writerows(cursor.fetchall())
 
 
-def make_stop_entry(stop: Stop) -> str:
-    return (f'"{stop.short_name}":{{'
-            f'n:"{stop.full_name}",'
-            f'lt:{stop.latitude},'
-            f'ln:{stop.longitude},'
-            f'l:[{','.join(f'[{line},"{destination}"]' for line, destination in stop.lines)}]'
-            f'}},')
-
-
-def make_vehicle_model_entry(model: VehicleModel) -> str:
-    return (f'"{model.model_id}":{{'
-            f'k:"{model.kind_detailed}",'
-            f'b:"{model.brand}",'
-            f'm:"{model.model}",'
-            f'{f's:{model.seats},' if model.seats else ''}'
-            f'l:"{model.lore}",'
-            f'}},')
-
-
-def make_carrier_entry(carrier: Carrier) -> str:
-    return (f'"{carrier.symbol}":{{'
-            f'n:"{carrier.full_name}",'
-            f'}},')
-
-
-def make_vehicle_entry(vehicle: Vehicle) -> str:
-    return (f'"{vehicle.vehicle_id}":{{'
-            f'm:"{vehicle.model.model_id}",'
-            f'c:"{vehicle.carrier.symbol}",'
-            f'{f'i:{f'"{vehicle.image_url}"'},' if vehicle.image_url else ''}'
-            f'l:"{vehicle.lore}",'
-            f'}},')
-
-
-def make_player_entry(player: Player, stops: dict[str, Stop]) -> str:
-    return (f'"{player.nickname}":{{'
-            f'v:[{','.join(sorted(f'"{v[0].vehicle_id}"' for v in player.get_vehicles()))}],'
-            f's:[{','.join(sorted(f'"{s.short_name}"' for s in stops.values() if s.visited_by(player.nickname)))}],'
-            f'}},')
-
-
 def main() -> None:
-    players: list[Player] = []
-    with open('data/csv/players.csv', 'r') as file:
-        reader = csv.reader(file)
-        next(reader)
-        for row in reader:
-            players.append(Player(*row))
+    district, regions = Region.read_regions('data/raw/regions.json')
+    players: list[Player] = Player.read_list('data/raw/players.csv')
 
     old_stops = {}
-    first_update = not os.path.exists('data/csv/stops.csv')
+    first_update = not os.path.exists('data/raw/stops.csv')
     if update_ztm_stops:
         if not first_update:
-            old_stops, _ = read_stops()
+            old_stops, _ = Stop.read_dicts('data/raw/stops.csv', district, regions)
         response: requests.Response = requests.get('https://www.ztm.poznan.pl/pl/dla-deweloperow/getGTFSFile')
         with open('data/gtfs.zip', 'wb') as file:
             file.write(response.content)
         with util.zip_file('data/gtfs.zip', 'r') as zip_ref:
-            zip_ref.extract_as('stops.txt', 'data/csv/stops.csv')
-            zip_ref.extract_as('stop_times.txt', 'data/csv/stop_times.csv')
-            zip_ref.extract_as('trips.txt', 'data/csv/trips.csv')
+            zip_ref.extract_as('stops.txt', 'data/raw/stops.csv')
+            zip_ref.extract_as('stop_times.txt', 'data/raw/stop_times.csv')
+            zip_ref.extract_as('trips.txt', 'data/raw/trips.csv')
         os.remove('data/gtfs.zip')
         attach_stop_routes()
-        os.remove('data/csv/stop_times.csv')
-        os.remove('data/csv/trips.csv')
-    elif not os.path.exists('data/csv/stops.csv'):
+        os.remove('data/raw/stop_times.csv')
+        os.remove('data/raw/trips.csv')
+    elif not os.path.exists('data/raw/stops.csv'):
         raise FileNotFoundError('stops.csv not found. Run the script with the --update flag to download the latest data.')
 
-    stops, stop_groups = read_stops()
+    stops, stop_groups = Stop.read_dicts('data/raw/stops.csv', district, regions)
 
     if update_ztm_stops:
         added_stops = {s for s in stops.values() if s not in old_stops.values()}
@@ -217,9 +88,9 @@ def main() -> None:
             if not added_stops and not removed_stops:
                 print('No changes')
 
-    carriers: dict[str, Carrier] = read_carriers()
-    models: dict[str, VehicleModel] = read_models()
-    vehicles: dict[str, Vehicle] = read_vehicles(carriers, models)
+    carriers: dict[str, Carrier] = Carrier.read_dict('data/raw/carriers.csv')
+    models: dict[str, VehicleModel] = VehicleModel.read_dict('data/raw/vehicle_models.csv')
+    vehicles: dict[str, Vehicle] = Vehicle.read_dict('data/raw/vehicles.csv', carriers, models)
 
     ever_visited_stops: set[Stop] = set()
     documented_visited_stops: set[Stop] = set()
@@ -334,15 +205,15 @@ def main() -> None:
             file.write(rendered_application)
 
         with open('data/js/stops_data.min.js', 'w') as file:
-            file.write(f'const stops = {{\n{'\n'.join(map(make_stop_entry, stops.values()))}\n}};')
+            file.write(f'const stops = {{\n{'\n'.join(map(Stop.json_entry, stops.values()))}\n}};')
 
         with open('data/js/vehicles_data.min.js', 'w') as file:
-            file.write(f'const vehicle_models = {{\n{'\n'.join(map(make_vehicle_model_entry, models.values()))}\n}};\n')
-            file.write(f'const carriers = {{\n{'\n'.join(map(make_carrier_entry, carriers.values()))}\n}};\n')
-            file.write(f'const vehicles = {{\n{'\n'.join(map(make_vehicle_entry, vehicles.values()))}\n}};')
+            file.write(f'const vehicle_models = {{\n{'\n'.join(map(VehicleModel.json_entry, models.values()))}\n}};\n')
+            file.write(f'const carriers = {{\n{'\n'.join(map(Carrier.json_entry, carriers.values()))}\n}};\n')
+            file.write(f'const vehicles = {{\n{'\n'.join(map(Vehicle.json_entry, vehicles.values()))}\n}};')
 
         with open('data/js/players_data.min.js', 'w') as file:
-            file.write(f'const players = {{\n{'\n'.join(map(lambda p: make_player_entry(p, stops), players))}\n}};')
+            file.write(f'const players = {{\n{'\n'.join(map(lambda p: p.json_entry(stops), players))}\n}};')
 
         html_archive: Html = create_archive(accessor)
         rendered_archive: str = clean_html(html_archive.render(True, True))

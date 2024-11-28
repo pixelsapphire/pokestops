@@ -1,0 +1,271 @@
+{
+  "district": "PZD",
+  "regions": [
+    {
+      "number": 0,
+      "short_name": "PZD",
+      "full_name": "Poznań",
+      "predicate": {
+        "type": "true"
+      }
+    },
+    {
+      "number": 1,
+      "short_name": "POZ",
+      "full_name": "Poznań City",
+      "predicate": {
+        "type": "or",
+        "operands": [
+          {
+            "type": "equals",
+            "field": "zone",
+            "value": "A"
+          },
+          {
+            "type": "does_not_contain",
+            "field": "full_name",
+            "value": "/"
+          }
+        ]
+      }
+    },
+    {
+      "number": 3,
+      "short_name": "SAR",
+      "full_name": "San Region",
+      "predicate": {
+        "type": "in_any_of",
+        "towns": [
+          "Annowo",
+          "Biedrusko",
+          "Bolechowo",
+          "Bolechowo-Os.",
+          "Bolechówko",
+          "Czerwonak",
+          "Dębogóra",
+          "Karłowice",
+          "Kicin",
+          "Kliny",
+          "Koziegłowy",
+          "Mielno",
+          "Miękowo",
+          "M. Goślina",
+          "Owińska",
+          "Potasze",
+          "Promnice",
+          "Przebędowo",
+          "Szlachęcin",
+          "Trzaskowo",
+          "Tuczno",
+          "Wierzonka"
+        ]
+      }
+    },
+    {
+      "number": 4,
+      "short_name": "YOR",
+      "full_name": "Yon Region",
+      "predicate": {
+        "type": "in_any_of",
+        "towns": [
+          "Biskupice",
+          "Bogucin",
+          "Bugaj",
+          "Bylin",
+          "Gortatowo",
+          "Gowarzewo",
+          "Garby Małe",
+          "Garby Wielkie",
+          "Gruszczyn",
+          "Janikowo",
+          "Jankowo",
+          "Jasin",
+          "Jerzykowo",
+          "Kleszczewo",
+          "Kobylnica",
+          "Komorniki gm.Kleszczewo",
+          "Krerowo",
+          "Kruszewnia",
+          "Krzyżowniki",
+          "Lipowiec",
+          "Łowęcin",
+          "Markowice",
+          "Nagradowice",
+          "Paczkowo",
+          "Pobiedziska",
+          "Poklatki",
+          "Promno",
+          "Rabowice",
+          "Sarbinowo",
+          "Siekierki Wielkie",
+          "Sokolniki Gwiazdowskie",
+          "Swarzędz",
+          "Szewce",
+          "Śródka",
+          "Tanibórz",
+          "Trzek",
+          "Tulce",
+          "Uzarzewo",
+          "Wierzenica",
+          "Zalasewo",
+          "Zimin"
+        ]
+      }
+    },
+    {
+      "number": 5,
+      "short_name": "GOR",
+      "full_name": "Go Region",
+      "predicate": {
+        "type": "in_any_of",
+        "towns": [
+          "Babki",
+          "Biernatki",
+          "Błażejewko",
+          "Błażejewo",
+          "Borówiec",
+          "Czapury",
+          "Dachowa",
+          "Daszewice",
+          "Dziećmierowo",
+          "Gądki",
+          "Jaryszki",
+          "Jeziory Małe",
+          "Jeziory Wielkie",
+          "Kamionki",
+          "Koninko",
+          "Kórnik",
+          "Łękno",
+          "Prusinowo",
+          "Robakowo",
+          "Skrzynki",
+          "Szczodrzykowo",
+          "Szczytniki",
+          "Świątniczki",
+          "Wiórek",
+          "Zaniemyśl",
+          "Żerniki"
+        ]
+      }
+    },
+    {
+      "number": 6,
+      "short_name": "ROR",
+      "full_name": "Roku Region",
+      "predicate": {
+        "type": "in_any_of",
+        "towns": [
+          "Luboń",
+          "Łęczyca",
+          "Mosina",
+          "Puszczykowo"
+        ]
+      }
+    },
+    {
+      "number": 7,
+      "short_name": "SHR",
+      "full_name": "Shichi Region",
+      "predicate": {
+        "type": "in_any_of",
+        "towns": [
+          "Chomęcice",
+          "Dąbrowa",
+          "Dąbrówka",
+          "Dopiewiec",
+          "Dopiewo",
+          "Fiałkowo",
+          "Głuchowo",
+          "Gołuski",
+          "Komorniki",
+          "Konarzewo",
+          "Lisówki",
+          "Palędzie",
+          "Plewiska",
+          "Pokrzywnica",
+          "Rosnowo",
+          "Rosnówko",
+          "Skórzewo",
+          "Szreniawa",
+          "Trzcielin",
+          "Walerianowo",
+          "Więckowice",
+          "Wiry",
+          "Zakrzewo",
+          "Zborowo"
+        ]
+      }
+    },
+    {
+      "number": 8,
+      "short_name": "HAR",
+      "full_name": "Hachi Region",
+      "predicate": {
+        "type": "in_any_of",
+        "towns": [
+          "Baranowo",
+          "Batorowo",
+          "Brzezno",
+          "Bytkowo",
+          "Bytyń",
+          "Ceradz Dolny",
+          "Ceradz Kościelny",
+          "Cerekwica",
+          "Chyby",
+          "Dalekie",
+          "Gaj Wielki",
+          "Góra",
+          "Grzebienisko",
+          "Jankowice",
+          "Kaźmierz",
+          "Kiekrz",
+          "Kobylniki",
+          "Kokoszczyn",
+          "Krzyszkowo",
+          "Lusowo",
+          "Lusówko",
+          "Młodasko",
+          "Mrowino",
+          "Napachanie",
+          "Otowo",
+          "Pawłowice",
+          "Piersko",
+          "Pólko",
+          "Przecław",
+          "Przeźmierowo",
+          "Przybroda",
+          "Rogierówko",
+          "Rokietnica",
+          "Rostworowo",
+          "Rumianek",
+          "Sady",
+          "Sierosław",
+          "Sobota",
+          "Starzyny",
+          "Swadzim",
+          "Tarnowo Pdg",
+          "Witkowice",
+          "Wysogotowo",
+          "Żydowo"
+        ]
+      }
+    },
+    {
+      "number": 9,
+      "short_name": "KYR",
+      "full_name": "Kyuu Region",
+      "predicate": {
+        "type": "in_any_of",
+        "towns": [
+          "Chludowo",
+          "Golęczewo",
+          "Jelonek",
+          "Suchy Las",
+          "Zielątkowo",
+          "Złotniki",
+          "Złotkowo"
+        ]
+      }
+    }
+  ]
+}

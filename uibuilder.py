@@ -188,24 +188,27 @@ def create_achievements_sidebar(db: DataAccessor) -> (Div, Button):
 
 
 def create_vehicle_row(vehicle: Vehicle, date: str) -> Tr:
+    model: VehicleModel = vehicle.model
+    if model is None:
+        print('Vehicle without specified model marked as found:', vehicle.vehicle_id)
+        model = VehicleModel('?', 'bus', '?', '?', '?', 0, '')
     return Tr(
         [],
         [
             Td(
                 [],
-                Img([Class('vehicle-icon'), Src(f'assets/vehicles/{vehicle.model.kind}.webp')]),
+                Img([Class('vehicle-icon'), Src(f'assets/vehicles/{model.kind}.webp')]),
             ),
             Td(
                 [],
-                Img([Class('brand-logo'),
-                     Src(f'assets/brands/{vehicle.model.brand.lower()}.webp')]),
+                Img([Class('brand-logo'), Src(f'assets/brands/{model.brand.lower()}.webp')]) if model.brand != '?' else '',
             ),
             Td(
                 [],
                 [
-                    Span([Class('smaller')], vehicle.model.brand),
+                    Span([Class('smaller')], model.brand),
                     Br(),
-                    Span([Class('smaller' if len(vehicle.model.model) >= 30 else '')], vehicle.model.model),
+                    Span([Class('smaller' if len(model.model) >= 30 else '')], model.model),
                     Br(),
                     Span([Class('larger')], f'#{vehicle.vehicle_id} '),
                     Span([Class('smaller')], f'({vehicle.carrier.short_name})'),
@@ -342,7 +345,7 @@ def create_navigation() -> Div:
 
 def create_stop_group_view(db: DataAccessor, group: str, stop_names: set[str]) -> Div:
     stops: list[Stop] = list(sorted((db.stops[stop] for stop in stop_names), key=lambda s: s.short_name))
-    region: Region = next(iter(set(db.stops[next(iter(stop_names))].regions) - {db.district}))
+    region: Region = next(iter(set(db.stops[next(iter(stop_names))].regions) - {db.district}), db.district)
     return Div(
         [Class('stop-group-view')],
         [
@@ -435,8 +438,8 @@ def create_vehicle_preview(vehicle: Vehicle) -> Div:
     return Div(
         [Class('vehicle-preview'), CustomHtmlTagAttribute('data-vehicle-id', vehicle.vehicle_id)],
         [
-            Img([Class('vehicle-icon'), Src(f'assets/vehicles/{vehicle.model.kind}.webp')]),
-            Img([Class('vehicle-brand'), Src(f'assets/brands/{vehicle.model.brand.lower()}.webp')]),
+            Img([Class('vehicle-icon'), Src(f'assets/vehicles/{vehicle.model.kind if vehicle.model else 'bus'}.webp')]),
+            Img([Class('vehicle-brand'), Src(f'assets/brands/{vehicle.model.brand.lower()}.webp')]) if vehicle.model else '',
             Div([Class('vehicle-id')], f'#{vehicle.vehicle_id}'),
         ],
     )
