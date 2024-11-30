@@ -17,13 +17,13 @@ def attach_stop_routes() -> None:
         gtfs_db.execute(f'CREATE TABLE stops ({", ".join(f'{col} TEXT' for col in header_row)})')
         gtfs_db.executemany(f'INSERT INTO stops VALUES ({','.join('?' * len(header_row))})', reader)
 
-    with open('stop_times.csv', 'r') as file:
+    with open('data/raw/stop_times.csv', 'r') as file:
         reader = csv.reader(file)
         header_row = next(reader)
         gtfs_db.execute(f'CREATE TABLE stop_times ({", ".join(f'{col} TEXT' for col in header_row)})')
         gtfs_db.executemany(f'INSERT INTO stop_times VALUES ({','.join('?' * len(header_row))})', reader)
 
-    with open('trips.csv', 'r') as file:
+    with open('data/raw/trips.csv', 'r') as file:
         reader = csv.reader(file)
         header_row = next(reader)
         gtfs_db.execute(f'CREATE TABLE trips ({", ".join(f'{col} TEXT' for col in header_row)})')

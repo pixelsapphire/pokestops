@@ -26,7 +26,7 @@ class Stop:
         self.zone: str = zone
         self.visits: set[Visit] = set()
         self.regions: list[Region] = []
-        self.lines: list[tuple[int, str]] = list(map(lambda e: (int(e[:e.index(':')]), e[e.index(':') + 1:]),
+        self.lines: list[tuple[str, str]] = list(map(lambda e: (e[:e.index(':')], e[e.index(':') + 1:]),
                                                      routes.split('&'))) if routes else []
 
     def __hash__(self):
@@ -70,7 +70,7 @@ class Stop:
             reader = csv.reader(file)
             next(reader)
             for row in reader:
-                stop = Stop(row[1], row[2], row[3], row[4], row[5], row[6])
+                stop = Stop(row[1], row[2], row[3], row[4], row[5], row[6] if len(row) > 6 else '')
                 region = next((r for r in regions.values() if stop in r), None)
                 if not region:
                     raise ValueError(f'Stop {stop.full_name} [{stop.short_name}] not in any region')
@@ -88,7 +88,7 @@ class Stop:
                 f'n:"{self.full_name}",'
                 f'lt:{self.latitude},'
                 f'ln:{self.longitude},'
-                f'l:[{','.join(f'[{line},"{destination}"]' for line, destination in self.lines)}]'
+                f'l:[{','.join(f'["{line}","{destination}"]' for line, destination in self.lines)}]'
                 f'}},')
 
 
