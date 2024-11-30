@@ -177,8 +177,9 @@ class VehicleModel:
 
 
 class Vehicle:
-    def __init__(self, vehicle_id: str, carrier: Carrier, model: VehicleModel, image_url: str, lore: str):
+    def __init__(self, vehicle_id: str, license_plate: str, carrier: Carrier, model: VehicleModel, image_url: str, lore: str):
         self.vehicle_id: str = vehicle_id
+        self.license_plate: str = license_plate
         self.carrier: Carrier = carrier
         self.model: VehicleModel = model
         self.image_url: str | None = image_url if image_url else None
@@ -201,12 +202,13 @@ class Vehicle:
         with open(source, 'r') as file:
             reader = csv.reader(file)
             next(reader)
-            return {row[0]: Vehicle(row[0], carriers.get(row[1]), models.get(row[2]), row[3], row[4])
+            return {row[0]: Vehicle(row[0], row[1], carriers.get(row[2]), models.get(row[3]), row[4], row[5])
                     for row in reader if row and not row[0].lstrip().startswith('#')}
 
     @staticmethod  # the annotation is a temporary fix to Pycharm issue PY-70668
     def json_entry(self) -> str:
         return (f'"{self.vehicle_id}":{{'
+                f'{f'p:"{self.license_plate}", ' if self.license_plate else ''}'
                 f'{f'm:"{self.model.model_id}", ' if self.model else ''}'
                 f'c:"{self.carrier.symbol}",'
                 f'{f'i:{f'"{self.image_url}"'},' if self.image_url else ''}'

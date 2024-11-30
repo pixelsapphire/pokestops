@@ -36,19 +36,31 @@ function select_vehicle(vehiclePreview, ctrl) {
     ctrl.vehicleDetails.classList.remove('hidden');
     const vehicleId = vehiclePreview.getAttribute('data-vehicle-id');
     const vehicle = vehicles[vehicleId];
-    const model = vehicle.m ? vehicle_models[vehicle.m] : {k: 'bus', b: '?', m: '?'};
+    const model = vehicle_models[vehicle.m];
     const carrier = carriers[vehicle.c];
     ctrl.vehicleNameLabel.innerHTML = `#${vehicleId}`;
+    if (vehicle.p) {
+        ctrl.vehicleLicensePlate.classList.remove('hidden');
+        ctrl.vehicleLicensePlate.innerHTML = '<div class="lp-component lp-euroband"><span class="lp-stars">*</span><span class="lp-country">|</span></div>';
+        for (const character of vehicle.p) {
+            if (character !== ' ') ctrl.vehicleLicensePlate.innerHTML += `<div class="lp-component lp-character">${character}</div>`;
+            else ctrl.vehicleLicensePlate.innerHTML += `<div class="lp-component lp-space"></div>`;
+        }
+        if (model && (model.k.startsWith('hydrogen') || model.k.startsWith('electric'))) ctrl.vehicleLicensePlate.classList.add('green');
+        else ctrl.vehicleLicensePlate.classList.remove('green');
+    } else ctrl.vehicleLicensePlate.classList.add('hidden');
     ctrl.vehicleCarrierLabel.innerHTML = carrier.n;
-    ctrl.vehicleKindLabel.innerHTML = model.k;
-    ctrl.vehicleBrandLabel.innerHTML = model.b;
-    ctrl.vehicleModelLabel.innerHTML = model.m;
-    ctrl.vehicleSeatsLabel.innerHTML = model.s ? `${model.s}` : '?';
+    [[model?.k, ctrl.vehicleKindLabel], [model?.b, ctrl.vehicleBrandLabel], [model?.m, ctrl.vehicleModelLabel], [model?.s, ctrl.vehicleSeatsLabel]]
+        .forEach(([value, label]) => {
+            if (value) label.parentElement.classList.remove('hidden') || (label.innerHTML = value);
+            else label.parentElement.classList.add('hidden');
+        });
     ctrl.vehicleLoreLabel.innerHTML = ''
-    if (model.l) ctrl.vehicleLoreLabel.innerHTML += `<p>${model.l}</p>`;
+    if (model?.l) ctrl.vehicleLoreLabel.innerHTML += `<p>${model.l}</p>`;
     if (vehicle.l) ctrl.vehicleLoreLabel.innerHTML += `<p>${vehicle.l}</p>`;
     if (vehicle.i) {
-        ctrl.vehicleImage.innerHTML = `<img src="${vehicle.i}" alt="${model.b} ${model.m} #${vehicleId}">`;
+        const alt = model ? `${model.b} ${model.m} #${vehicleId}` : `Vehicle #${vehicleId}`;
+        ctrl.vehicleImage.innerHTML = `<img src="${vehicle.i}" alt="${alt}">`;
         ctrl.vehicleImage.firstChild.addEventListener('click', () => window.open(vehicle.i, '_blank'));
     } else ctrl.vehicleImage.innerHTML = '';
 }
@@ -89,10 +101,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let vehicleViewControls = {
         vehicleDetails: vehicleView.querySelector('#vehicle-details'),
         vehicleNameLabel: vehicleView.querySelector('#vehicle-name'),
+        vehicleLicensePlate: vehicleView.querySelector('#vehicle-license-plate'),
+        vehicleCarrierLabel: vehicleView.querySelector('#vehicle-carrier'),
         vehicleKindLabel: vehicleView.querySelector('#vehicle-kind'),
         vehicleBrandLabel: vehicleView.querySelector('#vehicle-brand'),
         vehicleModelLabel: vehicleView.querySelector('#vehicle-model'),
-        vehicleCarrierLabel: vehicleView.querySelector('#vehicle-carrier'),
         vehicleSeatsLabel: vehicleView.querySelector('#vehicle-seats'),
         vehicleLoreLabel: vehicleView.querySelector('#vehicle-lore'),
         vehicleImage: vehicleView.querySelector('#vehicle-image'),

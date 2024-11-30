@@ -1,3 +1,8 @@
+@font-face {
+    font-family: 'Arklatrs';
+    src: url('assets/fonts/arklatrs.ttf');
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -151,6 +156,7 @@ a {
     flex: 3;
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     padding: min(2vh, 2dvw);
 }
 
@@ -245,6 +251,51 @@ a {
 .vehicle-id {
     margin-top: min(0.5vh, 0.5dvw);
     font-size: min(1.75vh, 1.75dvw);
+}
+
+#vehicle-license-plate {
+    margin-top: min(1.5vh, 1.5dvw);
+    font-size: min(6vh, 6dvw);
+    font-family: Arklatrs, monospace;
+    background-color: white;
+    color: black;
+    border-radius: min(1vh, 1dvw);
+}
+
+#vehicle-license-plate.green {
+    background-color: #90c798;
+}
+
+.lp-component {
+    display: inline-block;
+    width: min(3.5vh, 3.5dvw);
+    text-align: center;
+}
+
+.lp-euroband {
+    background-color: #243b80;
+    padding: min(0.5vh, 1dvw) 0 min(0.5vh, 1dvw) min(0.5vh, 1dvw);
+    border-radius: min(1vh, 1dvw) 0 0 min(1vh, 1dvw);
+    margin-right: min(0.5vh, 0.5dvw);
+}
+
+.lp-stars {
+    color: #f1c40f;
+}
+
+.lp-country {
+    color: white;
+}
+
+.lp-character:last-of-type {
+    margin-right: min(0.5vh, 0.5dvw);
+}
+
+.lp-space {
+    width: min(2vh, 2dvw);
+    background-color: silver;
+    height: 0.6em;
+    transform: scale(0.6) translate(0.05em, -0.15em);
 }
 
 #vehicle-image > img {

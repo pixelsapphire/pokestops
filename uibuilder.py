@@ -460,15 +460,16 @@ def create_vehicles_page(db: DataAccessor) -> Div:
                 [Class('content-section object-view'), Id('vehicle-view')],
                 [
                     Div([Id('vehicle-name'), Class('name-label')]),
+                    Div([Id('vehicle-license-plate')]),
                     Div([Id('vehicle-image')]),
                     Table(
                         [Id('vehicle-details'), Class('details-table hidden')],
                         [
-                            Tr([], [Td([Class('nowrap')], 'carrier:'), Td([Id('vehicle-carrier')])]),
-                            Tr([], [Td([Class('nowrap')], 'type:'), Td([Id('vehicle-kind')])]),
-                            Tr([], [Td([Class('nowrap')], 'brand:'), Td([Id('vehicle-brand')])]),
-                            Tr([], [Td([Class('nowrap')], 'model:'), Td([Id('vehicle-model')])]),
-                            Tr([], [Td([Class('nowrap')], 'seats:'), Td([Id('vehicle-seats')])]),
+                            Tr([], [Td([], 'carrier:'), Td([Id('vehicle-carrier')])]),
+                            Tr([], [Td([], 'type:'), Td([Id('vehicle-kind')])]),
+                            Tr([], [Td([], 'brand:'), Td([Id('vehicle-brand')])]),
+                            Tr([], [Td([], 'model:'), Td([Id('vehicle-model')])]),
+                            Tr([], [Td([], 'seats:'), Td([Id('vehicle-seats')])]),
                         ],
                     ),
                     Div([Id('vehicle-lore'), Class('lore-label')]),
