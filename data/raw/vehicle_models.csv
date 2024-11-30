@@ -21,11 +21,13 @@ SL312H,bus,hybrid bus,Solaris,Urbino 12 hybrid III gen,30,"A hybrid version of t
 SL318D,bus,diesel bus,Solaris,Urbino 18 III gen,40,"The third generation of the Urbino 18-meter model, produced since 2005."
 SL412D,bus,diesel bus,Solaris,Urbino 12 IV gen,30,"The fourth generation of the Urbino 12-meter model, produced since 2015."
 SL412E,bus,electric bus,Solaris,Urbino 12 electric IV gen,29,"An electric version of the IV-gen Urbino 12 model, produced since 2015."
+SL412H,bus,hydrogen bus,Solaris,Urbino 12 hydrogen IV gen,30,"A hydrogen version of the IV-gen Urbino 12 model, produced since 2020."
 SL418D,bus,diesel bus,Solaris,Urbino 18 IV gen,40,"The fourth generation of the Urbino 18-meter model, produced since 2015."
 SL418E,bus,hydrogen bus,Solaris,Urbino 18 electric IV gen,40,"An electric version of the IV-gen Urbino 18 model, produced since 2015."
 SL418H,bus,hydrogen bus,Solaris,Urbino 18 hydrogen IV gen,40,"A hydrogen version of the IV-gen Urbino 18 model, produced since 2022."
 MBC345,bus,diesel bus,Mercedes-Benz,Conecto G O345,40,"O345 is a Turkish 18-meter bus produced since 1997. Bought by Poznań to replace older vehicles that didn't meet European combustion standards."
 MBC530,bus,diesel bus,Mercedes-Benz,Citaro O530 II,30,"O530 is a Turkish 12-meter bus produced since 1997."
+MBC53L,bus,diesel bus,Mercedes-Benz,Citaro O530L II,30,"O530L is a Turkish 12-meter bus produced since 1997."
 MNNG36,bus,diesel bus,MAN,Lion's City G NG363,43,"NG363 is a German 18-meter bus produced since 2004."
 MNNL28,bus,hybrid bus,MAN,Lion's City 12 EfficientHybrid NL280,37,"NL280 is a german 12-meter hybrid bus produced since 2019."
 MNNG73,bus,electric bus,MAN,Lion's City 18E NG734,40,NG734 is a german 18-meter electric bus produced since 2020.
