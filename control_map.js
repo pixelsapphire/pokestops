@@ -1,5 +1,6 @@
 let showUnvisited = false;
 let showEverVisited = false;
+let stellarVoyage = false;
 let activePlayer = 'Zorie';
 let activeRegion = 'POZ';
 let darkMode = true;
@@ -29,33 +30,59 @@ function injectThemeSwitcher() {
 
 function refreshMap() {
 
-    document.querySelectorAll(`.marker.visited-${activePlayer.toLowerCase()}.region-${activeRegion}:not(.ever-visited-${activePlayer.toLowerCase()})`).forEach(m => {
-        m.style.color = colors[activePlayer][primary];
-        m.parentElement.style.display = null;
-    });
-    const everVisitedMarkers = document.querySelectorAll(`.marker.ever-visited-${activePlayer.toLowerCase()}.region-${activeRegion}`);
-    if (showEverVisited)
-        everVisitedMarkers.forEach(m => {
-            m.style.color = colors[activePlayer][tint];
+    const percentage = document.querySelector('#exploration-percentage');
+    document.body.classList.toggle('stellar-voyage', stellarVoyage);
+
+    if (!stellarVoyage) {
+
+        document.querySelectorAll(`.marker.visited-${activePlayer.toLowerCase()}.region-${activeRegion}:not(.ever-visited-${activePlayer.toLowerCase()})`).forEach(m => {
+            m.style.color = colors[activePlayer][primary];
             m.parentElement.style.display = null;
         });
-    else
-        everVisitedMarkers.forEach(m => {
+        const everVisitedMarkers = document.querySelectorAll(`.marker.ever-visited-${activePlayer.toLowerCase()}.region-${activeRegion}`);
+        if (showEverVisited)
+            everVisitedMarkers.forEach(m => {
+                m.style.color = colors[activePlayer][tint];
+                m.parentElement.style.display = null;
+            });
+        else
+            everVisitedMarkers.forEach(m => {
+                m.style.color = 'red';
+                m.parentElement.style.display = showUnvisited ? null : 'none';
+            });
+        document.querySelectorAll(`.marker:not(.visited-${activePlayer.toLowerCase()})`).forEach(m => {
             m.style.color = 'red';
             m.parentElement.style.display = showUnvisited ? null : 'none';
         });
-    document.querySelectorAll(`.marker:not(.visited-${activePlayer.toLowerCase()})`).forEach(m => {
-        m.style.color = 'red';
-        m.parentElement.style.display = showUnvisited ? null : 'none';
-    });
-    document.querySelectorAll(`.marker:not(.region-${activeRegion})`).forEach(m => {
-        m.parentElement.style.display = 'none';
-    });
+        document.querySelectorAll(`.marker:not(.region-${activeRegion})`).forEach(m => {
+            m.parentElement.style.display = 'none';
+        });
+        document.querySelectorAll(`.marker.terminal`).forEach(m => {
+            m.parentElement.style.display = 'none';
+        });
+
+        percentage.innerHTML = `${percentage.getAttribute(`data-${activeRegion.toLowerCase()}-${showEverVisited ? 'ev-' : ''}${activePlayer.toLowerCase()}`)} %`;
+
+    } else {
+        document.querySelectorAll(`.marker.terminal`).forEach(m => {
+            if (m.classList.contains(`reached-${activePlayer.toLowerCase()}`)) m.style.color = colors[activePlayer][primary];
+            else m.style.color = 'red';
+            m.parentElement.style.display = null;
+        });
+        document.querySelectorAll(`.marker.tp-${activePlayer.toLowerCase()}`).forEach(m => {
+            m.parentElement.style.display = null;
+            if (m.classList.contains(`visited-${activePlayer.toLowerCase()}`)) m.style.color = colors[activePlayer][tint];
+            else m.style.color = 'red';
+        });
+        document.querySelectorAll(`.marker:not(.terminal):not(.tp-${activePlayer.toLowerCase()})`).forEach(m => {
+            m.parentElement.style.display = 'none';
+        });
+
+        percentage.innerHTML = `${percentage.getAttribute(`data-sv-${activePlayer.toLowerCase()}`)} %`;
+    }
 
     document.querySelectorAll('.progress-list').forEach(
         list => list.style.display = list.getAttribute('data-player') === activePlayer.toLowerCase() ? null : 'none');
-    const percentage = document.querySelector('#exploration-percentage');
-    percentage.innerHTML = percentage.getAttribute(`data-${activeRegion.toLowerCase()}-${showEverVisited ? 'ev-' : ''}${activePlayer.toLowerCase()}`);
 
     document.querySelectorAll('.leaflet-layer,.leaflet-control-zoom-in,.leaflet-control-zoom-out,.leaflet-control-attribution,.leaflet-control-theme')
         .forEach(e => e.style.filter = darkMode ? 'invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)' : null);
@@ -69,6 +96,11 @@ function toggleUnvisited() {
 
 function toggleEV() {
     showEverVisited = document.querySelector("#ev-switch").checked;
+    refreshMap();
+}
+
+function toggleSV() {
+    stellarVoyage = document.querySelector("#sv-switch").checked;
     refreshMap();
 }
 

@@ -37,38 +37,61 @@
 'Zorie':['#4caf50','#93cf96'],
 'Sapphire':['#8566d9','#b5a3e8'],
 'Camomile':['#ff9800','#ffc166']};</script>
+    <script src='data/js/players_data.min.js'></script>
+    <script src='data/js/stops_data.min.js'></script>
     <script src='control_map.js'></script>
   </head>
   <body>
     <div class="folium-map" id="m" ></div>
-    <div id='control'>
-      <div style='display:table-cell;vertical-align:middle;'>
-        <div style='margin:0;' class='hud-text'>Show unvisited</div>
-        <div>
-          <label style='margin:0;' class='toggle-switch' onclick='toggleUnvisited()'>
-            <input id='visited-switch' type='checkbox'/>
-            <span class='slider'></span>
-          </label>
-        </div>
-        <div style='margin:0;' class='hud-text'>Show ever visited</div>
-        <div>
-          <label style='margin:0;' class='toggle-switch' onclick='toggleEV()'>
-            <input id='ev-switch' type='checkbox'/>
-            <span class='slider'></span>
-          </label>
-        </div>
-      </div>
+    <div id='control' class='hud'>
+      <table>
+        <tbody>
+          <tr>
+            <td><div>Show unvisited</div></td>
+            <td>
+              <div>
+                <label class='toggle-switch' onclick='toggleUnvisited()'>
+                  <input id='visited-switch' type='checkbox'/>
+                  <span class='slider'></span>
+                </label>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><div>Show ever visited</div></td>
+            <td>
+              <div>
+                <label class='toggle-switch' onclick='toggleEV()'>
+                  <input id='ev-switch' type='checkbox'/>
+                  <span class='slider'></span>
+                </label>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><div class='label-new'>Stellar Voyage</div></td>
+            <td>
+              <div>
+                <label class='toggle-switch' onclick='toggleSV()'>
+                  <input id='sv-switch' type='checkbox'/>
+                  <span class='slider'></span>
+                </label>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
       <label id='player-selection'>
-        <select class='dropdown hud-text' onchange='selectPlayer()'>
+        <select class='dropdown hud' onchange='selectPlayer()'>
           <option value='Zorie'>Zorie</option>
           <option value='Sapphire'>Sapphire</option>
           <option value='Camomile'>Camomile</option>
         </select>
       </label>
     </div>
-    <p id='exploration' class='hud-text'>
+    <p id='exploration' class='hud'>
       <label id='region-selection'>
-        <select class='dropdown hud-text' onchange='selectRegion()'>
+        <select class='dropdown hud' onchange='selectRegion()'>
           <option value='PZD'>Poznań</option>
           <option value='POZ'>Poznań City</option>
           <option value='SAR'>San Region</option>
@@ -135,10 +158,12 @@
               data-ror-ev-camomile='0.0' 
               data-shr-ev-camomile='0.0' 
               data-har-ev-camomile='0.0' 
-              data-kyr-ev-camomile='0.0'>
+              data-kyr-ev-camomile='0.0' 
+              data-sv-zorie='0.0' 
+              data-sv-sapphire='0.0' 
+              data-sv-camomile='0.0'>
         13.2
         </span>
-        %
       </span>
     </p>
     <img id='compass' src='assets/compass.png'/>

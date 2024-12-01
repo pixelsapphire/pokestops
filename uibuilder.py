@@ -33,45 +33,95 @@ class DataAccessor:
 def create_control_section(db: DataAccessor) -> Div:
     players: list[Player] = db.players
     return Div(
-        [Id('control')],
+        [Id('control'), Class('hud')],
         [
-            Div(
-                [InlineStyle('display:table-cell;vertical-align:middle;')],
-                [
-                    Div(
-                        [InlineStyle('margin:0;'), Class('hud-text')],
-                        'Show unvisited',
-                    ),
-                    Div(
-                        [],
-                        Label(
-                            [InlineStyle('margin:0;'), Class('toggle-switch'), Onclick('toggleUnvisited()')],
+            Table(
+                [],
+                Tbody(
+                    [],
+                    [
+                        Tr(
+                            [],
                             [
-                                Input([Id('visited-switch'), Type('checkbox')]),
-                                Span([Class('slider')]),
+                                Td(
+                                    [],
+                                    Div(
+                                        [],
+                                        'Show unvisited',
+                                    ),
+                                ),
+                                Td(
+                                    [],
+                                    Div(
+                                        [],
+                                        Label(
+                                            [Class('toggle-switch'), Onclick('toggleUnvisited()')],
+                                            [
+                                                Input([Id('visited-switch'), Type('checkbox')]),
+                                                Span([Class('slider')]),
+                                            ],
+                                        ),
+                                    ),
+                                ),
                             ],
                         ),
-                    ),
-                    Div(
-                        [InlineStyle('margin:0;'), Class('hud-text')],
-                        'Show ever visited',
-                    ),
-                    Div(
-                        [],
-                        Label(
-                            [InlineStyle('margin:0;'), Class('toggle-switch'), Onclick('toggleEV()')],
+                        Tr(
+                            [],
                             [
-                                Input([Id('ev-switch'), Type('checkbox')]),
-                                Span([Class('slider')]),
+                                Td(
+                                    [],
+                                    Div(
+                                        [],
+                                        'Show ever visited',
+                                    ),
+                                ),
+                                Td(
+                                    [],
+                                    Div(
+                                        [],
+                                        Label(
+                                            [Class('toggle-switch'), Onclick('toggleEV()')],
+                                            [
+                                                Input([Id('ev-switch'), Type('checkbox')]),
+                                                Span([Class('slider')]),
+                                            ],
+                                        ),
+                                    ),
+                                ),
                             ],
                         ),
-                    ),
-                ],
+                        Tr(
+                            [],
+                            [
+                                Td(
+                                    [],
+                                    Div(
+                                        [Class('label-new')],
+                                        'Stellar Voyage',
+                                    ),
+                                ),
+                                Td(
+                                    [],
+                                    Div(
+                                        [],
+                                        Label(
+                                            [Class('toggle-switch'), Onclick('toggleSV()')],
+                                            [
+                                                Input([Id('sv-switch'), Type('checkbox')]),
+                                                Span([Class('slider')]),
+                                            ],
+                                        ),
+                                    ),
+                                ),
+                            ],
+                        ),
+                    ],
+                ),
             ),
             Label(
                 [Id('player-selection')],
                 Select(
-                    [Class('dropdown hud-text'), Onchange('selectPlayer()')],
+                    [Class('dropdown hud'), Onchange('selectPlayer()')],
                     [Option([Value(p.nickname)], p.nickname) for p in players],
                 ),
             ),
@@ -82,13 +132,13 @@ def create_control_section(db: DataAccessor) -> Div:
 def create_region_exploration_section(db: DataAccessor) -> (P, Img):
     return (
         P(
-            [Id('exploration'), Class('hud-text')],
+            [Id('exploration'), Class('hud')],
             [
                 Label(
                     [Id('region-selection')],
                     [
                         Select(
-                            [Class('dropdown hud-text'), Onchange('selectRegion()')],
+                            [Class('dropdown hud'), Onchange('selectRegion()')],
                             [Option([Value(r.short_name)], r.full_name)
                              for r in sorted(db.regions.values(), key=lambda r: r.number)]
                         ),
@@ -102,17 +152,21 @@ def create_region_exploration_section(db: DataAccessor) -> (P, Img):
                         Span(
                             [
                                 Id('exploration-percentage'),
-                                *[
-                                    CustomHtmlTagAttribute(f'data-{r.short_name.lower()}-{nick.lower()}',
-                                                           f'{db.progress[r.short_name][nick]}')
-                                    for nick in
-                                    [p.nickname for p in db.players] + [f'ev-{p.nickname}' for p in db.players]
-                                    for r in sorted(db.regions.values())
-                                ]
+                                *([
+                                      CustomHtmlTagAttribute(f'data-{r.short_name.lower()}-{nick.lower()}',
+                                                             f'{db.progress[r.short_name][nick]}')
+                                      for nick in
+                                      [p.nickname for p in db.players] + [f'ev-{p.nickname}' for p in db.players]
+                                      for r in sorted(db.regions.values())
+                                  ] + [
+                                      CustomHtmlTagAttribute(f'data-sv-{p.nickname.lower()}',
+                                                             f'{db.progress['SV'][p.nickname]}')
+                                      for p in db.players
+                                  ]
+                                  )
                             ],
                             f'{db.progress[db.district.short_name][db.players[0].nickname]}',
                         ),
-                        '%',
                     ],
                 ),
             ],
@@ -282,6 +336,8 @@ def create_application(initial_html: str, db: DataAccessor) -> Html:
                     Link([Rel('stylesheet'), Type('text/css'), Href('style_map.css')]),
                     Script([], f'let colors={{\n{",\n".join(f'\'{p.nickname}\':[\'{p.primary_color}\',\'{p.tint_color}\']'
                                                             for p in db.players)}}};'),
+                    Script([Src('data/js/players_data.min.js')]),
+                    Script([Src('data/js/stops_data.min.js')]),
                     Script([Src('control_map.js')]),
                 ],
             ),

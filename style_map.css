@@ -2,22 +2,42 @@
     background-color: #181818;
 }
 
-.hud-text {
+.hud {
     color: white;
     font-family: Genshin, sans-serif;
     font-size: min(6dvh, 6dvw);
     z-index: 1000;
     text-align: right;
+    pointer-events: none;
+}
+
+.hud label, .hud input, .hud select {
+    pointer-events: auto;
+}
+
+.label-new::before {
+    content: "NEW";
+    padding: 0 min(0.5dvh, 0.5dvw);
+    border-radius: min(0.5dvh, 0.5dvw);
+    margin-right: min(0.5dvh, 0.5dvw);
+    font-size: min(2vh, 2dvw);
+    background-color: orangered;
+    -webkit-text-stroke: initial;
+    text-shadow: none;
+    position: relative;
+    bottom: 1.5em;
+    left: 0.5em;
+    z-index: -1;
 }
 
 @supports (-webkit-text-stroke: min(0.25dvh, 0.25dvw) black) {
-    .hud-text {
+    .hud {
         -webkit-text-stroke: min(0.25dvh, 0.25dvw) black;
     }
 }
 
 @supports not (-webkit-text-stroke: min(0.25dvh, 0.25dvw) black) {
-    .hud-text {
+    .hud {
         text-shadow: min(0.18dvh, 0.18dvw) min(0.18dvh, 0.18dvw) black,
         max(-0.18dvh, -0.18dvw) min(0.18dvh, 0.18dvw) black,
         min(0.18dvh, 0.18dvw) max(-0.18dvh, -0.18dvw) black,
@@ -80,8 +100,20 @@
     font-size: min(2dvh, 2dvw);
 }
 
-.stop-visitors {
+.stop-visitors, .stop-tp {
     font-size: min(1.5dvh, 1.5dvw);
+}
+
+.stellar-voyage .stop-visitors {
+    display: none;
+}
+
+.stop-tp {
+    display: none;
+}
+
+body.stellar-voyage .stop-tp {
+    display: initial;
 }
 
 #control {
@@ -138,8 +170,10 @@
 .toggle-switch {
     position: relative;
     display: inline-block;
+    margin-left: min(1dvh, 1dvw);
     width: min(12dvh, 12dvw);
     height: min(6dvh, 6dvw);
+    vertical-align: middle;
 }
 
 .toggle-switch input {

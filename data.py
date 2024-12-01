@@ -1,7 +1,25 @@
 import csv
 import json
 import os
-from typing import Any, Callable, Iterable, Self
+import re
+from typing import Any, Callable, Literal, Iterable, Self, TypeVar, Union
+
+T = TypeVar('T')
+C = TypeVar('C')
+
+
+def __read_collection__(source: str, identity: C, mapper: Callable[..., T], combiner: Callable[[C, T], None]) -> C:
+    with open(source, 'r') as file:
+        reader = csv.reader(file)
+        next(reader)
+        collection: C = identity
+        for row in reader:
+            if row and not row[0].lstrip().startswith('#'):
+                try:
+                    combiner(collection, mapper(*row))
+                except TypeError as e:
+                    print(f'Error while processing row {row}: {e}')
+        return collection
 
 
 class Visit:
@@ -13,8 +31,8 @@ class Visit:
         return hash(self.name) + hash(self.date)
 
     def __lt__(self, other: Self):
-        return (self.date < other.date if self.date != other.date else self.name > other.name) if isinstance(
-            other, type(self)) else False
+        return False if not isinstance(other, type(self)) else (
+            self.date < other.date if self.date != other.date else self.name > other.name)
 
 
 class Stop:
@@ -28,6 +46,7 @@ class Stop:
         self.regions: list[Region] = []
         self.lines: list[tuple[str, str]] = list(map(lambda e: (e[:e.index(':')], e[e.index(':') + 1:]),
                                                      routes.split('&'))) if routes else []
+        self.terminals_progress: list[tuple[Literal['arrival', 'departure'], Player, Terminal]] = []
 
     def __hash__(self):
         return hash(self.short_name)
@@ -38,7 +57,8 @@ class Stop:
     def in_any_of(self, towns: set[str]) -> bool:
         return '/' in self.full_name and self.full_name[:self.full_name.index('/')] in towns
 
-    def visited_by(self, name: str, include_ev: bool = True) -> str | None:
+    def visited_by(self, player: Union[str, 'Player'], include_ev: bool = True) -> str | None:
+        name = player.nickname if isinstance(player, Player) else player
         return next((visit.date for visit in self.visits
                      if name == visit.name and (visit.date != '2000-01-01' or include_ev)), None)
 
@@ -47,6 +67,12 @@ class Stop:
             print(f'{visit.name} already visited {self.short_name}, '
                   f'remove the entry from {visit.date if visit.date != '2000-01-01' else 'her EV file'}')
         self.visits.add(visit)
+
+    def mark_closest_arrival(self, player: 'Player', terminal: 'Terminal'):
+        self.terminals_progress.append(('arrival', player, terminal))
+
+    def mark_closest_departure(self, player: 'Player', terminal: 'Terminal'):
+        self.terminals_progress.append(('departure', player, terminal))
 
     def marker(self) -> tuple[str, str, float, str | None]:
         number = int(self.short_name[-2:])
@@ -62,7 +88,7 @@ class Stop:
             return 'triangle', '▲', 0.8, None
 
     @staticmethod
-    def read_dicts(source: str,
+    def read_stops(source: str,
                    district: 'Region', regions: dict[str, 'Region']) -> tuple[dict[str, 'Stop'], dict[str, set[str]]]:
         stops: dict[str, Stop] = {}
         stop_groups: dict[str, set[str]] = {}
@@ -114,6 +140,76 @@ class Achievements:
         self.stop_groups[s.full_name].add(s)
 
 
+class TerminalProgress:
+    def __init__(self, terminal: 'Terminal', player: 'Player', closest_arrival: Stop, closest_departure: Stop):
+        self.terminal: Terminal = terminal
+        self.player: Player = player
+        self.closest_arrival: Stop = closest_arrival
+        self.closest_departure: Stop = closest_departure
+
+    def arrived(self) -> bool:
+        return self.closest_arrival == self.terminal.arrival_stop
+
+    def departed(self) -> bool:
+        return self.closest_departure == self.terminal.departure_stop
+
+    def reached(self) -> bool:
+        return self.arrived() or self.departed()
+
+    def completed(self):
+        return self.arrived() and self.departed()
+
+
+class Terminal:
+    def __init__(self, terminal_id: str, name: str, latitude: str, longitude: str, arrival_stop: Stop, departure_stop: Stop):
+        self.id: str = terminal_id
+        self.name: str = name
+        self.latitude: float = float(latitude)
+        self.longitude: float = float(longitude)
+        self.arrival_stop: Stop = arrival_stop
+        self.departure_stop: Stop = departure_stop
+        self.progress: list[TerminalProgress] = []
+
+    def reached_by(self, player: 'Player') -> bool:
+        return any(p.reached() for p in self.progress if p.player == player)
+
+    def anybody_reached(self) -> bool:
+        return any(p.reached() for p in self.progress)
+
+    def completed_by(self, player: 'Player') -> bool:
+        progress: TerminalProgress = next((p for p in self.progress if p.player == player), None)
+        return progress and progress.completed()
+
+    def add_player_progress(self, player: 'Player', closest_arrival: Stop, closest_departure: Stop) -> None:
+        progress: TerminalProgress = TerminalProgress(self, player, closest_arrival, closest_departure)
+        self.progress.append(progress)
+        if not progress.arrived():
+            closest_arrival.mark_closest_arrival(player, self)
+        if not progress.departed():
+            closest_departure.mark_closest_departure(player, self)
+
+    def __hash__(self):
+        return hash(self.id)
+
+    def __eq__(self, other):
+        return self.id == other.id if isinstance(other, type(self)) else False
+
+    @staticmethod
+    def read_list(source: str, stops: dict[str, Stop]) -> list['Terminal']:
+        constructor = lambda *row: Terminal(row[0], row[1], row[2], row[3], stops.get(row[4]), stops.get(row[5]))
+        # warning caused by Pycharm issue PY-70668
+        # noinspection PyTypeChecker
+        return __read_collection__(source, [], constructor, list.append)
+
+    @staticmethod  # the annotation is a temporary fix to Pycharm issue PY-70668
+    def json_entry(self) -> str:
+        return (f'"{self.id}":{{'
+                f'n:"{self.name}",'
+                f'lt:{self.latitude},'
+                f'ln:{self.longitude}'
+                f'}},')
+
+
 class Carrier:
     def __init__(self, symbol: str, short_name: str, full_name: str):
         self.symbol: str = symbol
@@ -128,11 +224,7 @@ class Carrier:
 
     @staticmethod
     def read_dict(source: str) -> dict[str, 'Carrier']:
-        with open(source, 'r') as file:
-            reader = csv.reader(file)
-            next(reader)
-            return {row[0]: Carrier(*row)
-                    for row in reader if row and not row[0].lstrip().startswith('#')}
+        return __read_collection__(source, {}, Carrier, lambda c, v: c.update({v.symbol: v}))
 
     @staticmethod  # the annotation is a temporary fix to Pycharm issue PY-70668@
     def json_entry(self) -> str:
@@ -159,11 +251,7 @@ class VehicleModel:
 
     @staticmethod
     def read_dict(source: str) -> dict[str, 'VehicleModel']:
-        with open(source, 'r') as file:
-            reader = csv.reader(file)
-            next(reader)
-            return {row[0]: VehicleModel(*row)
-                    for row in reader if row and not row[0].lstrip().startswith('#')}
+        return __read_collection__(source, {}, VehicleModel, lambda c, v: c.update({v.model_id: v}))
 
     @staticmethod  # the annotation is a temporary fix to Pycharm issue PY-70668
     def json_entry(self) -> str:
@@ -199,11 +287,8 @@ class Vehicle:
 
     @staticmethod
     def read_dict(source: str, carriers: dict[str, Carrier], models: dict[str, VehicleModel]) -> dict[str, 'Vehicle']:
-        with open(source, 'r') as file:
-            reader = csv.reader(file)
-            next(reader)
-            return {row[0]: Vehicle(row[0], row[1], carriers.get(row[2]), models.get(row[3]), row[4], row[5])
-                    for row in reader if row and not row[0].lstrip().startswith('#')}
+        constructor = lambda *row: Vehicle(row[0], row[1], carriers.get(row[2]), models.get(row[3]), row[4], row[5])
+        return __read_collection__(source, {}, constructor, lambda c, v: c.update({v.vehicle_id: v}))
 
     @staticmethod  # the annotation is a temporary fix to Pycharm issue PY-70668
     def json_entry(self) -> str:
@@ -217,12 +302,14 @@ class Vehicle:
 
 
 class Player:
-    def __init__(self, nickname: str, primary_color: str, tint_color: str, stops_file: str, ev_file: str, vehicles_file: str):
+    def __init__(self, nickname: str, primary_color: str, tint_color: str,
+                 stops_file: str, ev_file: str, terminals_file: str, vehicles_file: str):
         self.nickname: str = nickname
         self.primary_color: str = primary_color
         self.tint_color: str = tint_color
         self.stops_file: str = stops_file
         self.ev_file: str = ev_file
+        self.terminals_file: str = terminals_file
         self.vehicles_file: str = vehicles_file
         self.__achievements__: Achievements = Achievements()
         self.__vehicles__: list[tuple[Vehicle, str]] = []
@@ -239,7 +326,7 @@ class Player:
             visited = len(self.__achievements__.stop_groups[group])
             total = len(stop_groups[group])
             if visited == total:
-                date = max(s.visited_by(self.nickname) for s in self.__achievements__.stop_groups[group])
+                date = max(s.visited_by(self) for s in self.__achievements__.stop_groups[group])
                 prog.append(AchievementProgress(group, visited, total, date))
             else:
                 prog.append(AchievementProgress(group, visited, total))
@@ -265,19 +352,19 @@ class Player:
     def init_files(self) -> None:
         self.init_file(self.stops_file, 'stop_id,date_visited\n')
         self.init_file(self.ev_file)
+        self.init_file(self.terminals_file, 'terminal_id,closest_arrival,closest_departure\n')
         self.init_file(self.vehicles_file, 'vehicle_id,date_discovered\n')
 
     @staticmethod
     def read_list(source: str) -> list['Player']:
-        with open(source, 'r') as file:
-            reader = csv.reader(file)
-            next(reader)
-            return [Player(*row) for row in reader if row and not row[0].lstrip().startswith('#')]
+        # warning caused by Pycharm issue PY-70668
+        # noinspection PyTypeChecker
+        return __read_collection__(source, [], Player, list.append)
 
     def json_entry(self, stops: dict[str, Stop]) -> str:
         return (f'"{self.nickname}":{{'
                 f'v:[{','.join(sorted(f'"{v[0].vehicle_id}"' for v in self.get_vehicles()))}],'
-                f's:[{','.join(sorted(f'"{s.short_name}"' for s in stops.values() if s.visited_by(self.nickname)))}],'
+                f's:[{','.join(sorted(f'"{s.short_name}"' for s in stops.values() if s.visited_by(self)))}],'
                 f'}},')
 
 
