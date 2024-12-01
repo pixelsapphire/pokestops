@@ -258,9 +258,6 @@ CZEA01
 CZEA02
 KAIN01
 KAIN02
-# Łacina, Rataje
-KORN93
-RRAT04
 # Old Market Square & surroundings
 MAGA01
 MAGA04
