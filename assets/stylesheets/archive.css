@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'Arklatrs';
-    src: url('assets/fonts/arklatrs.ttf');
+    src: url('../fonts/arklatrs.ttf');
 }
 
 * {
@@ -21,7 +21,7 @@ a {
 }
 
 #title-container {
-    background: url('assets/banner.png') center;
+    background: url('../images/banner.png') center;
     background-size: cover;
     text-align: center;
     padding: min(4vh, 4dvw);

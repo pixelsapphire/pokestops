@@ -5,6 +5,9 @@ let activePlayer = 'Zorie';
 let activeRegion = 'POZ';
 let darkMode = true;
 
+const lightModeIcon = 'assets/images/light_mode.png';
+const darkModeIcon = 'assets/images/dark_mode.png';
+
 const primary = 0;
 const tint = 1;
 
@@ -12,7 +15,7 @@ function injectThemeSwitcher() {
     let zoomControl = document.querySelector('.leaflet-control-zoom');
     let icon = document.createElement('img');
     icon.id = 'theme-icon';
-    icon.src = darkMode ? 'assets/light_mode.png' : 'assets/dark_mode.png';
+    icon.src = darkMode ? lightModeIcon : darkModeIcon;
     let themeSwitch = zoomControl.firstChild.cloneNode(true);
     themeSwitch.setAttribute('class', 'leaflet-control-theme');
     themeSwitch.title = 'Toggle theme';
@@ -22,7 +25,7 @@ function injectThemeSwitcher() {
     themeSwitch.addEventListener('click', () => {
         darkMode = !darkMode;
         localStorage.setItem('darkMode', darkMode);
-        icon.src = darkMode ? 'assets/light_mode.png' : 'assets/dark_mode.png';
+        icon.src = darkMode ? lightModeIcon : darkModeIcon;
         refreshMap();
     });
     zoomControl.insertBefore(themeSwitch, zoomControl.firstChild);

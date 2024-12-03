@@ -1,4 +1,5 @@
-asset_img_compass: str = 'assets/compass.png'
+asset_img_compass: str = 'assets/images/banner.png'
+asset_img_compass: str = 'assets/images/compass.png'
 asset_path_brands: str = 'assets/brands'
 asset_path_markers: str = 'assets/markers'
 asset_path_vehicles: str = 'assets/vehicles'
@@ -8,15 +9,15 @@ compileddata_players: str = 'data/js/players_data.min.js'
 compileddata_stops: str = 'data/js/stops_data.min.js'
 compileddata_vehicles: str = 'data/js/vehicles_data.min.js'
 
-controller_archive: str = 'control_archive.js'
-controller_map: str = 'control_map.js'
+controller_archive: str = 'assets/scripts/archive.js'
+controller_map: str = 'assets/scripts/map.js'
 
 document_archive: str = 'archive.html'
 document_map: str = 'index.html'
 
-stylesheet_archive: str = 'style_archive.css'
-stylesheet_common: str = 'style_common.css'
-stylesheet_map: str = 'style_map.css'
+stylesheet_archive: str = 'assets/stylesheets/archive.css'
+stylesheet_common: str = 'assets/stylesheets/common.css'
+stylesheet_map: str = 'assets/stylesheets/map.css'
 
 rawdata_carriers: str = 'data/raw/carriers.csv'
 rawdata_players: str = 'data/raw/players.csv'
