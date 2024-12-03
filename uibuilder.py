@@ -14,6 +14,28 @@ class CustomHtmlTagAttribute(HtmlTagAttribute):
         self._name = name
 
 
+def create_switch_row(label: str, switch_id: str, onclick: str, label_new: bool = False) -> Tr:
+    return Tr(
+        [],
+        [
+            Td([], Div([Class('label-new')] if label_new else [], label)),
+            Td(
+                [],
+                Div(
+                    [],
+                    Label(
+                        [Class('toggle-switch'), Onclick(onclick)],
+                        [
+                            Input([Id(switch_id), Type('checkbox')]),
+                            Span([Class('slider')]),
+                        ],
+                    ),
+                ),
+            ),
+        ],
+    )
+
+
 def create_control_section(db: Database) -> Div:
     players: list[Player] = db.players
     return Div(
@@ -24,81 +46,9 @@ def create_control_section(db: Database) -> Div:
                 Tbody(
                     [],
                     [
-                        Tr(
-                            [],
-                            [
-                                Td(
-                                    [],
-                                    Div(
-                                        [],
-                                        'Show unvisited',
-                                    ),
-                                ),
-                                Td(
-                                    [],
-                                    Div(
-                                        [],
-                                        Label(
-                                            [Class('toggle-switch'), Onclick('toggleUnvisited()')],
-                                            [
-                                                Input([Id('visited-switch'), Type('checkbox')]),
-                                                Span([Class('slider')]),
-                                            ],
-                                        ),
-                                    ),
-                                ),
-                            ],
-                        ),
-                        Tr(
-                            [],
-                            [
-                                Td(
-                                    [],
-                                    Div(
-                                        [],
-                                        'Show ever visited',
-                                    ),
-                                ),
-                                Td(
-                                    [],
-                                    Div(
-                                        [],
-                                        Label(
-                                            [Class('toggle-switch'), Onclick('toggleEV()')],
-                                            [
-                                                Input([Id('ev-switch'), Type('checkbox')]),
-                                                Span([Class('slider')]),
-                                            ],
-                                        ),
-                                    ),
-                                ),
-                            ],
-                        ),
-                        Tr(
-                            [],
-                            [
-                                Td(
-                                    [],
-                                    Div(
-                                        [Class('label-new')],
-                                        'Stellar Voyage',
-                                    ),
-                                ),
-                                Td(
-                                    [],
-                                    Div(
-                                        [],
-                                        Label(
-                                            [Class('toggle-switch'), Onclick('toggleSV()')],
-                                            [
-                                                Input([Id('sv-switch'), Type('checkbox')]),
-                                                Span([Class('slider')]),
-                                            ],
-                                        ),
-                                    ),
-                                ),
-                            ],
-                        ),
+                        create_switch_row('Show unvisited', 'visited-switch', 'toggleUnvisited()'),
+                        create_switch_row('Show ever visited', 'ev-switch', 'toggleEV()'),
+                        create_switch_row('Stellar Voyage', 'sv-switch', 'toggleSV()', label_new=True),
                     ],
                 ),
             ),
@@ -327,11 +277,11 @@ def create_application(initial_html: str, db: Database) -> Html:
             Body(
                 [],
                 [
-                    (initial_html[initial_html.find('<body>') + 6:initial_html.find('</body>')]).strip(),
+                    (initial_html[initial_html.find('<body>') + 6: initial_html.find('</body>')]).strip(),
                     create_control_section(db),
-                    *create_region_exploration_section(db),
-                    *create_achievements_sidebar(db),
-                    *create_vehicle_sidebar(db),
+                    create_region_exploration_section(db),
+                    create_achievements_sidebar(db),
+                    create_vehicle_sidebar(db),
                     create_archive_button(),
                     Script([Src(ref.compileddata_map)]),
                 ],
