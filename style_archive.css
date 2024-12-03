@@ -224,6 +224,12 @@ a {
     justify-content: right;
 }
 
+@media (max-aspect-ratio: 10/9) {
+    #vehicles-index {
+        flex: 2.5;
+    }
+}
+
 .vehicle-preview {
     position: relative;
     display: inline-block;
