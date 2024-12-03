@@ -427,6 +427,7 @@ class Region:
 class Database:
     type CollectionName = Literal[
         'players', 'progress', 'stops', 'stop_groups', 'terminals', 'carriers', 'regions', 'vehicles', 'models']
+    __stars__: dict[tuple[int, int], int] = {(1, 1): 1, (2, 2): 2, (3, 4): 3, (5, 7): 4, (8, 100): 5}
 
     def __init__(self, players: list[Player], progress: dict[str, dict[str, float]],
                  stops: dict[str, Stop], stop_groups: dict[str, set[str]], terminals: list[Terminal],
@@ -442,7 +443,6 @@ class Database:
         self.district: Region = district
         self.vehicles: dict[str, Vehicle] = vehicles
         self.models: dict[str, VehicleModel] = models
-        self.__stars__: dict[tuple[int, int], int] = {(1, 1): 1, (2, 2): 2, (3, 4): 3, (5, 7): 4, (8, 100): 5}
 
     @staticmethod
     def partial(players: list[Player] | None = None, progress: dict[str, dict[str, float]] | None = None,
@@ -457,8 +457,9 @@ class Database:
     def add_collection(self, name: CollectionName, collection: Any):
         setattr(self, name, collection)
 
-    def get_stars_for_group(self, size: int):
-        return next((stars for ((min_size, max_size), stars) in self.__stars__.items() if min_size <= size <= max_size), 0)
+    @staticmethod
+    def get_stars_for_group(size: int):
+        return next((stars for ((min_size, max_size), stars) in Database.__stars__.items() if min_size <= size <= max_size), 0)
 
     def regions_without_district(self) -> list[Region]:
         return [region for region in self.regions.values() if region != self.district]

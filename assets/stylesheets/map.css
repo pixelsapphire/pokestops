@@ -236,7 +236,7 @@ body.stellar-voyage .stop-tp {
     border: min(0.5dvh, 0.5dvw) solid black;
     border-left: none;
     border-radius: 0 min(2dvh, 2dvw) min(2dvh, 2dvw) 0;
-    padding: min(2dvh, 2dvw);
+    padding: min(1.25dvh, 1.25dvw);
     overflow: scroll;
     font-family: Genshin, sans-serif;
     font-size: min(2dvh, 2dvw);
@@ -266,6 +266,14 @@ body.stellar-voyage .stop-tp {
 
 .progress-list table td {
     padding-bottom: min(0.5dvh, 0.5dvw);
+}
+
+.achievement-stars {
+    font-size: min(2dvh, 2dvw);
+    width: min(5dvh, 5dvw);
+    text-align: center;
+    word-break: break-all;
+    line-height: 1;
 }
 
 .achievement-progress {

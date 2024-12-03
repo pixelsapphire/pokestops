@@ -114,6 +114,10 @@ def create_achievement_row(achievement: AchievementProgress) -> Tr:
         [],
         [
             Td(
+                [Class('achievement-stars')],
+                Database.get_stars_for_group(achievement.total) * '★',
+            ),
+            Td(
                 [],
                 [
                     achievement.name,
@@ -346,7 +350,7 @@ def create_stop_group_view(db: Database, group: str, stop_names: set[str]) -> Di
                         [Class('name-and-stars')],
                         [
                             Div([Class('stop-group-name')], group),
-                            Div([Class('stars')], [db.get_stars_for_group(len(stops)) * '★']),
+                            Div([Class('stars')], [Database.get_stars_for_group(len(stops)) * '★']),
                         ],
                     ),
                     Div([Class('expand-icon material-symbols-outlined')], 'add'),
