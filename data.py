@@ -1,7 +1,6 @@
 import csv
 import json
 import os
-import re
 from typing import Any, Callable, Literal, Iterable, Self, TypeVar, Union
 
 T = TypeVar('T')
@@ -36,6 +35,7 @@ class Visit:
 
 
 class Stop:
+
     def __init__(self, short_name: str, full_name: str, latitude: str, longitude: str, zone: str, routes: str):
         self.short_name: str = short_name
         self.full_name: str = full_name
@@ -61,6 +61,9 @@ class Stop:
         name = player.nickname if isinstance(player, Player) else player
         return next((visit.date for visit in self.visits
                      if name == visit.name and (visit.date != '2000-01-01' or include_ev)), None)
+
+    def visited(self, include_ev: bool = True) -> bool:
+        return any(visit.date != '2000-01-01' or include_ev for visit in self.visits)
 
     def add_visit(self, visit: Visit):
         if self.visited_by(visit.name):
@@ -88,8 +91,7 @@ class Stop:
             return 'triangle', '▲', 0.8, None
 
     @staticmethod
-    def read_stops(source: str,
-                   district: 'Region', regions: dict[str, 'Region']) -> tuple[dict[str, 'Stop'], dict[str, set[str]]]:
+    def read_stops(source: str, db: 'Database') -> tuple[dict[str, 'Stop'], dict[str, set[str]]]:
         stops: dict[str, Stop] = {}
         stop_groups: dict[str, set[str]] = {}
         with open(source, 'r', encoding='utf-8') as file:
@@ -97,11 +99,11 @@ class Stop:
             next(reader)
             for row in reader:
                 stop = Stop(row[1], row[2], row[3], row[4], row[5], row[6] if len(row) > 6 else '')
-                region = next((r for r in regions.values() if stop in r), None)
+                region = next((r for r in db.regions_without_district() if stop in r), None)
                 if not region:
                     raise ValueError(f'Stop {stop.full_name} [{stop.short_name}] not in any region')
                 region.add_stop(stop)
-                district.add_stop(stop)
+                db.district.add_stop(stop)
                 stops[row[1]] = stop
                 if stop.full_name not in stop_groups:
                     stop_groups[stop.full_name] = set()
@@ -416,4 +418,50 @@ class Region:
                               Region.__resolve_predicate__(region['predicate']))
                        for region in index['regions']]
             district: Region = next(filter(lambda r: r.short_name == index['district'], regions))
-            return district, {region.short_name: region for region in regions if region != district}
+            return district, {
+                district.short_name: district,
+                **{region.short_name: region for region in regions if region != district},
+            }
+
+
+class Database:
+    type CollectionName = Literal[
+        'players', 'progress', 'stops', 'stop_groups', 'terminals', 'carriers', 'regions', 'vehicles', 'models']
+
+    def __init__(self, players: list[Player], progress: dict[str, dict[str, float]],
+                 stops: dict[str, Stop], stop_groups: dict[str, set[str]], terminals: list[Terminal],
+                 carriers: dict[str, Carrier], regions: dict[str, Region], district: Region,
+                 vehicles: dict[str, Vehicle], models: dict[str, VehicleModel]):
+        self.players: list[Player] = players
+        self.progress: dict[str, dict[str, float]] = progress
+        self.stops: dict[str, Stop] = stops
+        self.stop_groups: dict[str, set[str]] = stop_groups
+        self.terminals: list[Terminal] = terminals
+        self.carriers: dict[str, Carrier] = carriers
+        self.regions: dict[str, Region] = regions
+        self.district: Region = district
+        self.vehicles: dict[str, Vehicle] = vehicles
+        self.models: dict[str, VehicleModel] = models
+        self.__stars__: dict[tuple[int, int], int] = {(1, 1): 1, (2, 2): 2, (3, 4): 3, (5, 7): 4, (8, 100): 5}
+
+    @staticmethod
+    def partial(players: list[Player] | None = None, progress: dict[str, dict[str, float]] | None = None,
+                stops: dict[str, Stop] | None = None, stop_groups: dict[str, set[str]] | None = None,
+                terminals: list[Terminal] | None = None, carriers: dict[str, Carrier] | None = None,
+                regions: dict[str, Region] | None = None, district: Region | None = None,
+                vehicles: dict[str, Vehicle] | None = None, models: dict[str, VehicleModel] | None = None):
+        return Database(players or [], progress or {}, stops or {}, stop_groups or {}, terminals or [],
+                        carriers or {}, regions or {}, district or Region(0, '', '', lambda _: False),
+                        vehicles or {}, models or {})
+
+    def add_collection(self, name: CollectionName, collection: Any):
+        setattr(self, name, collection)
+
+    def get_stars_for_group(self, size: int):
+        return next((stars for ((min_size, max_size), stars) in self.__stars__.items() if min_size <= size <= max_size), 0)
+
+    def regions_without_district(self) -> list[Region]:
+        return [region for region in self.regions.values() if region != self.district]
+
+    def region_of(self, stop: Stop) -> Region:
+        return next((region for region in stop.regions if stop and region != self.district), self.district)

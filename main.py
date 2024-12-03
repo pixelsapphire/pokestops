@@ -1,4 +1,5 @@
 import folium
+import ref
 import requests
 import sqlite3
 import sys
@@ -6,24 +7,24 @@ from postprocess import *
 from uibuilder import *
 
 
-# noinspection SqlNoDataSourceInspection
+# noinspection SqlNoDataSourceInspection,DuplicatedCode
 def attach_stop_routes() -> None:
     gtfs_db: sqlite3.Connection = sqlite3.connect(':memory:')
 
-    with open('data/raw/stops.csv', 'r') as file:
+    with open(ref.rawdata_stops, 'r') as file:
         reader = csv.reader(file)
         header_row = next(reader)
         stops_header_row = header_row
         gtfs_db.execute(f'CREATE TABLE stops ({", ".join(f'{col} TEXT' for col in header_row)})')
         gtfs_db.executemany(f'INSERT INTO stops VALUES ({','.join('?' * len(header_row))})', reader)
 
-    with open('data/raw/stop_times.csv', 'r') as file:
+    with open(ref.rawdata_stop_times, 'r') as file:
         reader = csv.reader(file)
         header_row = next(reader)
         gtfs_db.execute(f'CREATE TABLE stop_times ({", ".join(f'{col} TEXT' for col in header_row)})')
         gtfs_db.executemany(f'INSERT INTO stop_times VALUES ({','.join('?' * len(header_row))})', reader)
 
-    with open('data/raw/trips.csv', 'r') as file:
+    with open(ref.rawdata_trips, 'r') as file:
         reader = csv.reader(file)
         header_row = next(reader)
         gtfs_db.execute(f'CREATE TABLE trips ({", ".join(f'{col} TEXT' for col in header_row)})')
@@ -43,16 +44,14 @@ def attach_stop_routes() -> None:
                    'SELECT stops.*, routes '
                    'FROM stops JOIN stop_routes_groupped USING(stop_id)')
 
-    with open('data/raw/stops.csv', 'w') as file:
+    with open(ref.rawdata_stops, 'w') as file:
         writer = csv.writer(file)
         writer.writerow([*stops_header_row, 'routes'])
         writer.writerows(cursor.fetchall())
 
 
 def process_players_data(players: list[Player], stops: dict[str, Stop],
-                         terminals: list[Terminal], vehicles: dict[str, Vehicle]) -> tuple[set[Stop], set[Stop]]:
-    ever_visited_stops: set[Stop] = set()
-    documented_visited_stops: set[Stop] = set()
+                         terminals: list[Terminal], vehicles: dict[str, Vehicle]):
     for player in players:
         player.init_files()
         with open(player.stops_file, 'r') as file:
@@ -65,8 +64,6 @@ def process_players_data(players: list[Player], stops: dict[str, Stop],
                     stop = stops.get(row[0])
                     if stop:
                         stop.add_visit(Visit(player.nickname, row[1]))
-                        ever_visited_stops.add(stop)
-                        documented_visited_stops.add(stop)
                         player.add_stop(stop)
                     else:
                         print(f'Stop {row[0].lstrip()} not found, remove {player.nickname}\'s entry from her save file')
@@ -82,7 +79,6 @@ def process_players_data(players: list[Player], stops: dict[str, Stop],
                     stop = stops.get(stop_id)
                     if stop:
                         stop.add_visit(Visit(player.nickname, '2000-01-01'))
-                        ever_visited_stops.add(stop)
                         player.add_stop(stop)
                     else:
                         print(f'Stop {stop_id} not found, remove {player.nickname}\'s entry from her EV file')
@@ -129,37 +125,97 @@ def process_players_data(players: list[Player], stops: dict[str, Stop],
                     vehicle_id = row[0].replace('#', '').lstrip()
                     if vehicles.get(vehicle_id):
                         print(f'Found a commented out {player.nickname}\'s {vehicle_id} vehicles file entry, restore it')
-    return ever_visited_stops, documented_visited_stops
+
+
+def load_data(initial_db: Database) -> Database:
+    players: list[Player] = initial_db.players
+    regions: dict[str, Region] = initial_db.regions
+    district: Region = initial_db.district
+    stops, stop_groups = Stop.read_stops(ref.rawdata_stops, initial_db)
+    initial_db.add_collection('stops', stops)
+    terminals: list[Terminal] = Terminal.read_list(ref.rawdata_terminals, stops)
+    carriers: dict[str, Carrier] = Carrier.read_dict(ref.rawdata_carriers)
+    models: dict[str, VehicleModel] = VehicleModel.read_dict(ref.rawdata_vehicle_models)
+    vehicles: dict[str, Vehicle] = Vehicle.read_dict(ref.rawdata_vehicles, carriers, models)
+
+    process_players_data(players, stops, terminals, vehicles)
+
+    ever_visited_stops: list[Stop] = list(filter(lambda s: s.visited(), stops.values()))
+    progress: dict[str, dict[str, float]] = {
+        **{r.short_name: {
+            **{
+                p.nickname: round(len(list(filter(lambda s: s in r and s.visited_by(p, False), ever_visited_stops))) /
+                                  len(list(filter(lambda s: s in r, stops.values()))) * 100, 1) for p in players
+            },
+            **{
+                f'ev-{p.nickname}': round(len(list(filter(lambda s: s in r and s.visited_by(p), ever_visited_stops))) /
+                                          len(list(filter(lambda s: s in r, stops.values()))) * 100, 1) for p in players
+            },
+        } for r in regions.values()},
+        'SV': {
+            f'{p.nickname}': round(sum(1 if t.completed_by(p) else 0.5 if t.reached_by(p) else 0
+                                       for t in terminals) / len(terminals) * 100, 1) for p in players
+        }
+    }
+
+    return Database(players, progress, stops, stop_groups, terminals, carriers, regions, district, vehicles, models)
+
+
+def build_app(fmap: folium.Map, db: Database) -> None:
+    folium_html: str = fmap.get_root().render()
+    map_script: str = folium_html[folium_html.rfind('<script>') + 8:folium_html.rfind('</script>')]
+    with open(ref.compileddata_map, 'w') as script_file:
+        script_file.write(clean_js(map_script))
+
+    html_application: Html = create_application(folium_html, db)
+    rendered_application: str = clean_html(html_application.render(True, True))
+    with open(ref.document_map, 'w') as file:
+        file.write(rendered_application)
+
+    with open(ref.compileddata_stops, 'w') as file:
+        file.write(f'const stops = {{\n{'\n'.join(map(Stop.json_entry, db.stops.values()))}\n}};')
+        file.write(f'const terminals = {{\n{'\n'.join(map(Terminal.json_entry, db.terminals))}\n}};')
+
+    with open(ref.compileddata_vehicles, 'w') as file:
+        file.write(f'const vehicle_models = {{\n{'\n'.join(map(VehicleModel.json_entry, db.models.values()))}\n}};\n')
+        file.write(f'const carriers = {{\n{'\n'.join(map(Carrier.json_entry, db.carriers.values()))}\n}};\n')
+        file.write(f'const vehicles = {{\n{'\n'.join(map(Vehicle.json_entry, db.vehicles.values()))}\n}};')
+
+    with open(ref.compileddata_players, 'w') as file:
+        file.write(f'const players = {{\n{'\n'.join(map(lambda p: p.json_entry(db.stops), db.players))}\n}};')
+
+    html_archive: Html = create_archive(db)
+    rendered_archive: str = clean_html(html_archive.render(True, True))
+    with open(ref.document_archive, 'w') as file:
+        file.write(rendered_archive)
 
 
 def main() -> None:
-    district, regions = Region.read_regions('data/raw/regions.json')
-    players: list[Player] = Player.read_list('data/raw/players.csv')
+    district, regions = Region.read_regions(ref.rawdata_regions)
+    players: list[Player] = Player.read_list(ref.rawdata_players)
+    initial_db: Database = Database.partial(regions=regions, district=district, players=players)
 
     old_stops = {}
-    first_update = not os.path.exists('data/raw/stops.csv')
+    first_update = not os.path.exists(ref.rawdata_stops)
     if update_ztm_stops:
         if not first_update:
-            old_stops, _ = Stop.read_stops('data/raw/stops.csv', district, regions)
-        response: requests.Response = requests.get('https://www.ztm.poznan.pl/pl/dla-deweloperow/getGTFSFile')
-        with open('data/gtfs.zip', 'wb') as file:
+            old_stops, _ = Stop.read_stops(ref.rawdata_stops, initial_db)
+        response: requests.Response = requests.get(ref.url_ztm_gtfs)
+        with open(ref.tmpdata_gtfs, 'wb') as file:
             file.write(response.content)
-        with util.zip_file('data/gtfs.zip', 'r') as zip_ref:
-            zip_ref.extract_as('stops.txt', 'data/raw/stops.csv')
-            zip_ref.extract_as('stop_times.txt', 'data/raw/stop_times.csv')
-            zip_ref.extract_as('trips.txt', 'data/raw/trips.csv')
-        os.remove('data/gtfs.zip')
+        with util.zip_file(ref.tmpdata_gtfs, 'r') as zip_ref:
+            zip_ref.extract_as('stops.txt', ref.rawdata_stops)
+            zip_ref.extract_as('stop_times.txt', ref.rawdata_stop_times)
+            zip_ref.extract_as('trips.txt', ref.rawdata_trips)
+        os.remove(ref.tmpdata_gtfs)
         attach_stop_routes()
-        os.remove('data/raw/stop_times.csv')
-        os.remove('data/raw/trips.csv')
-    elif not os.path.exists('data/raw/stops.csv'):
-        raise FileNotFoundError('stops.csv not found. Run the script with the --update flag to download the latest data.')
+        os.remove(ref.rawdata_stop_times)
+        os.remove(ref.rawdata_trips)
 
-    stops, stop_groups = Stop.read_stops('data/raw/stops.csv', district, regions)
+        new_stops, _ = Stop.read_stops(ref.rawdata_stops, initial_db)
 
-    if update_ztm_stops:
-        added_stops = {s for s in stops.values() if s not in old_stops.values()}
-        removed_stops = {s for s in old_stops.values() if s not in stops.values()}
+        added_stops = {s for s in new_stops.values() if s not in old_stops.values()}
+        removed_stops = {s for s in old_stops.values() if s not in new_stops.values()}
         if first_update:
             print('Stops database created.')
         else:
@@ -170,40 +226,21 @@ def main() -> None:
                 print(f'Removed stops:\n- {'\n- '.join(f'{s.full_name} [{s.short_name}]' for s in removed_stops)}')
             if not added_stops and not removed_stops:
                 print('No changes')
-
-    terminals: list[Terminal] = Terminal.read_list('data/raw/tramway_terminals.csv', stops)
-    carriers: dict[str, Carrier] = Carrier.read_dict('data/raw/carriers.csv')
-    models: dict[str, VehicleModel] = VehicleModel.read_dict('data/raw/vehicle_models.csv')
-    vehicles: dict[str, Vehicle] = Vehicle.read_dict('data/raw/vehicles.csv', carriers, models)
-
-    ever_visited_stops, documented_visited_stops = process_players_data(players, stops, terminals, vehicles)
+    elif not os.path.exists(ref.rawdata_stops):
+        raise FileNotFoundError(f'{ref.rawdata_stops} not found. '
+                                f'Run the script with the --update flag to download the latest data.')
 
     if update_map:
 
-        regions[district.short_name] = district
-        progress: dict[str, dict[str, float]] = {
-            **{r.short_name: {
-                **{
-                    p.nickname: round(len(list(filter(lambda s: s in r and s.visited_by(p, False), ever_visited_stops))) /
-                                      len(list(filter(lambda s: s in r, stops.values()))) * 100, 1) for p in players
-                },
-                **{
-                    f'ev-{p.nickname}': round(len(list(filter(lambda s: s in r and s.visited_by(p), ever_visited_stops))) /
-                                              len(list(filter(lambda s: s in r, stops.values()))) * 100, 1) for p in players
-                },
-            } for r in regions.values()},
-            'SV': {
-                f'{p.nickname}': round(sum(1 if t.completed_by(p) else 0.5 if t.reached_by(p) else 0
-                                           for t in terminals) / len(terminals) * 100, 1) for p in players
-            }
-        }
+        db: Database = load_data(initial_db)
 
-        visible_stops = documented_visited_stops if len(documented_visited_stops) > 0 else stops.values()
+        documented_visited_stops: list[Stop] = list(filter(lambda s: s.visited(include_ev=False), db.stops.values()))
+        visible_stops = documented_visited_stops if len(documented_visited_stops) > 0 else db.stops.values()
         avg_lat = (min(float(s.latitude) for s in visible_stops) + max(float(s.latitude) for s in visible_stops)) / 2
         avg_lon = (min(float(s.longitude) for s in visible_stops) + max(float(s.longitude) for s in visible_stops)) / 2
         fmap: folium.Map = folium.Map(location=(avg_lat, avg_lon), zoom_start=12, prefer_canvas=True, zoom_control='bottomleft')
 
-        for stop in stops.values():
+        for stop in db.stops.values():
             stop_visits: list[Visit] = sorted(stop.visits)
             classes: str = ' '.join(
                 [f'visited-{visit.name.lower()}' for visit in stop_visits] +
@@ -230,7 +267,7 @@ def main() -> None:
             else:
                 return f'{tp.player.nickname} has {'arrived at' if tp.arrived() else 'departed from'} this terminal'
 
-        for terminal in terminals:
+        for terminal in db.terminals:
             classes: list[str] = [f'reached-{player.nickname.lower()}' for player in players if terminal.reached_by(player)]
             visited_label: str = '<br>'.join([tp_message(tp) for tp in terminal.progress if tp.reached()]
                                              ) if terminal.anybody_reached() else 'not yet reached'
@@ -241,33 +278,7 @@ def main() -> None:
             folium.Marker(location=(terminal.latitude, terminal.longitude),
                           popup=popup, icon=folium.DivIcon(html=marker)).add_to(fmap)
 
-        folium_html: str = fmap.get_root().render()
-        map_script: str = folium_html[folium_html.rfind('<script>') + 8:folium_html.rfind('</script>')]
-        with open('data/js/map.min.js', 'w') as script_file:
-            script_file.write(clean_js(map_script))
-
-        accessor: DataAccessor = DataAccessor(players, stops, stop_groups, regions, district, progress, vehicles)
-        html_application: Html = create_application(folium_html, accessor)
-        rendered_application: str = clean_html(html_application.render(True, True))
-        with open('index.html', 'w') as file:
-            file.write(rendered_application)
-
-        with open('data/js/stops_data.min.js', 'w') as file:
-            file.write(f'const stops = {{\n{'\n'.join(map(Stop.json_entry, stops.values()))}\n}};')
-            file.write(f'const terminals = {{\n{'\n'.join(map(Terminal.json_entry, terminals))}\n}};')
-
-        with open('data/js/vehicles_data.min.js', 'w') as file:
-            file.write(f'const vehicle_models = {{\n{'\n'.join(map(VehicleModel.json_entry, models.values()))}\n}};\n')
-            file.write(f'const carriers = {{\n{'\n'.join(map(Carrier.json_entry, carriers.values()))}\n}};\n')
-            file.write(f'const vehicles = {{\n{'\n'.join(map(Vehicle.json_entry, vehicles.values()))}\n}};')
-
-        with open('data/js/players_data.min.js', 'w') as file:
-            file.write(f'const players = {{\n{'\n'.join(map(lambda p: p.json_entry(stops), players))}\n}};')
-
-        html_archive: Html = create_archive(accessor)
-        rendered_archive: str = clean_html(html_archive.render(True, True))
-        with open('archive.html', 'w') as file:
-            file.write(rendered_archive)
+        build_app(fmap, db)
 
 
 update_ztm_stops = '--update' in sys.argv or '-u' in sys.argv

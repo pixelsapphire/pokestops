@@ -1,3 +1,4 @@
+import ref
 import util
 from data import *
 from htmlBuilder.attributes import *
@@ -13,24 +14,7 @@ class CustomHtmlTagAttribute(HtmlTagAttribute):
         self._name = name
 
 
-class DataAccessor:
-    def __init__(self, players: list[Player], stops: dict[str, Stop], stop_groups: dict[str, set[str]],
-                 regions: dict[str, Region], district: Region, progress: dict[str, dict[str, float]],
-                 vehicles: dict[str, Vehicle]):
-        self.players: list[Player] = players
-        self.stops: dict[str, Stop] = stops
-        self.stop_groups: dict[str, set[str]] = stop_groups
-        self.regions: dict[str, Region] = regions
-        self.district: Region = district
-        self.progress: dict[str, dict[str, float]] = progress
-        self.vehicles: dict[str, Vehicle] = vehicles
-        self.__stars__: dict[tuple[int, int], int] = {(1, 1): 1, (2, 2): 2, (3, 4): 3, (5, 7): 4, (8, 100): 5}
-
-    def get_stars_for_group(self, size: int):
-        return next((stars for ((min_size, max_size), stars) in self.__stars__.items() if min_size <= size <= max_size), 0)
-
-
-def create_control_section(db: DataAccessor) -> Div:
+def create_control_section(db: Database) -> Div:
     players: list[Player] = db.players
     return Div(
         [Id('control'), Class('hud')],
@@ -129,7 +113,7 @@ def create_control_section(db: DataAccessor) -> Div:
     )
 
 
-def create_region_exploration_section(db: DataAccessor) -> (P, Img):
+def create_region_exploration_section(db: Database) -> (P, Img):
     return (
         P(
             [Id('exploration'), Class('hud')],
@@ -171,7 +155,7 @@ def create_region_exploration_section(db: DataAccessor) -> (P, Img):
                 ),
             ],
         ),
-        Img([Id('compass'), Src('assets/compass.png')])
+        Img([Id('compass'), Src(ref.asset_img_compass)])
     )
 
 
@@ -201,7 +185,7 @@ def create_achievement_row(achievement: AchievementProgress) -> Tr:
     )
 
 
-def create_achievements_sidebar(db: DataAccessor) -> (Div, Button):
+def create_achievements_sidebar(db: Database) -> (Div, Button):
     return (
         Div(
             [Class('sidebar'), Id('achievements')],
@@ -251,11 +235,12 @@ def create_vehicle_row(vehicle: Vehicle, date: str) -> Tr:
         [
             Td(
                 [],
-                Img([Class('vehicle-icon'), Src(f'assets/vehicles/{model.kind}.webp')]),
+                Img([Class('vehicle-icon'), Src(f'{ref.asset_path_vehicles}/{model.kind}.webp')]),
             ),
             Td(
                 [],
-                Img([Class('brand-logo'), Src(f'assets/brands/{model.brand.lower()}.webp')]) if model.brand != '?' else '',
+                Img([Class('brand-logo'),
+                     Src(f'{ref.asset_path_brands}/{model.brand.lower()}.webp')]) if model.brand != '?' else '',
             ),
             Td(
                 [],
@@ -276,7 +261,7 @@ def create_vehicle_row(vehicle: Vehicle, date: str) -> Tr:
     )
 
 
-def create_vehicle_sidebar(db: DataAccessor) -> (Div, Button):
+def create_vehicle_sidebar(db: Database) -> (Div, Button):
     return (
         Div(
             [Class('sidebar'), Id('vehicles')],
@@ -320,7 +305,7 @@ def create_archive_button() -> Button:
     )
 
 
-def create_application(initial_html: str, db: DataAccessor) -> Html:
+def create_application(initial_html: str, db: Database) -> Html:
     return Html(
         [Lang('en')],
         [
@@ -329,16 +314,14 @@ def create_application(initial_html: str, db: DataAccessor) -> Html:
                 [
                     (initial_html[initial_html.find('<head>') + 6:initial_html.find('</head>')]).strip(),
                     Title([], 'Pokestops'),
-                    Link([Rel('stylesheet'), Type('text/css'),
-                          Href('https://fonts.googleapis.com/css2'
-                               '?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0')]),
-                    Link([Rel('stylesheet'), Type('text/css'), Href('style_common.css')]),
-                    Link([Rel('stylesheet'), Type('text/css'), Href('style_map.css')]),
+                    Link([Rel('stylesheet'), Type('text/css'), Href(ref.url_material_icons)]),
+                    Link([Rel('stylesheet'), Type('text/css'), Href(ref.stylesheet_common)]),
+                    Link([Rel('stylesheet'), Type('text/css'), Href(ref.stylesheet_map)]),
                     Script([], f'let colors={{\n{",\n".join(f'\'{p.nickname}\':[\'{p.primary_color}\',\'{p.tint_color}\']'
                                                             for p in db.players)}}};'),
-                    Script([Src('data/js/players_data.min.js')]),
-                    Script([Src('data/js/stops_data.min.js')]),
-                    Script([Src('control_map.js')]),
+                    Script([Src(ref.compileddata_players)]),
+                    Script([Src(ref.compileddata_stops)]),
+                    Script([Src(ref.controller_map)]),
                 ],
             ),
             Body(
@@ -350,7 +333,7 @@ def create_application(initial_html: str, db: DataAccessor) -> Html:
                     *create_achievements_sidebar(db),
                     *create_vehicle_sidebar(db),
                     create_archive_button(),
-                    Script([Src('data/js/map.min.js')]),
+                    Script([Src(ref.compileddata_map)]),
                 ],
             ),
         ],
@@ -399,9 +382,9 @@ def create_navigation() -> Div:
     )
 
 
-def create_stop_group_view(db: DataAccessor, group: str, stop_names: set[str]) -> Div:
+def create_stop_group_view(db: Database, group: str, stop_names: set[str]) -> Div:
     stops: list[Stop] = list(sorted((db.stops[stop] for stop in stop_names), key=lambda s: s.short_name))
-    region: Region = next(iter(set(db.stops[next(iter(stop_names))].regions) - {db.district}), db.district)
+    region: Region = db.region_of(db.stops.get(next(iter(stop_names), None)))
     return Div(
         [Class('stop-group-view')],
         [
@@ -425,7 +408,7 @@ def create_stop_group_view(db: DataAccessor, group: str, stop_names: set[str]) -
                     Div(
                         [Class('stop-preview'), CustomHtmlTagAttribute('data-stop-id', stop.short_name)],
                         [
-                            Img([Class('marker'), Src(f'assets/markers/{stop.marker()[0]}.svg')]),
+                            Img([Class('marker'), Src(f'{ref.asset_path_markers}/{stop.marker()[0]}.svg')]),
                             Span([Class('stop-id')], stop.short_name),
                         ],
                     )
@@ -436,7 +419,7 @@ def create_stop_group_view(db: DataAccessor, group: str, stop_names: set[str]) -
     )
 
 
-def create_stops_page(db: DataAccessor) -> Div:
+def create_stops_page(db: Database) -> Div:
     return Div(
         [Class('content-container selected'), Id('container-stops')],
         [
@@ -494,14 +477,16 @@ def create_vehicle_preview(vehicle: Vehicle) -> Div:
     return Div(
         [Class('vehicle-preview'), CustomHtmlTagAttribute('data-vehicle-id', vehicle.vehicle_id)],
         [
-            Img([Class('vehicle-icon'), Src(f'assets/vehicles/{vehicle.model.kind if vehicle.model else 'bus'}.webp')]),
-            Img([Class('vehicle-brand'), Src(f'assets/brands/{vehicle.model.brand.lower()}.webp')]) if vehicle.model else '',
+            Img([Class('vehicle-icon'),
+                 Src(f'{ref.asset_path_vehicles}/{vehicle.model.kind if vehicle.model else 'bus'}.webp')]),
+            Img([Class('vehicle-brand'),
+                 Src(f'{ref.asset_path_brands}/{vehicle.model.brand.lower()}.webp')]) if vehicle.model else '',
             Div([Class('vehicle-id')], f'#{vehicle.vehicle_id}'),
         ],
     )
 
 
-def create_vehicles_page(db: DataAccessor) -> Div:
+def create_vehicles_page(db: Database) -> Div:
     return Div(
         [
             Class('content-container'),
@@ -535,7 +520,7 @@ def create_vehicles_page(db: DataAccessor) -> Div:
     )
 
 
-def create_archive(db: DataAccessor) -> Html:
+def create_archive(db: Database) -> Html:
     return Html(
         [Lang('en')],
         [
@@ -543,15 +528,13 @@ def create_archive(db: DataAccessor) -> Html:
                 [],
                 [
                     Title([], 'Pokestops Archive'),
-                    Link([Rel('stylesheet'), Type('text/css'),
-                          Href('https://fonts.googleapis.com/css2'
-                               '?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0')]),
-                    Link([Rel('stylesheet'), Type('text/css'), Href('style_common.css')]),
-                    Link([Rel('stylesheet'), Type('text/css'), Href('style_archive.css')]),
-                    Script([Src('data/js/stops_data.min.js')]),
-                    Script([Src('data/js/vehicles_data.min.js')]),
-                    Script([Src('data/js/players_data.min.js')]),
-                    Script([Src('control_archive.js')]),
+                    Link([Rel('stylesheet'), Type('text/css'), Href(ref.url_material_icons)]),
+                    Link([Rel('stylesheet'), Type('text/css'), Href(ref.stylesheet_common)]),
+                    Link([Rel('stylesheet'), Type('text/css'), Href(ref.stylesheet_archive)]),
+                    Script([Src(ref.compileddata_stops)]),
+                    Script([Src(ref.compileddata_vehicles)]),
+                    Script([Src(ref.compileddata_players)]),
+                    Script([Src(ref.controller_archive)]),
                 ],
             ),
             Body(
