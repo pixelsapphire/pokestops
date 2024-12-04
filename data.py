@@ -348,6 +348,7 @@ class Player:
     @staticmethod
     def init_file(path: str, initial_content: str = '') -> None:
         if not os.path.exists(path):
+            os.makedirs(os.path.dirname(path), exist_ok=True)
             with open(path, 'x') as new_file:
                 new_file.write(initial_content)
 
