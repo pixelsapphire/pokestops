@@ -16,7 +16,7 @@ def __read_collection__(source: str, identity: C, mapper: Callable[..., T], comb
             if row and not row[0].lstrip().startswith('#'):
                 try:
                     combiner(collection, mapper(*row))
-                except TypeError as e:
+                except (IndexError, TypeError) as e:
                     print(f'Error while processing row {row}: {e}')
         return collection
 
