@@ -243,9 +243,9 @@ def main() -> None:
             stop_visits: list[Visit] = sorted(stop.visits)
             # noinspection PyUnresolvedReferences
             classes: str = ' '.join(
-                [f'visited-{visit.name.lower()}' for visit in stop_visits] +
-                [f'ever-visited-{visit.name.lower()}' for visit in stop_visits if visit.date == '2000-01-01'] +
-                [f'region-{region.short_name}' for region in stop.regions] +
+                [f'v-{visit.name.lower()}' for visit in stop_visits] +
+                [f'ev-{visit.name.lower()}' for visit in stop_visits if visit.date == '2000-01-01'] +
+                [f'r-{region.short_name}' for region in stop.regions] +
                 [f'tp-{player.nickname.lower()}' for _, player, _ in stop.terminals_progress]
             )
             visited_label: str = '<br>'.join(

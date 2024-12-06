@@ -38,11 +38,11 @@ function refreshMap() {
 
     if (!stellarVoyage) {
 
-        document.querySelectorAll(`.marker.visited-${activePlayer.toLowerCase()}.region-${activeRegion}:not(.ever-visited-${activePlayer.toLowerCase()})`).forEach(m => {
+        document.querySelectorAll(`.marker.v-${activePlayer.toLowerCase()}.r-${activeRegion}:not(.ev-${activePlayer.toLowerCase()})`).forEach(m => {
             m.style.color = colors[activePlayer][primary];
             m.parentElement.style.display = null;
         });
-        const everVisitedMarkers = document.querySelectorAll(`.marker.ever-visited-${activePlayer.toLowerCase()}.region-${activeRegion}`);
+        const everVisitedMarkers = document.querySelectorAll(`.marker.ev-${activePlayer.toLowerCase()}.r-${activeRegion}`);
         if (showEverVisited)
             everVisitedMarkers.forEach(m => {
                 m.style.color = colors[activePlayer][tint];
@@ -53,11 +53,11 @@ function refreshMap() {
                 m.style.color = 'red';
                 m.parentElement.style.display = showUnvisited ? null : 'none';
             });
-        document.querySelectorAll(`.marker:not(.visited-${activePlayer.toLowerCase()})`).forEach(m => {
+        document.querySelectorAll(`.marker:not(.v-${activePlayer.toLowerCase()})`).forEach(m => {
             m.style.color = 'red';
             m.parentElement.style.display = showUnvisited ? null : 'none';
         });
-        document.querySelectorAll(`.marker:not(.region-${activeRegion})`).forEach(m => {
+        document.querySelectorAll(`.marker:not(.r-${activeRegion})`).forEach(m => {
             m.parentElement.style.display = 'none';
         });
         document.querySelectorAll(`.marker.terminal`).forEach(m => {
@@ -74,7 +74,7 @@ function refreshMap() {
         });
         document.querySelectorAll(`.marker.tp-${activePlayer.toLowerCase()}`).forEach(m => {
             m.parentElement.style.display = null;
-            if (m.classList.contains(`visited-${activePlayer.toLowerCase()}`)) m.style.color = colors[activePlayer][tint];
+            if (m.classList.contains(`v-${activePlayer.toLowerCase()}`)) m.style.color = colors[activePlayer][tint];
             else m.style.color = 'red';
         });
         document.querySelectorAll(`.marker:not(.terminal):not(.tp-${activePlayer.toLowerCase()})`).forEach(m => {
