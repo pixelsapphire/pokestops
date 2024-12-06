@@ -77,18 +77,18 @@ class Stop:
     def mark_closest_departure(self, player: 'Player', terminal: 'Terminal'):
         self.terminals_progress.append(('departure', player, terminal))
 
-    def marker(self) -> tuple[str, str, float, str | None]:
+    def marker(self) -> str:
         number = int(self.short_name[-2:])
         if 0 < number < 20:
-            return 'circle', '●', 1.1, None
+            return 'B'
         elif 20 < number < 40:
-            return 'star', '★', 1, None
+            return 'T'
         elif 40 < number < 70:
-            return 'diamond', '■', 0.9, 'transform: rotate(45deg);'
+            return 'R'
         elif 70 < number < 90:
-            return 'square', '■', 0.9, None
+            return 'H'
         else:
-            return 'triangle', '▲', 0.8, None
+            return 'E'
 
     @staticmethod
     def read_stops(source: str, db: 'Database') -> tuple[dict[str, 'Stop'], dict[str, set[str]]]:

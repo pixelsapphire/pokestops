@@ -362,7 +362,8 @@ def create_stop_group_view(db: Database, group: str, stop_names: set[str]) -> Di
                     Div(
                         [Class('stop-preview'), CustomHtmlTagAttribute('data-stop-id', stop.short_name)],
                         [
-                            Img([Class('marker'), Src(f'{ref.asset_path_markers}/{stop.marker()[0]}.svg')]),
+                            # Img([Class('marker'), Src(f'{ref.asset_path_markers}/{stop.marker()[0]}.svg')]),
+                            Div([Class('marker')], stop.marker()),
                             Span([Class('stop-id')], stop.short_name),
                         ],
                     )

@@ -50,36 +50,28 @@
 }
 
 .marker {
-    width: 1em;
-    transform: translateX(-25%);
-    line-height: 0;
+    font-family: Markers, sans-serif;
 }
 
 @supports (-webkit-text-stroke: 4px white) {
     .marker {
+        font-size: 28px;
         -webkit-text-stroke: 4px white;
     }
 
     .marker.dark {
         -webkit-text-stroke: 4px black;
     }
-
-    .leaflet-marker-pane {
-        font-size: 40px;
-    }
 }
 
 @supports not (-webkit-text-stroke: 4px white) {
     .marker {
+        font-size: 22px;
         text-shadow: 3px 3px white, -3px 3px white, 3px -3px white, -3px -3px white, 0 4px white, 0 -4px white, 4px 0 white, -4px 0 white;
     }
 
     .marker.dark {
         text-shadow: 3px 3px black, -3px 3px black, 3px -3px black, -3px -3px black, 0 4px black, 0 -4px black, 4px 0 black, -4px 0 black;
-    }
-
-    .leaflet-marker-pane {
-        font-size: 32px;
     }
 }
 

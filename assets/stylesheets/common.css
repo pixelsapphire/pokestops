@@ -3,6 +3,11 @@
     src: url('../fonts/genshin.ttf');
 }
 
+@font-face {
+    font-family: 'Markers';
+    src: url('../fonts/markers.ttf');
+}
+
 .hidden {
     display: none;
 }

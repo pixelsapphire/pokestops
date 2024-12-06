@@ -1,5 +1,4 @@
 import folium
-import ref
 import requests
 import sqlite3
 import sys
@@ -242,6 +241,7 @@ def main() -> None:
 
         for stop in db.stops.values():
             stop_visits: list[Visit] = sorted(stop.visits)
+            # noinspection PyUnresolvedReferences
             classes: str = ' '.join(
                 [f'visited-{visit.name.lower()}' for visit in stop_visits] +
                 [f'ever-visited-{visit.name.lower()}' for visit in stop_visits if visit.date == '2000-01-01'] +
@@ -253,13 +253,15 @@ def main() -> None:
                  for visit in sorted(stop.visits)]) if stop.visits else 'not yet visited'
             terminal_progress_label: str = '<br>'.join([f'{player.nickname}\'s closest {kind} point to {terminal.name} '
                                                         for kind, player, terminal in stop.terminals_progress])
-            _, icon, scale, style = stop.marker()
-            marker: str = f'<div class="marker {classes}" style="font-size: {scale}em; {style}">{icon}</div>'
+            marker: folium.DivIcon = folium.DivIcon(
+                html=f'<div class="marker {classes}">{stop.marker()}</div>',
+                icon_anchor=(10, 10)
+            )
             popup: folium.Popup = folium.Popup(f'<span class="stop-name">{stop.full_name} [{stop.short_name}]</span>'
                                                f'<span class="stop-visitors"><br>{visited_label}</span>'
                                                f'<span class="stop-tp"><br>{terminal_progress_label}</span>')
             # noinspection PyTypeChecker
-            folium.Marker(location=(stop.latitude, stop.longitude), popup=popup, icon=folium.DivIcon(html=marker)).add_to(fmap)
+            folium.Marker(location=(stop.latitude, stop.longitude), popup=popup, icon=marker).add_to(fmap)
 
         def tp_message(tp: TerminalProgress) -> str:
             if tp.completed():
@@ -271,12 +273,14 @@ def main() -> None:
             classes: list[str] = [f'reached-{player.nickname.lower()}' for player in players if terminal.reached_by(player)]
             visited_label: str = '<br>'.join([tp_message(tp) for tp in terminal.progress if tp.reached()]
                                              ) if terminal.anybody_reached() else 'not yet reached'
-            marker: str = f'<div class="marker terminal {' '.join(classes)}" style="font-size: 1em;">★</div>'
+            marker: folium.DivIcon = folium.DivIcon(
+                html=f'<div class="marker terminal {' '.join(classes)}">T</div>',
+                icon_anchor=(10, 10)
+            )
             popup: folium.Popup = folium.Popup(f'<span class="stop-name">{terminal.name}</span>'
                                                f'<br><span class="stop-tp">{visited_label}</span>')
             # noinspection PyTypeChecker
-            folium.Marker(location=(terminal.latitude, terminal.longitude),
-                          popup=popup, icon=folium.DivIcon(html=marker)).add_to(fmap)
+            folium.Marker(location=(terminal.latitude, terminal.longitude), popup=popup, icon=marker).add_to(fmap)
 
         build_app(fmap, db)
 
