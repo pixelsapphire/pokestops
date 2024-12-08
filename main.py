@@ -181,7 +181,7 @@ def build_app(fmap: folium.Map, db: Database) -> None:
         file.write(f'const vehicles = {{\n{'\n'.join(map(Vehicle.json_entry, db.vehicles.values()))}\n}};')
 
     with open(ref.compileddata_players, 'w') as file:
-        file.write(f'const players = {{\n{'\n'.join(map(lambda p: p.json_entry(db.stops), db.players))}\n}};')
+        file.write(f'const players = {{\n{'\n'.join(map(lambda p: Player.json_entry(p, db), db.players))}\n}};')
 
     html_archive: Html = create_archive(db)
     rendered_archive: str = clean_html(html_archive.render(True, True))

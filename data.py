@@ -1,6 +1,7 @@
 import csv
 import json
 import os
+from abc import ABC
 from typing import Any, Callable, Literal, Iterable, Self, TypeVar, Union
 
 T = TypeVar('T')
@@ -21,6 +22,15 @@ def __read_collection__(source: str, identity: C, mapper: Callable[..., T], comb
         return collection
 
 
+class JsonSerializable(ABC):
+    def __json_entry__(self, db: Union['Database', None] = None) -> str:
+        pass
+
+    @staticmethod
+    def json_entry(obj: 'JsonSerializable', db: Union['Database', None] = None) -> str:
+        return obj.__json_entry__(db)
+
+
 class Visit:
     def __init__(self, name: str, date: str):
         self.name: str = name
@@ -34,7 +44,7 @@ class Visit:
             self.date < other.date if self.date != other.date else self.name > other.name)
 
 
-class Stop:
+class Stop(JsonSerializable):
 
     def __init__(self, short_name: str, full_name: str, latitude: str, longitude: str, zone: str, routes: str):
         self.short_name: str = short_name
@@ -110,8 +120,7 @@ class Stop:
                 stop_groups[stop.full_name].add(stop.short_name)
         return stops, stop_groups
 
-    @staticmethod  # the annotation is a temporary fix to Pycharm issue PY-70668
-    def json_entry(self) -> str:
+    def __json_entry__(self, _=None) -> str:
         return (f'"{self.short_name}":{{'
                 f'n:"{self.full_name}",'
                 f'lt:{self.latitude},'
@@ -162,7 +171,7 @@ class TerminalProgress:
         return self.arrived() and self.departed()
 
 
-class Terminal:
+class Terminal(JsonSerializable):
     def __init__(self, terminal_id: str, name: str, latitude: str, longitude: str, arrival_stop: Stop, departure_stop: Stop):
         self.id: str = terminal_id
         self.name: str = name
@@ -203,8 +212,7 @@ class Terminal:
         # noinspection PyTypeChecker
         return __read_collection__(source, [], constructor, list.append)
 
-    @staticmethod  # the annotation is a temporary fix to Pycharm issue PY-70668
-    def json_entry(self) -> str:
+    def __json_entry__(self, _=None) -> str:
         return (f'"{self.id}":{{'
                 f'n:"{self.name}",'
                 f'lt:{self.latitude},'
@@ -212,7 +220,7 @@ class Terminal:
                 f'}},')
 
 
-class Carrier:
+class Carrier(JsonSerializable):
     def __init__(self, symbol: str, short_name: str, full_name: str):
         self.symbol: str = symbol
         self.short_name: str = short_name
@@ -228,14 +236,13 @@ class Carrier:
     def read_dict(source: str) -> dict[str, 'Carrier']:
         return __read_collection__(source, {}, Carrier, lambda c, v: c.update({v.symbol: v}))
 
-    @staticmethod  # the annotation is a temporary fix to Pycharm issue PY-70668@
-    def json_entry(self) -> str:
+    def __json_entry__(self, _=None) -> str:
         return (f'"{self.symbol}":{{'
                 f'n:"{self.full_name}",'
                 f'}},')
 
 
-class VehicleModel:
+class VehicleModel(JsonSerializable):
     def __init__(self, model_id: str, kind: str, kind_detailed: str, brand: str, model: str, seats: str | int, lore: str):
         self.model_id: str = model_id
         self.kind: str = kind
@@ -255,8 +262,7 @@ class VehicleModel:
     def read_dict(source: str) -> dict[str, 'VehicleModel']:
         return __read_collection__(source, {}, VehicleModel, lambda c, v: c.update({v.model_id: v}))
 
-    @staticmethod  # the annotation is a temporary fix to Pycharm issue PY-70668
-    def json_entry(self) -> str:
+    def __json_entry__(self, _=None) -> str:
         return (f'"{self.model_id}":{{'
                 f'k:"{self.kind_detailed}",'
                 f'b:"{self.brand}",'
@@ -266,7 +272,7 @@ class VehicleModel:
                 f'}},')
 
 
-class Vehicle:
+class Vehicle(JsonSerializable):
     def __init__(self, vehicle_id: str, license_plate: str, carrier: Carrier, model: VehicleModel, image_url: str, lore: str):
         self.vehicle_id: str = vehicle_id
         self.license_plate: str = license_plate
@@ -292,8 +298,7 @@ class Vehicle:
         constructor = lambda *row: Vehicle(row[0], row[1], carriers.get(row[2]), models.get(row[3]), row[4], row[5])
         return __read_collection__(source, {}, constructor, lambda c, v: c.update({v.vehicle_id: v}))
 
-    @staticmethod  # the annotation is a temporary fix to Pycharm issue PY-70668
-    def json_entry(self) -> str:
+    def __json_entry__(self, _=None) -> str:
         return (f'"{self.vehicle_id}":{{'
                 f'{f'p:"{self.license_plate}", ' if self.license_plate else ''}'
                 f'{f'm:"{self.model.model_id}", ' if self.model else ''}'
@@ -303,7 +308,7 @@ class Vehicle:
                 f'}},')
 
 
-class Player:
+class Player(JsonSerializable):
     def __init__(self, nickname: str, primary_color: str, tint_color: str,
                  stops_file: str, ev_file: str, terminals_file: str, vehicles_file: str):
         self.nickname: str = nickname
@@ -364,7 +369,8 @@ class Player:
         # noinspection PyTypeChecker
         return __read_collection__(source, [], Player, list.append)
 
-    def json_entry(self, stops: dict[str, Stop]) -> str:
+    def __json_entry__(self, db: 'Database' = None) -> str:
+        stops: dict[str, Stop] = db.stops if db else {}
         return (f'"{self.nickname}":{{'
                 f'v:[{','.join(sorted(f'"{v[0].vehicle_id}"' for v in self.get_vehicles()))}],'
                 f's:[{','.join(sorted(f'"{s.short_name}"' for s in stops.values() if s.visited_by(self)))}],'
