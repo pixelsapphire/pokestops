@@ -31,7 +31,7 @@ class JsonSerializable(ABC):
         return obj.__json_entry__(db)
 
 
-class Visit:
+class Discovery:
     def __init__(self, name: str, date: str):
         self.name: str = name
         self.date: str = date
@@ -52,7 +52,7 @@ class Stop(JsonSerializable):
         self.latitude: float = float(latitude)
         self.longitude: float = float(longitude)
         self.zone: str = zone
-        self.visits: set[Visit] = set()
+        self.visits: set[Discovery] = set()
         self.regions: list[Region] = []
         self.lines: list[tuple[str, str]] = list(map(lambda e: (e[:e.index(':')], e[e.index(':') + 1:]),
                                                      routes.split('&'))) if routes else []
@@ -75,7 +75,7 @@ class Stop(JsonSerializable):
     def visited(self, include_ev: bool = True) -> bool:
         return any(visit.date != '2000-01-01' or include_ev for visit in self.visits)
 
-    def add_visit(self, visit: Visit):
+    def add_visit(self, visit: Discovery):
         if self.visited_by(visit.name):
             print(f'{visit.name} already visited {self.short_name}, '
                   f'remove the entry from {visit.date if visit.date != '2000-01-01' else 'her EV file'}')
@@ -125,7 +125,9 @@ class Stop(JsonSerializable):
                 f'n:"{self.full_name}",'
                 f'lt:{self.latitude},'
                 f'ln:{self.longitude},'
-                f'l:[{','.join(f'["{line}","{destination}"]' for line, destination in self.lines)}]'
+                f'l:[{','.join(f'["{line}","{destination}"]' for line, destination in self.lines)}],'
+                f'{f'v:[{','.join(f'["{visit.name}","{visit.date if visit.date != '2000-01-01' else ''}"]'
+                                  for visit in sorted(self.visits))}],' if self.visits else ''}'
                 f'}},')
 
 
@@ -280,6 +282,7 @@ class Vehicle(JsonSerializable):
         self.model: VehicleModel = model
         self.image_url: str | None = image_url if image_url else None
         self.lore: str = lore
+        self.discoveries: set[Discovery] = set()
 
     def __hash__(self):
         return hash(self.vehicle_id)
@@ -293,6 +296,15 @@ class Vehicle(JsonSerializable):
     def __lt__(self, other):
         return self.__cmp_key__() < other.__cmp_key__() if isinstance(other, type(self)) else False
 
+    def discovered_by(self, player: Union[str, 'Player']) -> str | None:
+        name = player.nickname if isinstance(player, Player) else player
+        return next((visit.date for visit in self.discoveries if name == visit.name), None)
+
+    def add_discovery(self, visit: Discovery):
+        if self.discovered_by(visit.name):
+            print(f'{visit.name} already discovered {self.vehicle_id}, remove the entry from {visit.date}')
+        self.discoveries.add(visit)
+
     @staticmethod
     def read_dict(source: str, carriers: dict[str, Carrier], models: dict[str, VehicleModel]) -> dict[str, 'Vehicle']:
         constructor = lambda *row: Vehicle(row[0], row[1], carriers.get(row[2]), models.get(row[3]), row[4], row[5])
@@ -305,6 +317,8 @@ class Vehicle(JsonSerializable):
                 f'c:"{self.carrier.symbol}",'
                 f'{f'i:{f'"{self.image_url}"'},' if self.image_url else ''}'
                 f'l:"{self.lore}",'
+                f'{f'd:[{','.join(f'["{visit.name}","{visit.date}"]'
+                                  for visit in sorted(self.discoveries))}],' if self.discoveries else ''}'
                 f'}},')
 
 
@@ -371,9 +385,9 @@ class Player(JsonSerializable):
 
     def __json_entry__(self, db: 'Database' = None) -> str:
         stops: dict[str, Stop] = db.stops if db else {}
-        return (f'"{self.nickname}":{{'
-                f'v:[{','.join(sorted(f'"{v[0].vehicle_id}"' for v in self.get_vehicles()))}],'
-                f's:[{','.join(sorted(f'"{s.short_name}"' for s in stops.values() if s.visited_by(self)))}],'
+        return (f'"{self.nickname}":{{\n'
+                f'v:[{','.join(sorted(f'"{v[0].vehicle_id}"' for v in self.get_vehicles()))}],\n'
+                f's:[{','.join(sorted(f'"{s.short_name}"' for s in stops.values() if s.visited_by(self)))}],\n'
                 f'}},')
 
 

@@ -327,3 +327,7 @@ a {
 .lore-label > p {
     margin-bottom: min(1vh, 1dvw);
 }
+
+.discoveries-label {
+    margin-top: min(1vh, 1dvw);
+}

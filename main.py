@@ -62,7 +62,7 @@ def process_players_data(players: list[Player], stops: dict[str, Stop],
                 elif not row[0].lstrip().startswith('#'):
                     stop = stops.get(row[0])
                     if stop:
-                        stop.add_visit(Visit(player.nickname, row[1]))
+                        stop.add_visit(Discovery(player.nickname, row[1]))
                         player.add_stop(stop)
                     else:
                         print(f'Stop {row[0].lstrip()} not found, remove {player.nickname}\'s entry from her save file')
@@ -77,7 +77,7 @@ def process_players_data(players: list[Player], stops: dict[str, Stop],
                 elif not stop_id.startswith('#'):
                     stop = stops.get(stop_id)
                     if stop:
-                        stop.add_visit(Visit(player.nickname, '2000-01-01'))
+                        stop.add_visit(Discovery(player.nickname, '2000-01-01'))
                         player.add_stop(stop)
                     else:
                         print(f'Stop {stop_id} not found, remove {player.nickname}\'s entry from her EV file')
@@ -109,6 +109,7 @@ def process_players_data(players: list[Player], stops: dict[str, Stop],
                     vehicle_id = row[0].lstrip()
                     vehicle = vehicles.get(vehicle_id)
                     if vehicle:
+                        vehicle.add_discovery(Discovery(player.nickname, row[1]))
                         player.add_vehicle(vehicle, row[1])
                     else:
                         combined: str | None = next((v for v in vehicles.keys() if
@@ -240,7 +241,7 @@ def main() -> None:
         fmap: folium.Map = folium.Map(location=(avg_lat, avg_lon), zoom_start=12, prefer_canvas=True, zoom_control='bottomleft')
 
         for stop in db.stops.values():
-            stop_visits: list[Visit] = sorted(stop.visits)
+            stop_visits: list[Discovery] = sorted(stop.visits)
             # noinspection PyUnresolvedReferences
             classes: str = ' '.join(
                 [f'v-{visit.name.lower()}' for visit in stop_visits] +

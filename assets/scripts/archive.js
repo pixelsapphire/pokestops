@@ -4,7 +4,7 @@ function openTab(tile, tab) {
     document.querySelector(`#container-${tab}`).classList.add('selected');
 }
 
-function make_address(address) {
+function makeAddress(address) {
     let road = address.road ? `${address.road}` : '';
     const suburb = address.suburb ? `${address.suburb}, ` : '';
     const town = address.city || address.town || address.village;
@@ -13,7 +13,7 @@ function make_address(address) {
     return `${road}${suburb}${address.postcode} ${town}`;
 }
 
-function select_stop(stopPreview, ctrl) {
+function selectStop(stopPreview, ctrl) {
     ctrl.stopDetails.classList.remove('hidden');
     const stopId = stopPreview.getAttribute('data-stop-id');
     const stop = stops[stopId];
@@ -24,15 +24,17 @@ function select_stop(stopPreview, ctrl) {
         ctrl.stopLinesField.innerHTML += `<div class="line-view"><span class="line-number">${number}</span><span class="line-destination">${destination}</span></div>`;
     });
     const coordinates = `${stop.lt},${stop.ln}`;
-    const streetViewLink = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${coordinates}`
+    const streetViewLink = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${coordinates}`;
+    ctrl.stopAddressLabel.innerHTML = '<i>searching for address...</i>';
     fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${stop.lt}&lon=${stop.ln}&zoom=18&addressdetails=1`)
         .then(response => response.json())
-        .then(data => ctrl.stopAddressLabel.innerHTML = make_address(data.address));
+        .then(data => ctrl.stopAddressLabel.innerHTML = makeAddress(data.address));
     ctrl.stopCoordinatesLabel.innerHTML = `(${coordinates})`;
     ctrl.stopLocationViewButton.href = streetViewLink;
+    ctrl.stopDiscoveriesLabel.innerHTML = stop.v ? stop.v.map((v) => `visited by ${v[0]} ${v[1] ? `on ${v[1]}` : 'a long time ago'}`).join('<br>') : 'not yet visited';
 }
 
-function select_vehicle(vehiclePreview, ctrl) {
+function selectVehicle(vehiclePreview, ctrl) {
     ctrl.vehicleDetails.classList.remove('hidden');
     const vehicleId = vehiclePreview.getAttribute('data-vehicle-id');
     const vehicle = vehicles[vehicleId];
@@ -63,6 +65,7 @@ function select_vehicle(vehiclePreview, ctrl) {
         ctrl.vehicleImage.innerHTML = `<img src="${vehicle.i}" alt="${alt}">`;
         ctrl.vehicleImage.firstChild.addEventListener('click', () => window.open(vehicle.i, '_blank'));
     } else ctrl.vehicleImage.innerHTML = '';
+    ctrl.vehicleDiscoveriesLabel.innerHTML = vehicle.d ? vehicle.d.map((d) => `discovered by ${d[0]} on ${d[1]}`).join('<br>') : 'not yet discovered';
 }
 
 Array.prototype.containsBS = function (target) {
@@ -94,8 +97,9 @@ document.addEventListener('DOMContentLoaded', () => {
         stopAddressLabel: stopView.querySelector('#stop-address'),
         stopCoordinatesLabel: stopView.querySelector('#stop-coordinates'),
         stopLocationViewButton: stopView.querySelector('#street-view-link'),
+        stopDiscoveriesLabel: stopView.querySelector('#stop-discoveries'),
     };
-    document.querySelectorAll('.stop-preview').forEach(preview => preview.addEventListener('click', () => select_stop(preview, stopViewControls)));
+    document.querySelectorAll('.stop-preview').forEach(preview => preview.addEventListener('click', () => selectStop(preview, stopViewControls)));
 
     let vehicleView = document.querySelector('#vehicle-view');
     let vehicleViewControls = {
@@ -109,8 +113,9 @@ document.addEventListener('DOMContentLoaded', () => {
         vehicleSeatsLabel: vehicleView.querySelector('#vehicle-seats'),
         vehicleLoreLabel: vehicleView.querySelector('#vehicle-lore'),
         vehicleImage: vehicleView.querySelector('#vehicle-image'),
+        vehicleDiscoveriesLabel: vehicleView.querySelector('#vehicle-discoveries'),
     };
-    document.querySelectorAll('.vehicle-preview').forEach(preview => preview.addEventListener('click', () => select_vehicle(preview, vehicleViewControls)));
+    document.querySelectorAll('.vehicle-preview').forEach(preview => preview.addEventListener('click', () => selectVehicle(preview, vehicleViewControls)));
 
     const activePlayer = players[localStorage.getItem('activePlayer') || 'Zorie'];
     document.querySelectorAll('.stop-group-view').forEach(group => {

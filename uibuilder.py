@@ -421,7 +421,7 @@ def create_stops_page(db: Database) -> Div:
                             )
                         ],
                     ),
-                    Div([Id('street-view-pane'), Class('hidden')]),
+                    Div([Id('stop-discoveries'), Class('discoveries-label')]),
                 ],
             ),
         ],
@@ -469,6 +469,7 @@ def create_vehicles_page(db: Database) -> Div:
                         ],
                     ),
                     Div([Id('vehicle-lore'), Class('lore-label')]),
+                    Div([Id('vehicle-discoveries'), Class('discoveries-label')]),
                 ],
             ),
         ],
