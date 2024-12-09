@@ -21,7 +21,8 @@ function selectStop(stopPreview, ctrl) {
     ctrl.stopLinesField.innerHTML = '';
     stops[stopId].l.forEach(line => {
         const [number, destination] = line;
-        ctrl.stopLinesField.innerHTML += `<div class="line-view"><span class="line-number">${number}</span><span class="line-destination">${destination}</span></div>`;
+        const style = `background-color: #${routes[number].b}; color: #${routes[number].t}`;
+        ctrl.stopLinesField.innerHTML += `<div class="line-view"><span class="line-number" style="${style}">${number}</span><span class="line-destination">${destination}</span></div>`;
     });
     const coordinates = `${stop.lt},${stop.ln}`;
     const streetViewLink = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${coordinates}`;

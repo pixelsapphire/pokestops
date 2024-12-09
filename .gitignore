@@ -3,6 +3,7 @@
 __pycache__/
 deploy.sh
 server.sh
+data/raw/routes.csv
 data/raw/stops.csv
 test.py
 toolbox/

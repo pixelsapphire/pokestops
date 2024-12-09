@@ -489,6 +489,7 @@ def create_archive(db: Database) -> Html:
                     Link([Rel('stylesheet'), Type('text/css'), Href(ref.stylesheet_archive)]),
                     Script([Src(ref.compileddata_stops)]),
                     Script([Src(ref.compileddata_vehicles)]),
+                    Script([Src(ref.compileddata_routes)]),
                     Script([Src(ref.compileddata_players)]),
                     Script([Src(ref.controller_archive)]),
                 ],

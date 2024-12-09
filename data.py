@@ -322,6 +322,24 @@ class Vehicle(JsonSerializable):
                 f'}},')
 
 
+class Route(JsonSerializable):
+    def __init__(self, number: str, background_color: str, text_color: str):
+        self.number: str = number
+        self.background_color: str = background_color
+        self.text_color: str = text_color
+
+    @staticmethod
+    def read_dict(source: str) -> dict[str, 'Route']:
+        constructor = lambda *row: Route(row[2], row[6], row[7])
+        return __read_collection__(source, {}, constructor, lambda c, v: c.update({v.number: v}))
+
+    def __json_entry__(self, _=None) -> str:
+        return (f'"{self.number}":{{'
+                f'b:"{self.background_color}",'
+                f't:"{self.text_color}",'
+                f'}},')
+
+
 class Player(JsonSerializable):
     def __init__(self, nickname: str, primary_color: str, tint_color: str,
                  stops_file: str, ev_file: str, terminals_file: str, vehicles_file: str):
@@ -453,7 +471,7 @@ class Database:
     def __init__(self, players: list[Player], progress: dict[str, dict[str, float]],
                  stops: dict[str, Stop], stop_groups: dict[str, set[str]], terminals: list[Terminal],
                  carriers: dict[str, Carrier], regions: dict[str, Region], district: Region,
-                 vehicles: dict[str, Vehicle], models: dict[str, VehicleModel]):
+                 vehicles: dict[str, Vehicle], models: dict[str, VehicleModel], routes: dict[str, Route]):
         self.players: list[Player] = players
         self.progress: dict[str, dict[str, float]] = progress
         self.stops: dict[str, Stop] = stops
@@ -464,16 +482,18 @@ class Database:
         self.district: Region = district
         self.vehicles: dict[str, Vehicle] = vehicles
         self.models: dict[str, VehicleModel] = models
+        self.routes: dict[str, Route] = routes
 
     @staticmethod
     def partial(players: list[Player] | None = None, progress: dict[str, dict[str, float]] | None = None,
                 stops: dict[str, Stop] | None = None, stop_groups: dict[str, set[str]] | None = None,
                 terminals: list[Terminal] | None = None, carriers: dict[str, Carrier] | None = None,
                 regions: dict[str, Region] | None = None, district: Region | None = None,
-                vehicles: dict[str, Vehicle] | None = None, models: dict[str, VehicleModel] | None = None):
+                vehicles: dict[str, Vehicle] | None = None, models: dict[str, VehicleModel] | None = None,
+                routes: dict[str, Route] | None = None) -> 'Database':
         return Database(players or [], progress or {}, stops or {}, stop_groups or {}, terminals or [],
                         carriers or {}, regions or {}, district or Region(0, '', '', lambda _: False),
-                        vehicles or {}, models or {})
+                        vehicles or {}, models or {}, routes or {})
 
     def add_collection(self, name: CollectionName, collection: Any):
         setattr(self, name, collection)

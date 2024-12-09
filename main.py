@@ -7,28 +7,32 @@ from uibuilder import *
 
 
 # noinspection SqlNoDataSourceInspection,DuplicatedCode
-def attach_stop_routes() -> None:
-    gtfs_db: sqlite3.Connection = sqlite3.connect(':memory:')
+def create_gtfs_databsse() -> sqlite3.Connection:
+    db: sqlite3.Connection = sqlite3.connect(':memory:')
 
     with open(ref.rawdata_stops, 'r') as file:
         reader = csv.reader(file)
         header_row = next(reader)
-        stops_header_row = header_row
-        gtfs_db.execute(f'CREATE TABLE stops ({", ".join(f'{col} TEXT' for col in header_row)})')
-        gtfs_db.executemany(f'INSERT INTO stops VALUES ({','.join('?' * len(header_row))})', reader)
+        db.execute(f'CREATE TABLE stops ({", ".join(f'{col} TEXT' for col in header_row)})')
+        db.executemany(f'INSERT INTO stops VALUES ({','.join('?' * len(header_row))})', reader)
 
     with open(ref.rawdata_stop_times, 'r') as file:
         reader = csv.reader(file)
         header_row = next(reader)
-        gtfs_db.execute(f'CREATE TABLE stop_times ({", ".join(f'{col} TEXT' for col in header_row)})')
-        gtfs_db.executemany(f'INSERT INTO stop_times VALUES ({','.join('?' * len(header_row))})', reader)
+        db.execute(f'CREATE TABLE stop_times ({", ".join(f'{col} TEXT' for col in header_row)})')
+        db.executemany(f'INSERT INTO stop_times VALUES ({','.join('?' * len(header_row))})', reader)
 
     with open(ref.rawdata_trips, 'r') as file:
         reader = csv.reader(file)
         header_row = next(reader)
-        gtfs_db.execute(f'CREATE TABLE trips ({", ".join(f'{col} TEXT' for col in header_row)})')
-        gtfs_db.executemany(f'INSERT INTO trips VALUES ({','.join('?' * len(header_row))})', reader)
+        db.execute(f'CREATE TABLE trips ({", ".join(f'{col} TEXT' for col in header_row)})')
+        db.executemany(f'INSERT INTO trips VALUES ({','.join('?' * len(header_row))})', reader)
 
+    return db
+
+
+# noinspection SqlNoDataSourceInspection
+def attach_stop_routes(gtfs_db: sqlite3.Connection) -> None:
     cursor = gtfs_db.cursor()
     cursor.execute('WITH stop_routes_groupped AS'
                    '(WITH stop_routes_ungroupped AS '
@@ -43,10 +47,48 @@ def attach_stop_routes() -> None:
                    'SELECT stops.*, routes '
                    'FROM stops JOIN stop_routes_groupped USING(stop_id)')
 
+    stops_header_row: list[str]
+    with open(ref.rawdata_stops, 'r') as file:
+        stops_header_row = next(csv.reader(file))
+
     with open(ref.rawdata_stops, 'w') as file:
         writer = csv.writer(file)
         writer.writerow([*stops_header_row, 'routes'])
         writer.writerows(cursor.fetchall())
+
+
+def update_gtds_data(first_update: bool, initial_db: Database) -> None:
+    old_stops: dict[str, Stop] = {}
+    if not first_update:
+        old_stops, _ = Stop.read_stops(ref.rawdata_stops, initial_db)
+    response: requests.Response = requests.get(ref.url_ztm_gtfs)
+    with open(ref.tmpdata_gtfs, 'wb') as file:
+        file.write(response.content)
+    with util.zip_file(ref.tmpdata_gtfs, 'r') as zip_ref:
+        zip_ref.extract_as('stops.txt', ref.rawdata_stops)
+        zip_ref.extract_as('stop_times.txt', ref.rawdata_stop_times)
+        zip_ref.extract_as('trips.txt', ref.rawdata_trips)
+        zip_ref.extract_as('routes.txt', ref.rawdata_routes)
+    os.remove(ref.tmpdata_gtfs)
+    gtfs_db: sqlite3.Connection = create_gtfs_databsse()
+    attach_stop_routes(gtfs_db)
+    os.remove(ref.rawdata_stop_times)
+    os.remove(ref.rawdata_trips)
+
+    new_stops, _ = Stop.read_stops(ref.rawdata_stops, initial_db)
+
+    added_stops = {s for s in new_stops.values() if s not in old_stops.values()}
+    removed_stops = {s for s in old_stops.values() if s not in new_stops.values()}
+    if first_update:
+        print('Stops database created.')
+    else:
+        print('Stops database updated.')
+        if added_stops:
+            print(f'Added stops:\n- {'\n- '.join(f'{s.full_name} [{s.short_name}]' for s in added_stops)}')
+        if removed_stops:
+            print(f'Removed stops:\n- {'\n- '.join(f'{s.full_name} [{s.short_name}]' for s in removed_stops)}')
+        if not added_stops and not removed_stops:
+            print('No changes')
 
 
 def process_players_data(players: list[Player], stops: dict[str, Stop],
@@ -137,6 +179,7 @@ def load_data(initial_db: Database) -> Database:
     carriers: dict[str, Carrier] = Carrier.read_dict(ref.rawdata_carriers)
     models: dict[str, VehicleModel] = VehicleModel.read_dict(ref.rawdata_vehicle_models)
     vehicles: dict[str, Vehicle] = Vehicle.read_dict(ref.rawdata_vehicles, carriers, models)
+    routes: dict[str, Route] = Route.read_dict(ref.rawdata_routes)
 
     process_players_data(players, stops, terminals, vehicles)
 
@@ -158,7 +201,7 @@ def load_data(initial_db: Database) -> Database:
         }
     }
 
-    return Database(players, progress, stops, stop_groups, terminals, carriers, regions, district, vehicles, models)
+    return Database(players, progress, stops, stop_groups, terminals, carriers, regions, district, vehicles, models, routes)
 
 
 def build_app(fmap: folium.Map, db: Database) -> None:
@@ -181,6 +224,9 @@ def build_app(fmap: folium.Map, db: Database) -> None:
         file.write(f'const carriers = {{\n{'\n'.join(map(Carrier.json_entry, db.carriers.values()))}\n}};\n')
         file.write(f'const vehicles = {{\n{'\n'.join(map(Vehicle.json_entry, db.vehicles.values()))}\n}};')
 
+    with open(ref.compileddata_routes, 'w') as file:
+        file.write(f'const routes = {{\n{'\n'.join(map(Route.json_entry, db.routes.values()))}\n}};')
+
     with open(ref.compileddata_players, 'w') as file:
         file.write(f'const players = {{\n{'\n'.join(map(lambda p: Player.json_entry(p, db), db.players))}\n}};')
 
@@ -195,40 +241,15 @@ def main() -> None:
     players: list[Player] = Player.read_list(ref.rawdata_players)
     initial_db: Database = Database.partial(regions=regions, district=district, players=players)
 
-    old_stops = {}
-    first_update = not os.path.exists(ref.rawdata_stops)
     if update_ztm_stops:
-        if not first_update:
-            old_stops, _ = Stop.read_stops(ref.rawdata_stops, initial_db)
-        response: requests.Response = requests.get(ref.url_ztm_gtfs)
-        with open(ref.tmpdata_gtfs, 'wb') as file:
-            file.write(response.content)
-        with util.zip_file(ref.tmpdata_gtfs, 'r') as zip_ref:
-            zip_ref.extract_as('stops.txt', ref.rawdata_stops)
-            zip_ref.extract_as('stop_times.txt', ref.rawdata_stop_times)
-            zip_ref.extract_as('trips.txt', ref.rawdata_trips)
-        os.remove(ref.tmpdata_gtfs)
-        attach_stop_routes()
-        os.remove(ref.rawdata_stop_times)
-        os.remove(ref.rawdata_trips)
-
-        new_stops, _ = Stop.read_stops(ref.rawdata_stops, initial_db)
-
-        added_stops = {s for s in new_stops.values() if s not in old_stops.values()}
-        removed_stops = {s for s in old_stops.values() if s not in new_stops.values()}
-        if first_update:
-            print('Stops database created.')
-        else:
-            print('Stops database updated.')
-            if added_stops:
-                print(f'Added stops:\n- {'\n- '.join(f'{s.full_name} [{s.short_name}]' for s in added_stops)}')
-            if removed_stops:
-                print(f'Removed stops:\n- {'\n- '.join(f'{s.full_name} [{s.short_name}]' for s in removed_stops)}')
-            if not added_stops and not removed_stops:
-                print('No changes')
-    elif not os.path.exists(ref.rawdata_stops):
-        raise FileNotFoundError(f'{ref.rawdata_stops} not found. '
-                                f'Run the script with the --update flag to download the latest data.')
+        update_gtds_data(not os.path.exists(ref.rawdata_stops), initial_db)
+    else:
+        if not os.path.exists(ref.rawdata_stops):
+            raise FileNotFoundError(f'{ref.rawdata_stops} not found. '
+                                    f'Run the script with the --update flag to download the latest data.')
+        if not os.path.exists(ref.rawdata_routes):
+            raise FileNotFoundError(f'{ref.rawdata_routes} not found. '
+                                    f'Run the script with the --update flag to download the latest data.')
 
     if update_map:
 
