@@ -1,0 +1,22 @@
+<svg width="1024.0" height="474.1" xmlns="http://www.w3.org/2000/svg">
+<path d="M214.09730974252622 12.0 L93.6 132.5 L12.0 132.5 L84.6 132.5 L264.9 312.9 L414.2 462.1 L533.2 462.1 L551.0 462.1 L618.4 394.8 L676.5 394.8 L705.4 423.6 L709.7 423.6 L790.3 343.0 L989.6 343.0 L1012.0 365.5 " />
+<circle cx="214.1" cy="12.0" r="8" />
+<circle cx="12.0" cy="132.5" r="8" />
+<circle cx="264.9" cy="312.9" r="8" />
+<circle cx="533.2" cy="462.1" r="8" />
+<circle cx="618.4" cy="394.8" r="8" />
+<circle cx="705.4" cy="423.6" r="8" />
+<circle cx="790.3" cy="343.0" r="8" />
+<circle cx="1012.0" cy="365.5" r="8" />
+<style>
+circle {
+fill: white;
+stroke: #525252;
+stroke-width: 4;
+}
+path {
+fill: none;
+stroke: #525252;
+stroke-width: 8;
+}</style>
+</svg>

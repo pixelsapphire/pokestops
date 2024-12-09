@@ -1,0 +1,30 @@
+<svg width="1024.0" height="104.1" xmlns="http://www.w3.org/2000/svg">
+<path d="M1012.0 92.14000258039961 L990.5 92.1 L986.4 88.0 L977.1 78.7 L926.2 78.7 L908.4 78.7 L905.6 75.9 L898.3 68.6 L853.0 68.6 L823.7 68.6 L821.8 66.7 L818.2 63.1 L768.3 63.1 L731.4 63.1 L713.4 81.1 L691.3 81.1 L681.1 70.9 L649.7 39.6 L574.2 39.6 L509.7 39.6 L485.4 15.3 L482.1 12.0 L318.4 12.0 L265.4 12.0 L265.1 12.4 L262.2 15.2 L198.4 15.2 L119.4 15.2 L115.3 19.3 L18.1 19.3 L12.0 13.2 " />
+<circle cx="1012.0" cy="92.1" r="8" />
+<circle cx="986.4" cy="88.0" r="8" />
+<circle cx="926.2" cy="78.7" r="8" />
+<circle cx="905.6" cy="75.9" r="8" />
+<circle cx="853.0" cy="68.6" r="8" />
+<circle cx="821.8" cy="66.7" r="8" />
+<circle cx="768.3" cy="63.1" r="8" />
+<circle cx="713.4" cy="81.1" r="8" />
+<circle cx="681.1" cy="70.9" r="8" />
+<circle cx="574.2" cy="39.6" r="8" />
+<circle cx="485.4" cy="15.3" r="8" />
+<circle cx="318.4" cy="12.0" r="8" />
+<circle cx="265.1" cy="12.4" r="8" />
+<circle cx="198.4" cy="15.2" r="8" />
+<circle cx="115.3" cy="19.3" r="8" />
+<circle cx="12.0" cy="13.2" r="8" />
+<style>
+circle {
+fill: white;
+stroke: black;
+stroke-width: 4;
+}
+path {
+fill: none;
+stroke: #FFFFFF;
+stroke-width: 8;
+}</style>
+</svg>

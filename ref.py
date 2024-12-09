@@ -1,4 +1,4 @@
-asset_img_compass: str = 'assets/images/banner.png'
+asset_img_banner: str = 'assets/images/banner.png'
 asset_img_compass: str = 'assets/images/compass.png'
 asset_path_brands: str = 'assets/brands'
 asset_path_markers: str = 'assets/markers'
@@ -15,6 +15,8 @@ controller_map: str = 'assets/scripts/map.js'
 
 document_archive: str = 'archive.html'
 document_map: str = 'index.html'
+
+mapdata_path: str = 'data/map'
 
 stylesheet_archive: str = 'assets/stylesheets/archive.css'
 stylesheet_common: str = 'assets/stylesheets/common.css'

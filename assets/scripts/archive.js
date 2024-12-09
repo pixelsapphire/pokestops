@@ -35,6 +35,19 @@ function selectStop(stopPreview, ctrl) {
     ctrl.stopDiscoveriesLabel.innerHTML = stop.v ? stop.v.map((v) => `visited by ${v[0]} ${v[1] ? `on ${v[1]}` : 'a long time ago'}`).join('<br>') : 'not yet visited';
 }
 
+function selectLine(linePreview, ctrl) {
+    ctrl.lineDetails.classList.remove('hidden');
+    ctrl.lineNumberLabel.parentElement.classList.remove('hidden');
+    const lineNumber = linePreview.getAttribute('data-line-number');
+    const line = routes[lineNumber];
+    ctrl.lineNumberLabel.innerHTML = `${lineNumber}`;
+    ctrl.lineNumberLabel.style.backgroundColor = `#${line.b}`;
+    ctrl.lineNumberLabel.style.color = `#${line.t}`;
+    ctrl.lineTerminalsLabel.innerHTML = line.d;
+    ctrl.lineKindLabel.innerHTML = `${line.k} line`;
+    ctrl.lineRouteLabel.innerHTML = line.r;
+}
+
 function selectVehicle(vehiclePreview, ctrl) {
     ctrl.vehicleDetails.classList.remove('hidden');
     const vehicleId = vehiclePreview.getAttribute('data-vehicle-id');
@@ -101,6 +114,16 @@ document.addEventListener('DOMContentLoaded', () => {
         stopDiscoveriesLabel: stopView.querySelector('#stop-discoveries'),
     };
     document.querySelectorAll('.stop-preview').forEach(preview => preview.addEventListener('click', () => selectStop(preview, stopViewControls)));
+
+    let lineView = document.querySelector('#line-view');
+    let lineViewControls = {
+        lineDetails: lineView.querySelector('#line-details'),
+        lineNumberLabel: lineView.querySelector('#line-number'),
+        lineTerminalsLabel: lineView.querySelector('#line-terminals'),
+        lineKindLabel: lineView.querySelector('#line-kind'),
+        lineRouteLabel: lineView.querySelector('#line-route'),
+    };
+    document.querySelectorAll('.line-preview').forEach(preview => preview.addEventListener('click', () => selectLine(preview, lineViewControls)));
 
     let vehicleView = document.querySelector('#vehicle-view');
     let vehicleViewControls = {

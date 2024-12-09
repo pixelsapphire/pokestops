@@ -326,6 +326,13 @@ def create_navigation() -> Div:
                 ],
             ),
             Div(
+                [Class('navigation-tile'), Onclick('openTab(this, "lines")')],
+                [
+                    Span([Class('material-icon material-symbols-outlined')], 'route'),
+                    Span([], ['Lines'])
+                ],
+            ),
+            Div(
                 [Class('navigation-tile'), Onclick('openTab(this, "vehicles")')],
                 [
                     Span([Class('material-icon material-symbols-outlined')], 'tram'),
@@ -428,6 +435,53 @@ def create_stops_page(db: Database) -> Div:
     )
 
 
+def create_line_preview(line: Route) -> Div:
+    return Div(
+        [Class('line-preview'), CustomHtmlTagAttribute('data-line-number', line.number)],
+        [
+            Div([Class('line-path-container')], Img([Class('line-path'), Src(f'{ref.mapdata_path}/{line.number}/1.svg')])),
+            Div(
+                [
+                    Class('line-number'),
+                    InlineStyle(f'background-color: #{line.background_color}; color: #{line.text_color};'),
+                ],
+                line.number,
+            ),
+        ],
+    )
+
+
+def create_lines_page(db: Database) -> Div:
+    return Div(
+        [Class('content-container'), Id('container-lines')],
+        [
+            Div(
+                [Class('content-section'), Id('lines-index')],
+                [create_line_preview(line) for line in sorted(db.routes.values())],
+            ),
+            Div(
+                [Class('content-section object-view'), Id('line-view')],
+                [
+                    Div(
+                        [Class('line-view hidden')],
+                        [
+                            Span([Id('line-number'), Class('line-number')]),
+                            Span([Id('line-terminals'), Class('line-destination')]),
+                        ],
+                    ),
+                    Table(
+                        [Id('line-details'), Class('details-table hidden')],
+                        [
+                            Tr([], [Td([], 'type:'), Td([Id('line-kind')])]),
+                            Tr([], [Td([], 'route:'), Td([Id('line-route')])]),
+                        ],
+                    ),
+                ],
+            ),
+        ],
+    )
+
+
 def create_vehicle_preview(vehicle: Vehicle) -> Div:
     return Div(
         [Class('vehicle-preview'), CustomHtmlTagAttribute('data-vehicle-id', vehicle.vehicle_id)],
@@ -443,10 +497,7 @@ def create_vehicle_preview(vehicle: Vehicle) -> Div:
 
 def create_vehicles_page(db: Database) -> Div:
     return Div(
-        [
-            Class('content-container'),
-            Id('container-vehicles'),
-        ],
+        [Class('content-container'), Id('container-vehicles')],
         [
             Div(
                 [Class('content-section'), Id('vehicles-index')],
@@ -503,6 +554,7 @@ def create_archive(db: Database) -> Html:
                         [
                             create_navigation(),
                             create_stops_page(db),
+                            create_lines_page(db),
                             create_vehicles_page(db),
                         ],
                     ),

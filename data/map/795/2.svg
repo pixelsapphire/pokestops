@@ -1,0 +1,19 @@
+<svg width="1024.0" height="704.3" xmlns="http://www.w3.org/2000/svg">
+<path d="M415.5806093968443 12.0 L214.6 12.0 L129.3 97.3 L12.0 214.6 L12.0 255.1 L449.1 692.3 L780.1 692.3 L950.5 692.3 L1012.0 630.8 " />
+<circle cx="415.6" cy="12.0" r="8" />
+<circle cx="129.3" cy="97.3" r="8" />
+<circle cx="12.0" cy="255.1" r="8" />
+<circle cx="780.1" cy="692.3" r="8" />
+<circle cx="1012.0" cy="630.8" r="8" />
+<style>
+circle {
+fill: white;
+stroke: black;
+stroke-width: 4;
+}
+path {
+fill: none;
+stroke: #FFFFFF;
+stroke-width: 8;
+}</style>
+</svg>

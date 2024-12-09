@@ -76,11 +76,11 @@ a {
 }
 
 #navigation span {
-    font-size: min(6vh, 6dvw);
+    font-size: min(4.5vh, 4.5dvw);
     margin: 0 min(0.5vh, 0.5dvw);
 }
 
-.content-container {;
+.content-container {
     display: none;
     padding: min(2vh, 2dvw);
     flex: 1;
@@ -202,6 +202,7 @@ a {
     padding: min(0.5vh, 0.5dvw) min(1.5vh, 1.5dvw);
     border-radius: 100vmax;
     font-size: min(3vh, 3dvw);
+    display: inline-block;
 }
 
 .line-destination {
@@ -221,6 +222,46 @@ a {
     padding: min(1vh, 1dvw);
     font-size: min(1.5vh, 1.5dvw);
     background-color: rgba(255, 255, 255, 0.1);
+}
+
+#lines-index {
+    flex: 2;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: right;
+}
+
+@media (max-aspect-ratio: 11/9) {
+    #lines-index {
+        flex: 3;
+    }
+}
+
+.line-preview {
+    position: relative;
+    display: inline-block;
+    margin: min(0.75vh, 0.75dvw) min(0.5vh, 0.5dvw);
+    padding: min(1vh, 1dvw);
+    background-color: #222;
+    cursor: pointer;
+}
+
+.line-path-container {
+    width: min(18vh, 18dvw);
+    height: min(18vh, 18dvw);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.line-path {
+    max-width: min(18vh, 18dvw);
+    max-height: min(18vh, 18dvw);
+}
+
+.line-preview .line-number {
+    margin-top: min(1vh, 1dvw);
 }
 
 #vehicles-index {

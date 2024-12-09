@@ -23,6 +23,10 @@
           <span class='material-icon material-symbols-outlined'>pin_drop</span>
           <span>Stops</span>
         </div>
+        <div class='navigation-tile' onclick='openTab(this, "lines")'>
+          <span class='material-icon material-symbols-outlined'>route</span>
+          <span>Lines</span>
+        </div>
         <div class='navigation-tile' onclick='openTab(this, "vehicles")'>
           <span class='material-icon material-symbols-outlined'>tram</span>
           <span>Vehicles</span>
@@ -27833,6 +27837,1166 @@
             </tr>
           </table>
           <div id='stop-discoveries' class='discoveries-label'></div>
+        </div>
+      </div>
+      <div class='content-container' id='container-lines'>
+        <div class='content-section' id='lines-index'>
+          <div class='line-preview' data-line-number='T8'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/T8/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>T8</div>
+          </div>
+          <div class='line-preview' data-line-number='1'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/1/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #D0006F; color: #FFFFFF;'>1</div>
+          </div>
+          <div class='line-preview' data-line-number='2'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/2/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #72C4E7; color: #000000;'>2</div>
+          </div>
+          <div class='line-preview' data-line-number='3'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/3/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #8E364C; color: #FFFFFF;'>3</div>
+          </div>
+          <div class='line-preview' data-line-number='5'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/5/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #6CC24A; color: #000000;'>5</div>
+          </div>
+          <div class='line-preview' data-line-number='6'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/6/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #009639; color: #FFFFFF;'>6</div>
+          </div>
+          <div class='line-preview' data-line-number='7'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/7/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #003594; color: #FFFFFF;'>7</div>
+          </div>
+          <div class='line-preview' data-line-number='8'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/8/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #DA291C; color: #FFFFFF;'>8</div>
+          </div>
+          <div class='line-preview' data-line-number='9'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/9/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FF671F; color: #000000;'>9</div>
+          </div>
+          <div class='line-preview' data-line-number='10'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/10/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #F1B434; color: #000000;'>10</div>
+          </div>
+          <div class='line-preview' data-line-number='11'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/11/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #3CDBC0; color: #000000;'>11</div>
+          </div>
+          <div class='line-preview' data-line-number='12'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/12/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #CBA3D8; color: #000000;'>12</div>
+          </div>
+          <div class='line-preview' data-line-number='13'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/13/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #AD841F; color: #FFFFFF;'>13</div>
+          </div>
+          <div class='line-preview' data-line-number='14'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/14/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #946037; color: #FFFFFF;'>14</div>
+          </div>
+          <div class='line-preview' data-line-number='15'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/15/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #A2AAAD; color: #000000;'>15</div>
+          </div>
+          <div class='line-preview' data-line-number='16'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/16/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #440099; color: #FFFFFF;'>16</div>
+          </div>
+          <div class='line-preview' data-line-number='17'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/17/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #004F71; color: #FFFFFF;'>17</div>
+          </div>
+          <div class='line-preview' data-line-number='18'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/18/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FEDB00; color: #000000;'>18</div>
+          </div>
+          <div class='line-preview' data-line-number='19'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/19/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #40BDB0; color: #FFFFFF;'>19</div>
+          </div>
+          <div class='line-preview' data-line-number='24'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/24/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FFFFFF; color: #000000;'>24</div>
+          </div>
+          <div class='line-preview' data-line-number='121'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/121/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>121</div>
+          </div>
+          <div class='line-preview' data-line-number='122'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/122/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>122</div>
+          </div>
+          <div class='line-preview' data-line-number='123'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/123/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>123</div>
+          </div>
+          <div class='line-preview' data-line-number='124'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/124/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>124</div>
+          </div>
+          <div class='line-preview' data-line-number='145'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/145/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>145</div>
+          </div>
+          <div class='line-preview' data-line-number='146'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/146/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>146</div>
+          </div>
+          <div class='line-preview' data-line-number='148'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/148/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>148</div>
+          </div>
+          <div class='line-preview' data-line-number='149'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/149/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>149</div>
+          </div>
+          <div class='line-preview' data-line-number='152'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/152/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>152</div>
+          </div>
+          <div class='line-preview' data-line-number='153'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/153/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>153</div>
+          </div>
+          <div class='line-preview' data-line-number='154'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/154/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>154</div>
+          </div>
+          <div class='line-preview' data-line-number='156'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/156/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>156</div>
+          </div>
+          <div class='line-preview' data-line-number='157'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/157/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>157</div>
+          </div>
+          <div class='line-preview' data-line-number='158'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/158/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>158</div>
+          </div>
+          <div class='line-preview' data-line-number='159'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/159/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>159</div>
+          </div>
+          <div class='line-preview' data-line-number='160'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/160/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>160</div>
+          </div>
+          <div class='line-preview' data-line-number='162'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/162/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>162</div>
+          </div>
+          <div class='line-preview' data-line-number='163'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/163/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>163</div>
+          </div>
+          <div class='line-preview' data-line-number='164'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/164/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>164</div>
+          </div>
+          <div class='line-preview' data-line-number='166'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/166/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>166</div>
+          </div>
+          <div class='line-preview' data-line-number='167'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/167/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>167</div>
+          </div>
+          <div class='line-preview' data-line-number='168'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/168/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>168</div>
+          </div>
+          <div class='line-preview' data-line-number='169'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/169/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>169</div>
+          </div>
+          <div class='line-preview' data-line-number='170'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/170/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>170</div>
+          </div>
+          <div class='line-preview' data-line-number='171'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/171/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>171</div>
+          </div>
+          <div class='line-preview' data-line-number='173'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/173/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>173</div>
+          </div>
+          <div class='line-preview' data-line-number='174'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/174/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>174</div>
+          </div>
+          <div class='line-preview' data-line-number='175'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/175/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>175</div>
+          </div>
+          <div class='line-preview' data-line-number='176'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/176/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>176</div>
+          </div>
+          <div class='line-preview' data-line-number='177'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/177/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>177</div>
+          </div>
+          <div class='line-preview' data-line-number='178'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/178/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>178</div>
+          </div>
+          <div class='line-preview' data-line-number='179'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/179/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>179</div>
+          </div>
+          <div class='line-preview' data-line-number='180'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/180/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>180</div>
+          </div>
+          <div class='line-preview' data-line-number='181'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/181/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>181</div>
+          </div>
+          <div class='line-preview' data-line-number='182'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/182/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>182</div>
+          </div>
+          <div class='line-preview' data-line-number='183'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/183/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>183</div>
+          </div>
+          <div class='line-preview' data-line-number='184'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/184/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>184</div>
+          </div>
+          <div class='line-preview' data-line-number='185'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/185/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>185</div>
+          </div>
+          <div class='line-preview' data-line-number='186'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/186/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>186</div>
+          </div>
+          <div class='line-preview' data-line-number='188'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/188/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>188</div>
+          </div>
+          <div class='line-preview' data-line-number='189'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/189/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>189</div>
+          </div>
+          <div class='line-preview' data-line-number='190'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/190/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>190</div>
+          </div>
+          <div class='line-preview' data-line-number='191'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/191/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>191</div>
+          </div>
+          <div class='line-preview' data-line-number='193'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/193/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>193</div>
+          </div>
+          <div class='line-preview' data-line-number='194'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/194/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>194</div>
+          </div>
+          <div class='line-preview' data-line-number='196'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/196/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>196</div>
+          </div>
+          <div class='line-preview' data-line-number='198'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/198/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>198</div>
+          </div>
+          <div class='line-preview' data-line-number='201'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/201/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #000000; color: #FFFFFF;'>201</div>
+          </div>
+          <div class='line-preview' data-line-number='202'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/202/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #000000; color: #FFFFFF;'>202</div>
+          </div>
+          <div class='line-preview' data-line-number='211'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/211/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #000000; color: #FFFFFF;'>211</div>
+          </div>
+          <div class='line-preview' data-line-number='212'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/212/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #000000; color: #FFFFFF;'>212</div>
+          </div>
+          <div class='line-preview' data-line-number='213'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/213/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #000000; color: #FFFFFF;'>213</div>
+          </div>
+          <div class='line-preview' data-line-number='214'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/214/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #000000; color: #FFFFFF;'>214</div>
+          </div>
+          <div class='line-preview' data-line-number='215'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/215/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #000000; color: #FFFFFF;'>215</div>
+          </div>
+          <div class='line-preview' data-line-number='216'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/216/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #000000; color: #FFFFFF;'>216</div>
+          </div>
+          <div class='line-preview' data-line-number='218'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/218/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #000000; color: #FFFFFF;'>218</div>
+          </div>
+          <div class='line-preview' data-line-number='219'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/219/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #000000; color: #FFFFFF;'>219</div>
+          </div>
+          <div class='line-preview' data-line-number='220'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/220/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #000000; color: #FFFFFF;'>220</div>
+          </div>
+          <div class='line-preview' data-line-number='221'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/221/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #000000; color: #FFFFFF;'>221</div>
+          </div>
+          <div class='line-preview' data-line-number='222'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/222/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #000000; color: #FFFFFF;'>222</div>
+          </div>
+          <div class='line-preview' data-line-number='223'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/223/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #000000; color: #FFFFFF;'>223</div>
+          </div>
+          <div class='line-preview' data-line-number='224'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/224/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #000000; color: #FFFFFF;'>224</div>
+          </div>
+          <div class='line-preview' data-line-number='226'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/226/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #000000; color: #FFFFFF;'>226</div>
+          </div>
+          <div class='line-preview' data-line-number='227'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/227/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #000000; color: #FFFFFF;'>227</div>
+          </div>
+          <div class='line-preview' data-line-number='250'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/250/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #000000; color: #FFFFFF;'>250</div>
+          </div>
+          <div class='line-preview' data-line-number='252'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/252/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #000000; color: #FFFFFF;'>252</div>
+          </div>
+          <div class='line-preview' data-line-number='253'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/253/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #000000; color: #FFFFFF;'>253</div>
+          </div>
+          <div class='line-preview' data-line-number='257'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/257/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #000000; color: #FFFFFF;'>257</div>
+          </div>
+          <div class='line-preview' data-line-number='258'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/258/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #000000; color: #FFFFFF;'>258</div>
+          </div>
+          <div class='line-preview' data-line-number='312'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/312/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>312</div>
+          </div>
+          <div class='line-preview' data-line-number='320'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/320/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>320</div>
+          </div>
+          <div class='line-preview' data-line-number='321'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/321/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>321</div>
+          </div>
+          <div class='line-preview' data-line-number='322'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/322/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>322</div>
+          </div>
+          <div class='line-preview' data-line-number='323'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/323/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>323</div>
+          </div>
+          <div class='line-preview' data-line-number='341'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/341/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>341</div>
+          </div>
+          <div class='line-preview' data-line-number='342'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/342/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>342</div>
+          </div>
+          <div class='line-preview' data-line-number='348'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/348/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>348</div>
+          </div>
+          <div class='line-preview' data-line-number='388'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/388/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>388</div>
+          </div>
+          <div class='line-preview' data-line-number='392'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/392/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>392</div>
+          </div>
+          <div class='line-preview' data-line-number='394'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/394/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>394</div>
+          </div>
+          <div class='line-preview' data-line-number='396'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/396/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>396</div>
+          </div>
+          <div class='line-preview' data-line-number='397'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/397/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>397</div>
+          </div>
+          <div class='line-preview' data-line-number='400'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/400/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FFFFFF; color: #000000;'>400</div>
+          </div>
+          <div class='line-preview' data-line-number='401'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/401/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FFFFFF; color: #000000;'>401</div>
+          </div>
+          <div class='line-preview' data-line-number='405'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/405/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FFFFFF; color: #000000;'>405</div>
+          </div>
+          <div class='line-preview' data-line-number='406'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/406/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FFFFFF; color: #000000;'>406</div>
+          </div>
+          <div class='line-preview' data-line-number='407'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/407/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FFFFFF; color: #000000;'>407</div>
+          </div>
+          <div class='line-preview' data-line-number='412'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/412/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FFFFFF; color: #000000;'>412</div>
+          </div>
+          <div class='line-preview' data-line-number='416'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/416/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>416</div>
+          </div>
+          <div class='line-preview' data-line-number='425'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/425/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>425</div>
+          </div>
+          <div class='line-preview' data-line-number='431'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/431/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>431</div>
+          </div>
+          <div class='line-preview' data-line-number='432'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/432/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>432</div>
+          </div>
+          <div class='line-preview' data-line-number='433'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/433/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FFFFFF; color: #000000;'>433</div>
+          </div>
+          <div class='line-preview' data-line-number='484'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/484/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FFFFFF; color: #000000;'>484</div>
+          </div>
+          <div class='line-preview' data-line-number='485'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/485/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FFFFFF; color: #000000;'>485</div>
+          </div>
+          <div class='line-preview' data-line-number='486'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/486/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FFFFFF; color: #000000;'>486</div>
+          </div>
+          <div class='line-preview' data-line-number='488'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/488/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>488</div>
+          </div>
+          <div class='line-preview' data-line-number='489'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/489/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>489</div>
+          </div>
+          <div class='line-preview' data-line-number='490'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/490/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FFFFFF; color: #000000;'>490</div>
+          </div>
+          <div class='line-preview' data-line-number='491'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/491/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FFFFFF; color: #000000;'>491</div>
+          </div>
+          <div class='line-preview' data-line-number='492'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/492/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FFFFFF; color: #000000;'>492</div>
+          </div>
+          <div class='line-preview' data-line-number='493'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/493/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FFFFFF; color: #000000;'>493</div>
+          </div>
+          <div class='line-preview' data-line-number='494'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/494/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FFFFFF; color: #000000;'>494</div>
+          </div>
+          <div class='line-preview' data-line-number='495'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/495/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FFFFFF; color: #000000;'>495</div>
+          </div>
+          <div class='line-preview' data-line-number='497'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/497/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FFFFFF; color: #000000;'>497</div>
+          </div>
+          <div class='line-preview' data-line-number='498'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/498/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FFFFFF; color: #000000;'>498</div>
+          </div>
+          <div class='line-preview' data-line-number='499'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/499/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FFFFFF; color: #000000;'>499</div>
+          </div>
+          <div class='line-preview' data-line-number='501'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/501/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>501</div>
+          </div>
+          <div class='line-preview' data-line-number='502'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/502/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>502</div>
+          </div>
+          <div class='line-preview' data-line-number='503'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/503/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>503</div>
+          </div>
+          <div class='line-preview' data-line-number='511'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/511/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>511</div>
+          </div>
+          <div class='line-preview' data-line-number='512'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/512/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>512</div>
+          </div>
+          <div class='line-preview' data-line-number='527'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/527/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>527</div>
+          </div>
+          <div class='line-preview' data-line-number='560'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/560/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>560</div>
+          </div>
+          <div class='line-preview' data-line-number='561'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/561/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>561</div>
+          </div>
+          <div class='line-preview' data-line-number='602'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/602/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>602</div>
+          </div>
+          <div class='line-preview' data-line-number='603'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/603/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>603</div>
+          </div>
+          <div class='line-preview' data-line-number='610'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/610/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>610</div>
+          </div>
+          <div class='line-preview' data-line-number='611'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/611/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>611</div>
+          </div>
+          <div class='line-preview' data-line-number='614'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/614/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>614</div>
+          </div>
+          <div class='line-preview' data-line-number='616'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/616/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>616</div>
+          </div>
+          <div class='line-preview' data-line-number='651'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/651/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>651</div>
+          </div>
+          <div class='line-preview' data-line-number='690'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/690/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>690</div>
+          </div>
+          <div class='line-preview' data-line-number='701'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/701/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>701</div>
+          </div>
+          <div class='line-preview' data-line-number='702'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/702/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>702</div>
+          </div>
+          <div class='line-preview' data-line-number='703'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/703/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>703</div>
+          </div>
+          <div class='line-preview' data-line-number='704'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/704/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>704</div>
+          </div>
+          <div class='line-preview' data-line-number='705'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/705/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>705</div>
+          </div>
+          <div class='line-preview' data-line-number='707'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/707/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>707</div>
+          </div>
+          <div class='line-preview' data-line-number='710'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/710/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>710</div>
+          </div>
+          <div class='line-preview' data-line-number='715'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/715/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>715</div>
+          </div>
+          <div class='line-preview' data-line-number='716'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/716/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>716</div>
+          </div>
+          <div class='line-preview' data-line-number='727'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/727/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>727</div>
+          </div>
+          <div class='line-preview' data-line-number='729'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/729/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>729</div>
+          </div>
+          <div class='line-preview' data-line-number='790'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/790/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FFFFFF; color: #000000;'>790</div>
+          </div>
+          <div class='line-preview' data-line-number='791'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/791/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FFFFFF; color: #000000;'>791</div>
+          </div>
+          <div class='line-preview' data-line-number='792'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/792/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FFFFFF; color: #000000;'>792</div>
+          </div>
+          <div class='line-preview' data-line-number='795'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/795/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FFFFFF; color: #000000;'>795</div>
+          </div>
+          <div class='line-preview' data-line-number='796'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/796/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FFFFFF; color: #000000;'>796</div>
+          </div>
+          <div class='line-preview' data-line-number='797'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/797/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FFFFFF; color: #000000;'>797</div>
+          </div>
+          <div class='line-preview' data-line-number='798'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/798/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FFFFFF; color: #000000;'>798</div>
+          </div>
+          <div class='line-preview' data-line-number='799'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/799/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FFFFFF; color: #000000;'>799</div>
+          </div>
+          <div class='line-preview' data-line-number='801'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/801/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>801</div>
+          </div>
+          <div class='line-preview' data-line-number='802'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/802/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>802</div>
+          </div>
+          <div class='line-preview' data-line-number='803'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/803/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>803</div>
+          </div>
+          <div class='line-preview' data-line-number='804'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/804/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>804</div>
+          </div>
+          <div class='line-preview' data-line-number='811'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/811/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>811</div>
+          </div>
+          <div class='line-preview' data-line-number='812'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/812/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>812</div>
+          </div>
+          <div class='line-preview' data-line-number='813'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/813/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>813</div>
+          </div>
+          <div class='line-preview' data-line-number='821'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/821/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>821</div>
+          </div>
+          <div class='line-preview' data-line-number='825'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/825/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FFFFFF; color: #000000;'>825</div>
+          </div>
+          <div class='line-preview' data-line-number='826'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/826/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #FFFFFF; color: #000000;'>826</div>
+          </div>
+          <div class='line-preview' data-line-number='832'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/832/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>832</div>
+          </div>
+          <div class='line-preview' data-line-number='833'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/833/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>833</div>
+          </div>
+          <div class='line-preview' data-line-number='834'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/834/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>834</div>
+          </div>
+          <div class='line-preview' data-line-number='835'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/835/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>835</div>
+          </div>
+          <div class='line-preview' data-line-number='836'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/836/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>836</div>
+          </div>
+          <div class='line-preview' data-line-number='837'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/837/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>837</div>
+          </div>
+          <div class='line-preview' data-line-number='881'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/881/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>881</div>
+          </div>
+          <div class='line-preview' data-line-number='882'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/882/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>882</div>
+          </div>
+          <div class='line-preview' data-line-number='886'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/886/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>886</div>
+          </div>
+          <div class='line-preview' data-line-number='889'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/889/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>889</div>
+          </div>
+          <div class='line-preview' data-line-number='891'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/891/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>891</div>
+          </div>
+          <div class='line-preview' data-line-number='893'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/893/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>893</div>
+          </div>
+          <div class='line-preview' data-line-number='901'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/901/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>901</div>
+          </div>
+          <div class='line-preview' data-line-number='902'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/902/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>902</div>
+          </div>
+          <div class='line-preview' data-line-number='904'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/904/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>904</div>
+          </div>
+          <div class='line-preview' data-line-number='905'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/905/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>905</div>
+          </div>
+          <div class='line-preview' data-line-number='907'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/907/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>907</div>
+          </div>
+          <div class='line-preview' data-line-number='911'>
+            <div class='line-path-container'>
+              <img class='line-path' src='data/map/911/1.svg'/>
+            </div>
+            <div class='line-number' style='background-color: #525252; color: #FFFFFF;'>911</div>
+          </div>
+        </div>
+        <div class='content-section object-view' id='line-view'>
+          <div class='line-view hidden'>
+            <span id='line-number' class='line-number'></span>
+            <span id='line-terminals' class='line-destination'></span>
+          </div>
+          <table id='line-details' class='details-table hidden'>
+            <tr>
+              <td>type:</td>
+              <td id='line-kind'></td>
+            </tr>
+            <tr>
+              <td>route:</td>
+              <td id='line-route'></td>
+            </tr>
+          </table>
         </div>
       </div>
       <div class='content-container' id='container-vehicles'>

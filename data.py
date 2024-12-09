@@ -1,8 +1,10 @@
 import csv
 import json
 import os
+import re
 from abc import ABC
 from typing import Any, Callable, Literal, Iterable, Self, TypeVar, Union
+from util import geopoint
 
 T = TypeVar('T')
 C = TypeVar('C')
@@ -49,8 +51,7 @@ class Stop(JsonSerializable):
     def __init__(self, short_name: str, full_name: str, latitude: str, longitude: str, zone: str, routes: str):
         self.short_name: str = short_name
         self.full_name: str = full_name
-        self.latitude: float = float(latitude)
-        self.longitude: float = float(longitude)
+        self.location: geopoint = geopoint(float(latitude), float(longitude))
         self.zone: str = zone
         self.visits: set[Discovery] = set()
         self.regions: list[Region] = []
@@ -123,8 +124,8 @@ class Stop(JsonSerializable):
     def __json_entry__(self, _=None) -> str:
         return (f'"{self.short_name}":{{'
                 f'n:"{self.full_name}",'
-                f'lt:{self.latitude},'
-                f'ln:{self.longitude},'
+                f'lt:{self.location.latitude},'
+                f'ln:{self.location.longitude},'
                 f'l:[{','.join(f'["{line}","{destination}"]' for line, destination in self.lines)}],'
                 f'{f'v:[{','.join(f'["{visit.name}","{visit.date if visit.date != '2000-01-01' else ''}"]'
                                   for visit in sorted(self.visits))}],' if self.visits else ''}'
@@ -323,20 +324,58 @@ class Vehicle(JsonSerializable):
 
 
 class Route(JsonSerializable):
-    def __init__(self, number: str, background_color: str, text_color: str):
+    def __init__(self, number: str, terminals: str, description: str,
+                 background_color: str, text_color: str, stops: list[list[str]]):
         self.number: str = number
+        self.terminals: str = terminals
+        self.description: str = description
         self.background_color: str = background_color
         self.text_color: str = text_color
+        self.stops: list[list[str]] = stops
+
+    def kind(self) -> str:
+        if self.number.startswith('T'):
+            return 'substitute'
+        if not self.number.isdigit():
+            return 'special'
+        number: int = int(self.number)
+        if number == 0 or number == 100:
+            return 'tourist'
+        if number == 24:
+            return 'Christmas tram'
+        if 1 <= number <= 89:
+            return 'tram'
+        if 90 <= number <= 99:
+            return 'temporary tram'
+        if 101 <= number <= 140:
+            return 'minibus'
+        if 141 <= number <= 199:
+            return 'bus'
+        if 200 <= number <= 209:
+            return 'night tram'
+        if 210 <= number <= 299:
+            return 'night bus'
+        return 'suburban bus'
 
     @staticmethod
     def read_dict(source: str) -> dict[str, 'Route']:
-        constructor = lambda *row: Route(row[2], row[6], row[7])
+        constructor = lambda *row: Route(row[2], row[3].split('|')[0], row[4].split('|')[0].split('^')[0], row[6], row[7],
+                                         list(map(lambda seq: seq.split('&'), row[8].split('|'))))
         return __read_collection__(source, {}, constructor, lambda c, v: c.update({v.number: v}))
+
+    def __cmp_key__(self):
+        return int(self.number) if self.number.isdigit() else int(re.sub(r'\D', '', self.number)) - 1000
+
+    def __lt__(self, other):
+        return self.__cmp_key__() < other.__cmp_key__() if isinstance(other, type(self)) else False
 
     def __json_entry__(self, _=None) -> str:
         return (f'"{self.number}":{{'
                 f'b:"{self.background_color}",'
                 f't:"{self.text_color}",'
+                f'r:"{self.description}",'
+                f'k:"{self.kind()}",'
+                f'd:"{self.terminals}",'
                 f'}},')
 
 
@@ -507,3 +546,8 @@ class Database:
 
     def region_of(self, stop: Stop) -> Region:
         return next((region for region in stop.regions if stop and region != self.district), self.district)
+
+    def group_location(self, stop: Stop) -> geopoint:
+        stops = list(map(lambda stop_id: self.stops[stop_id], self.stop_groups[stop.full_name]))
+        return geopoint(sum(s.location.latitude for s in stops) / len(stops),
+                        sum(s.location.longitude for s in stops) / len(stops))
