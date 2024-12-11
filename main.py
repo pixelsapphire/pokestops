@@ -4,7 +4,7 @@ import sqlite3
 import sys
 from postprocess import *
 from uibuilder import *
-from util import sign, to_css, vector2f
+from util import prepare_path, sign, to_css, vector2f
 
 
 # noinspection SqlNoDataSourceInspection,DuplicatedCode,SqlInsertValues
@@ -52,7 +52,7 @@ def attach_stop_routes(gtfs_db: sqlite3.Connection) -> None:
     with open(ref.rawdata_stops, 'r') as file:
         stops_header_row = next(csv.reader(file))
 
-    with open(ref.rawdata_stops, 'w') as file:
+    with open(prepare_path(ref.rawdata_stops), 'w') as file:
         writer = csv.writer(file)
         writer.writerow([*stops_header_row, 'routes'])
         writer.writerows(cursor.fetchall())
@@ -92,7 +92,7 @@ def attach_route_stops(gtfs_db: sqlite3.Connection) -> None:
         routes_header_row = next(reader)
         routes_data = list(reader)
 
-    with open(ref.rawdata_routes, 'w') as file:
+    with open(prepare_path(ref.rawdata_routes), 'w') as file:
         writer: csv.writer = csv.writer(file)
         writer.writerow([*routes_header_row, 'stops'])
         for route in routes_data:
@@ -106,7 +106,7 @@ def update_gtfs_data(first_update: bool, initial_db: Database) -> None:
         old_stops, _ = Stop.read_stops(ref.rawdata_stops, initial_db)
         old_routes = Route.read_dict(ref.rawdata_routes)
     response: requests.Response = requests.get(ref.url_ztm_gtfs)
-    with open(ref.tmpdata_gtfs, 'wb') as file:
+    with open(prepare_path(ref.tmpdata_gtfs), 'wb') as file:
         file.write(response.content)
     with util.zip_file(ref.tmpdata_gtfs, 'r') as zip_ref:
         zip_ref.extract_as('stops.txt', ref.rawdata_stops)
@@ -325,9 +325,7 @@ def create_route_map(route: Route, db: Database):
         scale_factor: float = 1000 / coord_range
         points = [vector2f(12 + (s.longitude - lon_min) * scale_factor, 12 + (lat_max - s.latitude) * scale_factor)
                   for s in stops_locations]
-        if not os.path.exists(f'{ref.mapdata_path}/{route.number}'):
-            os.mkdir(f'{ref.mapdata_path}/{route.number}')
-        with open(f'{ref.mapdata_path}/{route.number}/{variant}.svg', 'w') as file:
+        with open(prepare_path(f'{ref.mapdata_path}/{route.number}/{variant}.svg'), 'w') as file:
             file.write(f'<svg'
                        f' width="{24 + 1000 * lon_range / coord_range:.1f}"'
                        f' height="{24 + 1000 * lat_range / coord_range:.1f}"'
@@ -357,32 +355,32 @@ def create_route_map(route: Route, db: Database):
 def build_app(fmap: folium.Map, db: Database) -> None:
     folium_html: str = fmap.get_root().render()
     map_script: str = folium_html[folium_html.rfind('<script>') + 8:folium_html.rfind('</script>')]
-    with open(ref.compileddata_map, 'w') as script_file:
+    with open(prepare_path(ref.compileddata_map), 'w') as script_file:
         script_file.write(clean_js(map_script))
 
     html_application: Html = create_application(folium_html, db)
     rendered_application: str = clean_html(html_application.render(True, True))
-    with open(ref.document_map, 'w') as file:
+    with open(prepare_path(ref.document_map), 'w') as file:
         file.write(rendered_application)
 
-    with open(ref.compileddata_stops, 'w') as file:
+    with open(prepare_path(ref.compileddata_stops), 'w') as file:
         file.write(f'const stops = {{\n{'\n'.join(map(Stop.json_entry, db.stops.values()))}\n}};')
         file.write(f'const terminals = {{\n{'\n'.join(map(Terminal.json_entry, db.terminals))}\n}};')
 
-    with open(ref.compileddata_vehicles, 'w') as file:
+    with open(prepare_path(ref.compileddata_vehicles), 'w') as file:
         file.write(f'const vehicle_models = {{\n{'\n'.join(map(VehicleModel.json_entry, db.models.values()))}\n}};\n')
         file.write(f'const carriers = {{\n{'\n'.join(map(Carrier.json_entry, db.carriers.values()))}\n}};\n')
         file.write(f'const vehicles = {{\n{'\n'.join(map(Vehicle.json_entry, db.vehicles.values()))}\n}};')
 
-    with open(ref.compileddata_routes, 'w') as file:
+    with open(prepare_path(ref.compileddata_routes), 'w') as file:
         file.write(f'const routes = {{\n{'\n'.join(map(Route.json_entry, db.routes.values()))}\n}};')
 
-    with open(ref.compileddata_players, 'w') as file:
+    with open(prepare_path(ref.compileddata_players), 'w') as file:
         file.write(f'const players = {{\n{'\n'.join(map(lambda p: Player.json_entry(p, db), db.players))}\n}};')
 
     html_archive: Html = create_archive(db)
     rendered_archive: str = clean_html(html_archive.render(True, True))
-    with open(ref.document_archive, 'w') as file:
+    with open(prepare_path(ref.document_archive), 'w') as file:
         file.write(rendered_archive)
 
 

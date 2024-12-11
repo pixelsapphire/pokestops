@@ -27,6 +27,13 @@ def to_css(stylesheet: dict[str, dict[str, str]]) -> str:
     )
 
 
+def prepare_path(file_path: str | os.PathLike[str]) -> str | os.PathLike[str]:
+    directory_path = os.path.dirname(os.path.abspath(file_path))
+    if not os.path.exists(directory_path):
+        os.makedirs(directory_path)
+    return file_path
+
+
 class zip_file(zipfile.ZipFile):
     def extract_as(self, member: str | zipfile.ZipInfo, output: str | os.PathLike[str],
                    path: str | os.PathLike[str] | None = None, pwd: bytes | None = None):
