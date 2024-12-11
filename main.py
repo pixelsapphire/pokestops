@@ -4,7 +4,7 @@ import sqlite3
 import sys
 from postprocess import *
 from uibuilder import *
-from util import prepare_path, sign, system_open, to_css, vector2f
+from util import *
 
 
 # noinspection SqlNoDataSourceInspection,DuplicatedCode,SqlInsertValues
@@ -114,12 +114,45 @@ def attach_route_stops(gtfs_db: sqlite3.Connection) -> None:
     print('Done!')
 
 
+def make_update_report(old_data: Database, new_data: Database) -> None:
+    added_stops: set[Stop] = {s for s in new_data.stops.values() if s not in old_data.stops.values()}
+    removed_stops: set[Stop] = {s for s in old_data.stops.values() if s not in new_data.stops.values()}
+    added_routes: set[str] = {r for r in new_data.routes.keys() if r not in old_data.routes.keys()}
+    removed_routes: set[str] = {r for r in old_data.routes.keys() if r not in new_data.routes.keys()}
+    changed_routes: set[str] = {r for r in new_data.routes.keys()
+                                if r in old_data.routes.keys() and new_data.routes[r].stops != old_data.routes[r].stops}
+    if not added_stops and not removed_stops and not added_routes and not removed_routes and not changed_routes:
+        print('  No changes, no report created.')
+    else:
+        print('  Data has changed, creating report... ', end='')
+        routes: int = max(len(added_routes), len(removed_routes), len(changed_routes))
+        lexmap: dict[str, float] = create_lexicographic_mapping(file_to_string(ref.lexmap_polish))
+        line_key = lambda line: int(line) if line.isdigit() else int(re.sub(r'\D', '', line)) - routes
+        stop_key = lambda stop: lexicographic_sequence(f'{stop.full_name}{stop.short_name}', lexmap)
+        with open(prepare_path(ref.report_gtfs), 'w') as file:
+            if added_stops:
+                file.write(f'Added stops:\n- {'\n- '.join(f'{s.full_name} [{s.short_name}]'
+                                                          for s in sorted(added_stops, key=stop_key))}\n')
+            if removed_stops:
+                file.write(f'Removed stops:\n- {'\n- '.join(f'{s.full_name} [{s.short_name}]'
+                                                            for s in sorted(removed_stops, key=stop_key))}\n')
+            if added_routes:
+                file.write(f'Added routes:\n- {"\n- ".join(sorted(added_routes, key=line_key))}\n')
+            if removed_routes:
+                file.write(f'Removed routes:\n- {"\n- ".join(sorted(removed_routes, key=line_key))}\n')
+            if changed_routes:
+                file.write(f'Changed routes:\n- {"\n- ".join(sorted(changed_routes, key=line_key))}\n')
+        print(f'Report stored in {ref.report_gtfs}!')
+        system_open(ref.report_gtfs)
+
+
 def update_gtfs_data(first_update: bool, initial_db: Database) -> None:
-    old_stops: dict[str, Stop] = {}
-    old_routes: dict[str, Route] = {}
+    old_db: Database = Database.partial()
     if not first_update:
-        old_stops, _ = Stop.read_stops(ref.rawdata_stops, initial_db)
-        old_routes = Route.read_dict(ref.rawdata_routes)
+        if os.path.exists(ref.rawdata_stops):
+            old_db.add_collection('stops', Stop.read_stops(ref.rawdata_stops, initial_db)[0])
+        if os.path.exists(ref.rawdata_routes):
+            old_db.add_collection('routes', Line.read_dict(ref.rawdata_routes))
     print(f'  Downloading latest GTFS data from {ref.url_ztm_gtfs}... ', end='')
     try:
         response: requests.Response = requests.get(ref.url_ztm_gtfs)
@@ -150,37 +183,15 @@ def update_gtfs_data(first_update: bool, initial_db: Database) -> None:
     new_stops, new_stop_groups = Stop.read_stops(ref.rawdata_stops, initial_db)
     new_routes = Route.read_dict(ref.rawdata_routes)
 
-    added_stops: set[Stop] = {s for s in new_stops.values() if s not in old_stops.values()}
-    removed_stops: set[Stop] = {s for s in old_stops.values() if s not in new_stops.values()}
-    added_routes: set[str] = {r for r in new_routes.keys() if r not in old_routes.keys()}
-    removed_routes: set[str] = {r for r in old_routes.keys() if r not in new_routes.keys()}
-    changed_routes: set[str] = {r for r in new_routes.keys()
-                                if r in old_routes.keys() and new_routes[r].stops != old_routes[r].stops}
+    initial_db.add_collection('stops', new_stops)
+    initial_db.add_collection('stop_groups', new_stop_groups)
+    initial_db.add_collection('routes', new_routes)
+
     if first_update:
         print('  GTFS database created.')
     else:
         print('  GTFS database updated.')
-        if not added_stops and not removed_stops and not added_routes and not removed_routes and not changed_routes:
-            print('  No changes, no report created.')
-        else:
-            print('  Data has changed, creating report... ', end='')
-            with open(prepare_path(ref.report_gtfs), 'w') as file:
-                if added_stops:
-                    file.write(f'Added stops:\n- {'\n- '.join(f'{s.full_name} [{s.short_name}]' for s in added_stops)}\n')
-                if removed_stops:
-                    file.write(f'Removed stops:\n- {'\n- '.join(f'{s.full_name} [{s.short_name}]' for s in removed_stops)}\n')
-                if added_routes:
-                    file.write(f'Added routes:\n- {", ".join(added_routes)}\n')
-                if removed_routes:
-                    file.write(f'Removed routes:\n- {", ".join(removed_routes)}\n')
-                if changed_routes:
-                    file.write(f'Changed routes:\n- {", ".join(changed_routes)}\n')
-            print(f'Report stored in {ref.report_gtfs}!')
-            system_open(ref.report_gtfs)
-
-    initial_db.add_collection('stops', new_stops)
-    initial_db.add_collection('stop_groups', new_stop_groups)
-    initial_db.add_collection('routes', new_routes)
+        make_update_report(old_db, initial_db)
 
 
 def process_players_data(players: list[Player], stops: dict[str, Stop],

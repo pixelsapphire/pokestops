@@ -382,12 +382,15 @@ def create_stop_group_view(db: Database, group: str, stop_names: set[str]) -> Di
 
 
 def create_stops_page(db: Database) -> Div:
+    lexmap: dict[str, float] = util.create_lexicographic_mapping(util.file_to_string(ref.lexmap_polish))
     return Div(
         [Class('content-container selected'), Id('container-stops')],
         [
             Div(
                 [Class('content-section'), Id('stops-index')],
-                [create_stop_group_view(db, group, stops) for group, stops in sorted(db.stop_groups.items())],
+                [create_stop_group_view(db, group, stops)
+                 for group, stops in sorted(db.stop_groups.items(),
+                                            key=lambda group: util.lexicographic_sequence(group[0], lexmap))],
             ),
             Div(
                 [Class('content-section object-view'), Id('stop-view')],
