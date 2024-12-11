@@ -45,6 +45,26 @@ def system_open(file_path: str | os.PathLike[str]) -> None:
         subprocess.call(('xdg-open', file_path))
 
 
+def file_to_string(file_path: str | os.PathLike[str]) -> str:
+    with open(file_path, 'r') as file:
+        return file.read()
+
+
+def create_lexicographic_mapping(mapping_data: str) -> dict[str, float]:
+    mapping: dict[str, float] = {}
+    character_sets = mapping_data.split()
+    for base_character, *derived_characters in character_sets:
+        if not derived_characters:
+            continue
+        for i, derived_character in enumerate(derived_characters):
+            mapping[derived_character] = ord(base_character) + (1 + i) / (1 + len(derived_characters))
+    return mapping
+
+
+def lexicographic_sequence(s: str, mapping: dict[str, float]) -> list[float]:
+    return [mapping[c] if c in mapping else float(ord(c)) for c in s]
+
+
 class zip_file(zipfile.ZipFile):
     def extract_as(self, member: str | zipfile.ZipInfo, output: str | os.PathLike[str],
                    path: str | os.PathLike[str] | None = None, pwd: bytes | None = None):

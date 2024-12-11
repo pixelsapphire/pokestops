@@ -16,6 +16,8 @@ controller_map: str = 'assets/scripts/map.js'
 document_archive: str = 'archive.html'
 document_map: str = 'index.html'
 
+lexmap_polish: str = 'assets/lang/alphabet/pl_pl.txt'
+
 mapdata_path: str = 'data/map'
 
 report_gtfs: str = 'reports/gtfs_update.txt'
