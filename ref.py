@@ -18,6 +18,8 @@ document_map: str = 'index.html'
 
 mapdata_path: str = 'data/map'
 
+report_gtfs: str = 'reports/gtfs_update.txt'
+
 stylesheet_archive: str = 'assets/stylesheets/archive.css'
 stylesheet_common: str = 'assets/stylesheets/common.css'
 stylesheet_map: str = 'assets/stylesheets/map.css'

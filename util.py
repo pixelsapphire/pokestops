@@ -1,4 +1,6 @@
 import os
+import platform
+import subprocess
 import zipfile
 from math import atan2, pi
 from typing import Any, Protocol, Union
@@ -32,6 +34,15 @@ def prepare_path(file_path: str | os.PathLike[str]) -> str | os.PathLike[str]:
     if not os.path.exists(directory_path):
         os.makedirs(directory_path)
     return file_path
+
+
+def system_open(file_path: str | os.PathLike[str]) -> None:
+    if platform.system() == 'Darwin':  # macOS
+        subprocess.call(('open', file_path))
+    elif platform.system() == 'Windows':  # windows
+        os.startfile(file_path)
+    else:  # linux
+        subprocess.call(('xdg-open', file_path))
 
 
 class zip_file(zipfile.ZipFile):

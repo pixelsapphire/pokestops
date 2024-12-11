@@ -21,6 +21,7 @@ def __read_collection__(source: str, identity: C, mapper: Callable[..., T], comb
                     combiner(collection, mapper(*row))
                 except (IndexError, TypeError) as e:
                     print(f'Error while processing row {row}: {e}')
+        print('Done!')
         return collection
 
 
@@ -103,6 +104,7 @@ class Stop(JsonSerializable):
 
     @staticmethod
     def read_stops(source: str, db: 'Database') -> tuple[dict[str, 'Stop'], dict[str, set[str]]]:
+        print(f'  Reading stops data from {source}... ', end='')
         stops: dict[str, Stop] = {}
         stop_groups: dict[str, set[str]] = {}
         with open(source, 'r', encoding='utf-8') as file:
@@ -119,6 +121,7 @@ class Stop(JsonSerializable):
                 if stop.full_name not in stop_groups:
                     stop_groups[stop.full_name] = set()
                 stop_groups[stop.full_name].add(stop.short_name)
+        print('Done!')
         return stops, stop_groups
 
     def __json_entry__(self, _=None) -> str:
@@ -210,6 +213,7 @@ class Terminal(JsonSerializable):
 
     @staticmethod
     def read_list(source: str, stops: dict[str, Stop]) -> list['Terminal']:
+        print(f'  Reading terminals data from {source}... ', end='')
         constructor = lambda *row: Terminal(row[0], row[1], row[2], row[3], stops.get(row[4]), stops.get(row[5]))
         # warning caused by Pycharm issue PY-70668
         # noinspection PyTypeChecker
@@ -237,6 +241,7 @@ class Carrier(JsonSerializable):
 
     @staticmethod
     def read_dict(source: str) -> dict[str, 'Carrier']:
+        print(f'  Reading carriers data from {source}... ', end='')
         return __read_collection__(source, {}, Carrier, lambda c, v: c.update({v.symbol: v}))
 
     def __json_entry__(self, _=None) -> str:
@@ -263,6 +268,7 @@ class VehicleModel(JsonSerializable):
 
     @staticmethod
     def read_dict(source: str) -> dict[str, 'VehicleModel']:
+        print(f'  Reading vehicle models data from {source}... ', end='')
         return __read_collection__(source, {}, VehicleModel, lambda c, v: c.update({v.model_id: v}))
 
     def __json_entry__(self, _=None) -> str:
@@ -308,6 +314,7 @@ class Vehicle(JsonSerializable):
 
     @staticmethod
     def read_dict(source: str, carriers: dict[str, Carrier], models: dict[str, VehicleModel]) -> dict[str, 'Vehicle']:
+        print(f'  Reading vehicles data from {source}... ', end='')
         constructor = lambda *row: Vehicle(row[0], row[1], carriers.get(row[2]), models.get(row[3]), row[4], row[5])
         return __read_collection__(source, {}, constructor, lambda c, v: c.update({v.vehicle_id: v}))
 
@@ -359,6 +366,7 @@ class Route(JsonSerializable):
 
     @staticmethod
     def read_dict(source: str) -> dict[str, 'Route']:
+        print(f'  Reading routes data from {source}... ', end='')
         constructor = lambda *row: Route(row[2], row[3].split('|')[0], row[4].split('|')[0].split('^')[0], row[6], row[7],
                                          list(map(lambda seq: seq.split('&'), row[8].split('|'))))
         return __read_collection__(source, {}, constructor, lambda c, v: c.update({v.number: v}))
@@ -436,6 +444,7 @@ class Player(JsonSerializable):
 
     @staticmethod
     def read_list(source: str) -> list['Player']:
+        print(f'  Reading players data from {source}... ', end='')
         # warning caused by Pycharm issue PY-70668
         # noinspection PyTypeChecker
         return __read_collection__(source, [], Player, list.append)
@@ -490,12 +499,14 @@ class Region:
 
     @staticmethod
     def read_regions(source: str) -> tuple['Region', dict[str, 'Region']]:
+        print(f'  Reading regions data from {source}... ', end='')
         with (open(source, 'r') as file):
             index = json.load(file)
             regions = [Region(region['number'], region['short_name'], region['full_name'],
                               Region.__resolve_predicate__(region['predicate']))
                        for region in index['regions']]
             district: Region = next(filter(lambda r: r.short_name == index['district'], regions))
+            print('Done!')
             return district, {
                 district.short_name: district,
                 **{region.short_name: region for region in regions if region != district},
@@ -504,7 +515,7 @@ class Region:
 
 class Database:
     type CollectionName = Literal[
-        'players', 'progress', 'stops', 'stop_groups', 'terminals', 'carriers', 'regions', 'vehicles', 'models']
+        'players', 'progress', 'stops', 'stop_groups', 'terminals', 'carriers', 'regions', 'vehicles', 'models', 'routes']
     __stars__: dict[tuple[int, int], int] = {(1, 1): 1, (2, 2): 2, (3, 4): 3, (5, 7): 4, (8, 100): 5}
 
     def __init__(self, players: list[Player], progress: dict[str, dict[str, float]],
@@ -533,6 +544,9 @@ class Database:
         return Database(players or [], progress or {}, stops or {}, stop_groups or {}, terminals or [],
                         carriers or {}, regions or {}, district or Region(0, '', '', lambda _: False),
                         vehicles or {}, models or {}, routes or {})
+
+    def has_collection(self, name: CollectionName) -> bool:
+        return bool(getattr(self, name))
 
     def add_collection(self, name: CollectionName, collection: Any):
         setattr(self, name, collection)

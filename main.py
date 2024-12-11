@@ -4,36 +4,44 @@ import sqlite3
 import sys
 from postprocess import *
 from uibuilder import *
-from util import prepare_path, sign, to_css, vector2f
+from util import prepare_path, sign, system_open, to_css, vector2f
 
 
 # noinspection SqlNoDataSourceInspection,DuplicatedCode,SqlInsertValues
 def create_gtfs_database() -> sqlite3.Connection:
+    print('    Creating temporary SQL database... ')
     db: sqlite3.Connection = sqlite3.connect(':memory:')
 
     with open(ref.rawdata_stops, 'r') as file:
+        print(f'      Reading stops data from {ref.rawdata_stops}... ', end='')
         reader = csv.reader(file)
         header_row = next(reader)
         db.execute(f'CREATE TABLE stops ({", ".join(f'{col} TEXT' for col in header_row)})')
         db.executemany(f'INSERT INTO stops VALUES ({','.join('?' * len(header_row))})', reader)
+        print('Done!')
 
     with open(ref.rawdata_stop_times, 'r') as file:
+        print(f'      Reading stop times data from {ref.rawdata_stop_times}... ', end='')
         reader = csv.reader(file)
         header_row = next(reader)
         db.execute(f'CREATE TABLE stop_times ({", ".join(f'{col} TEXT' for col in header_row)})')
         db.executemany(f'INSERT INTO stop_times VALUES ({','.join('?' * len(header_row))})', reader)
+        print('Done!')
 
     with open(ref.rawdata_trips, 'r') as file:
+        print(f'      Reading trips data from {ref.rawdata_trips}... ', end='')
         reader = csv.reader(file)
         header_row = next(reader)
         db.execute(f'CREATE TABLE trips ({", ".join(f'{col} TEXT' for col in header_row)})')
         db.executemany(f'INSERT INTO trips VALUES ({','.join('?' * len(header_row))})', reader)
+        print('Done!')
 
     return db
 
 
 # noinspection SqlNoDataSourceInspection
-def attach_stop_routes(gtfs_db: sqlite3.Connection) -> None:
+def attach_stop_lines(gtfs_db: sqlite3.Connection) -> None:
+    print('    Attaching line nubmers to stops... ', end='')
     cursor: sqlite3.Cursor = gtfs_db.cursor()
     cursor.execute('WITH stop_routes_groupped AS'
                    '(WITH stop_routes_ungroupped AS '
@@ -57,9 +65,13 @@ def attach_stop_routes(gtfs_db: sqlite3.Connection) -> None:
         writer.writerow([*stops_header_row, 'routes'])
         writer.writerows(cursor.fetchall())
 
+    cursor.close()
+    print('Done!')
+
 
 # noinspection SqlNoDataSourceInspection
 def attach_route_stops(gtfs_db: sqlite3.Connection) -> None:
+    print('    Attaching stop codes to routes... ', end='')
     cursor: sqlite3.Cursor = gtfs_db.cursor()
     cursor.execute('SELECT route_id, trip_id, stop_code '
                    'FROM trips JOIN stop_times USING (trip_id) JOIN stops USING (stop_id)'
@@ -98,6 +110,9 @@ def attach_route_stops(gtfs_db: sqlite3.Connection) -> None:
         for route in routes_data:
             writer.writerow([*route, '|'.join(map(lambda stops: '&'.join(stops), route_stops_unique[route[0]]))])
 
+    cursor.close()
+    print('Done!')
+
 
 def update_gtfs_data(first_update: bool, initial_db: Database) -> None:
     old_stops: dict[str, Stop] = {}
@@ -105,7 +120,17 @@ def update_gtfs_data(first_update: bool, initial_db: Database) -> None:
     if not first_update:
         old_stops, _ = Stop.read_stops(ref.rawdata_stops, initial_db)
         old_routes = Route.read_dict(ref.rawdata_routes)
-    response: requests.Response = requests.get(ref.url_ztm_gtfs)
+    print(f'  Downloading latest GTFS data from {ref.url_ztm_gtfs}... ', end='')
+    try:
+        response: requests.Response = requests.get(ref.url_ztm_gtfs)
+    except requests.RequestException as e:
+        print(f'Failed!\n  Connection error: {e}')
+        return
+    if response.status_code != 200:
+        print(f'Failed!\n  Request error: {response.reason}')
+        return
+    print('Done!')
+    print('  Extracting GTFS data... ', end='')
     with open(prepare_path(ref.tmpdata_gtfs), 'wb') as file:
         file.write(response.content)
     with util.zip_file(ref.tmpdata_gtfs, 'r') as zip_ref:
@@ -114,13 +139,15 @@ def update_gtfs_data(first_update: bool, initial_db: Database) -> None:
         zip_ref.extract_as('trips.txt', ref.rawdata_trips)
         zip_ref.extract_as('routes.txt', ref.rawdata_routes)
     os.remove(ref.tmpdata_gtfs)
+    print('Done!')
+    print('  Processing GTFS data... ')
     gtfs_db: sqlite3.Connection = create_gtfs_database()
-    attach_stop_routes(gtfs_db)
+    attach_stop_lines(gtfs_db)
     attach_route_stops(gtfs_db)
     os.remove(ref.rawdata_stop_times)
     os.remove(ref.rawdata_trips)
 
-    new_stops, _ = Stop.read_stops(ref.rawdata_stops, initial_db)
+    new_stops, new_stop_groups = Stop.read_stops(ref.rawdata_stops, initial_db)
     new_routes = Route.read_dict(ref.rawdata_routes)
 
     added_stops: set[Stop] = {s for s in new_stops.values() if s not in old_stops.values()}
@@ -130,21 +157,30 @@ def update_gtfs_data(first_update: bool, initial_db: Database) -> None:
     changed_routes: set[str] = {r for r in new_routes.keys()
                                 if r in old_routes.keys() and new_routes[r].stops != old_routes[r].stops}
     if first_update:
-        print('Stops database created.')
+        print('  GTFS database created.')
     else:
-        print('Stops database updated.')
-        if added_stops:
-            print(f'Added stops:\n- {'\n- '.join(f'{s.full_name} [{s.short_name}]' for s in added_stops)}')
-        if removed_stops:
-            print(f'Removed stops:\n- {'\n- '.join(f'{s.full_name} [{s.short_name}]' for s in removed_stops)}')
-        if added_routes:
-            print(f'Added routes:\n- {", ".join(added_routes)}')
-        if removed_routes:
-            print(f'Removed routes:\n- {", ".join(removed_routes)}')
-        if changed_routes:
-            print(f'Changed routes:\n- {", ".join(changed_routes)}')
+        print('  GTFS database updated.')
         if not added_stops and not removed_stops and not added_routes and not removed_routes and not changed_routes:
-            print('No changes')
+            print('  No changes, no report created.')
+        else:
+            print('  Data has changed, creating report... ', end='')
+            with open(prepare_path(ref.report_gtfs), 'w') as file:
+                if added_stops:
+                    file.write(f'Added stops:\n- {'\n- '.join(f'{s.full_name} [{s.short_name}]' for s in added_stops)}\n')
+                if removed_stops:
+                    file.write(f'Removed stops:\n- {'\n- '.join(f'{s.full_name} [{s.short_name}]' for s in removed_stops)}\n')
+                if added_routes:
+                    file.write(f'Added routes:\n- {", ".join(added_routes)}\n')
+                if removed_routes:
+                    file.write(f'Removed routes:\n- {", ".join(removed_routes)}\n')
+                if changed_routes:
+                    file.write(f'Changed routes:\n- {", ".join(changed_routes)}\n')
+            print(f'Report stored in {ref.report_gtfs}!')
+            system_open(ref.report_gtfs)
+
+    initial_db.add_collection('stops', new_stops)
+    initial_db.add_collection('stop_groups', new_stop_groups)
+    initial_db.add_collection('routes', new_routes)
 
 
 def process_players_data(players: list[Player], stops: dict[str, Stop],
@@ -229,13 +265,17 @@ def load_data(initial_db: Database) -> Database:
     players: list[Player] = initial_db.players
     regions: dict[str, Region] = initial_db.regions
     district: Region = initial_db.district
-    stops, stop_groups = Stop.read_stops(ref.rawdata_stops, initial_db)
-    initial_db.add_collection('stops', stops)
+    if not initial_db.has_collection('stops') or not initial_db.has_collection('routes'):
+        initial_db.add_collection('stops', (stops_and_groups := Stop.read_stops(ref.rawdata_stops, initial_db))[0])
+        initial_db.add_collection('stop_groups', stops_and_groups[1])
+        initial_db.add_collection('routes', Route.read_dict(ref.rawdata_routes))
+    stops: dict[str, Stop] = initial_db.stops
+    stop_groups: dict[str, set[str]] = initial_db.stop_groups
     terminals: list[Terminal] = Terminal.read_list(ref.rawdata_terminals, stops)
     carriers: dict[str, Carrier] = Carrier.read_dict(ref.rawdata_carriers)
     models: dict[str, VehicleModel] = VehicleModel.read_dict(ref.rawdata_vehicle_models)
     vehicles: dict[str, Vehicle] = Vehicle.read_dict(ref.rawdata_vehicles, carriers, models)
-    routes: dict[str, Route] = Route.read_dict(ref.rawdata_routes)
+    routes: dict[str, Route] = initial_db.routes
 
     process_players_data(players, stops, terminals, vehicles)
 
@@ -352,16 +392,64 @@ def create_route_map(route: Route, db: Database):
             file.write('</svg>')
 
 
-def build_app(fmap: folium.Map, db: Database) -> None:
-    folium_html: str = fmap.get_root().render()
-    map_script: str = folium_html[folium_html.rfind('<script>') + 8:folium_html.rfind('</script>')]
-    with open(prepare_path(ref.compileddata_map), 'w') as script_file:
-        script_file.write(clean_js(map_script))
+def generate_map(db: Database) -> folium.Map:
+    documented_visited_stops: list[Stop] = list(filter(lambda s: s.visited(include_ev=False), db.stops.values()))
+    visible_stops = documented_visited_stops if len(documented_visited_stops) > 0 else db.stops.values()
+    avg_lat = (min(s.location.latitude for s in visible_stops) + max(s.location.latitude for s in visible_stops)) / 2
+    avg_lon = (min(s.location.longitude for s in visible_stops) + max(s.location.longitude for s in visible_stops)) / 2
+    fmap: folium.Map = folium.Map(location=(avg_lat, avg_lon), zoom_start=12, prefer_canvas=True, zoom_control='bottomleft')
 
-    html_application: Html = create_application(folium_html, db)
-    rendered_application: str = clean_html(html_application.render(True, True))
-    with open(prepare_path(ref.document_map), 'w') as file:
-        file.write(rendered_application)
+    print('  Placing markers... ', end='')
+    for stop in db.stops.values():
+        stop_visits: list[Discovery] = sorted(stop.visits)
+        # noinspection PyUnresolvedReferences
+        classes: str = ' '.join(
+            [f'v-{visit.name.lower()}' for visit in stop_visits] +
+            [f'ev-{visit.name.lower()}' for visit in stop_visits if visit.date == '2000-01-01'] +
+            [f'r-{region.short_name}' for region in stop.regions] +
+            [f'tp-{player.nickname.lower()}' for _, player, _ in stop.terminals_progress]
+        )
+        visited_label: str = '<br>'.join(
+            [f'visited by {visit.name} {f'on {visit.date}' if visit.date != '2000-01-01' else 'a long time ago'}'
+             for visit in sorted(stop.visits)]) if stop.visits else 'not yet visited'
+        terminal_progress_label: str = '<br>'.join([f'{player.nickname}\'s closest {kind} point to {terminal.name} '
+                                                    for kind, player, terminal in stop.terminals_progress])
+        marker: folium.DivIcon = folium.DivIcon(
+            html=f'<div class="marker {classes}">{stop.marker()}</div>',
+            icon_anchor=(10, 10)
+        )
+        popup: folium.Popup = folium.Popup(f'<span class="stop-name">{stop.full_name} [{stop.short_name}]</span>'
+                                           f'<span class="stop-visitors"><br>{visited_label}</span>'
+                                           f'<span class="stop-tp"><br>{terminal_progress_label}</span>')
+        # noinspection PyTypeChecker
+        folium.Marker(location=stop.location, popup=popup, icon=marker).add_to(fmap)
+
+    def tp_message(tp: TerminalProgress) -> str:
+        if tp.completed():
+            return f'{tp.player.nickname} has completed this terminal'
+        else:
+            return f'{tp.player.nickname} has {'arrived at' if tp.arrived() else 'departed from'} this terminal'
+
+    for terminal in db.terminals:
+        classes: list[str] = [f'reached-{player.nickname.lower()}' for player in db.players if terminal.reached_by(player)]
+        visited_label: str = '<br>'.join([tp_message(tp) for tp in terminal.progress if tp.reached()]
+                                         ) if terminal.anybody_reached() else 'not yet reached'
+        marker: folium.DivIcon = folium.DivIcon(
+            html=f'<div class="marker terminal {' '.join(classes)}">T</div>',
+            icon_anchor=(10, 10)
+        )
+        popup: folium.Popup = folium.Popup(f'<span class="stop-name">{terminal.name}</span>'
+                                           f'<br><span class="stop-tp">{visited_label}</span>')
+        # noinspection PyTypeChecker
+        folium.Marker(location=(terminal.latitude, terminal.longitude), popup=popup, icon=marker).add_to(fmap)
+
+    print('Done!')
+
+    return fmap
+
+
+def build_app(fmap: folium.Map, db: Database) -> None:
+    print('  Compiling data to JavaScript... ', end='')
 
     with open(prepare_path(ref.compileddata_stops), 'w') as file:
         file.write(f'const stops = {{\n{'\n'.join(map(Stop.json_entry, db.stops.values()))}\n}};')
@@ -378,18 +466,35 @@ def build_app(fmap: folium.Map, db: Database) -> None:
     with open(prepare_path(ref.compileddata_players), 'w') as file:
         file.write(f'const players = {{\n{'\n'.join(map(lambda p: Player.json_entry(p, db), db.players))}\n}};')
 
+    folium_html: str = fmap.get_root().render()
+    map_script: str = folium_html[folium_html.rfind('<script>') + 8:folium_html.rfind('</script>')]
+    with open(prepare_path(ref.compileddata_map), 'w') as script_file:
+        script_file.write(clean_js(map_script))
+
+    print('Done!')
+    print('  Building HTML documents... ', end='')
+
+    html_application: Html = create_application(folium_html, db)
+    rendered_application: str = clean_html(html_application.render(True, True))
+    with open(prepare_path(ref.document_map), 'w') as file:
+        file.write(rendered_application)
+
     html_archive: Html = create_archive(db)
     rendered_archive: str = clean_html(html_archive.render(True, True))
     with open(prepare_path(ref.document_archive), 'w') as file:
         file.write(rendered_archive)
 
+    print('Done!')
+
 
 def main() -> None:
+    print('Building initial database...')
     district, regions = Region.read_regions(ref.rawdata_regions)
     players: list[Player] = Player.read_list(ref.rawdata_players)
     initial_db: Database = Database.partial(regions=regions, district=district, players=players)
 
     if update_ztm_stops:
+        print('Updating GTFS data...')
         update_gtfs_data(not os.path.exists(ref.rawdata_stops), initial_db)
     else:
         if not os.path.exists(ref.rawdata_stops):
@@ -399,6 +504,7 @@ def main() -> None:
             raise FileNotFoundError(f'{ref.rawdata_routes} not found. '
                                     f'Run the script with the --update flag to download the latest data.')
 
+    print('Building full database...')
     db: Database = load_data(initial_db)
     del initial_db
 
@@ -407,56 +513,10 @@ def main() -> None:
             create_route_map(route, db)
 
     if update_map:
+        print('Generating map data...')
+        fmap: folium.Map = generate_map(db)
 
-        documented_visited_stops: list[Stop] = list(filter(lambda s: s.visited(include_ev=False), db.stops.values()))
-        visible_stops = documented_visited_stops if len(documented_visited_stops) > 0 else db.stops.values()
-        avg_lat = (min(s.location.latitude for s in visible_stops) + max(s.location.latitude for s in visible_stops)) / 2
-        avg_lon = (min(s.location.longitude for s in visible_stops) + max(s.location.longitude for s in visible_stops)) / 2
-        fmap: folium.Map = folium.Map(location=(avg_lat, avg_lon), zoom_start=12, prefer_canvas=True, zoom_control='bottomleft')
-
-        for stop in db.stops.values():
-            stop_visits: list[Discovery] = sorted(stop.visits)
-            # noinspection PyUnresolvedReferences
-            classes: str = ' '.join(
-                [f'v-{visit.name.lower()}' for visit in stop_visits] +
-                [f'ev-{visit.name.lower()}' for visit in stop_visits if visit.date == '2000-01-01'] +
-                [f'r-{region.short_name}' for region in stop.regions] +
-                [f'tp-{player.nickname.lower()}' for _, player, _ in stop.terminals_progress]
-            )
-            visited_label: str = '<br>'.join(
-                [f'visited by {visit.name} {f'on {visit.date}' if visit.date != '2000-01-01' else 'a long time ago'}'
-                 for visit in sorted(stop.visits)]) if stop.visits else 'not yet visited'
-            terminal_progress_label: str = '<br>'.join([f'{player.nickname}\'s closest {kind} point to {terminal.name} '
-                                                        for kind, player, terminal in stop.terminals_progress])
-            marker: folium.DivIcon = folium.DivIcon(
-                html=f'<div class="marker {classes}">{stop.marker()}</div>',
-                icon_anchor=(10, 10)
-            )
-            popup: folium.Popup = folium.Popup(f'<span class="stop-name">{stop.full_name} [{stop.short_name}]</span>'
-                                               f'<span class="stop-visitors"><br>{visited_label}</span>'
-                                               f'<span class="stop-tp"><br>{terminal_progress_label}</span>')
-            # noinspection PyTypeChecker
-            folium.Marker(location=stop.location, popup=popup, icon=marker).add_to(fmap)
-
-        def tp_message(tp: TerminalProgress) -> str:
-            if tp.completed():
-                return f'{tp.player.nickname} has completed this terminal'
-            else:
-                return f'{tp.player.nickname} has {'arrived at' if tp.arrived() else 'departed from'} this terminal'
-
-        for terminal in db.terminals:
-            classes: list[str] = [f'reached-{player.nickname.lower()}' for player in players if terminal.reached_by(player)]
-            visited_label: str = '<br>'.join([tp_message(tp) for tp in terminal.progress if tp.reached()]
-                                             ) if terminal.anybody_reached() else 'not yet reached'
-            marker: folium.DivIcon = folium.DivIcon(
-                html=f'<div class="marker terminal {' '.join(classes)}">T</div>',
-                icon_anchor=(10, 10)
-            )
-            popup: folium.Popup = folium.Popup(f'<span class="stop-name">{terminal.name}</span>'
-                                               f'<br><span class="stop-tp">{visited_label}</span>')
-            # noinspection PyTypeChecker
-            folium.Marker(location=(terminal.latitude, terminal.longitude), popup=popup, icon=marker).add_to(fmap)
-
+        print('Compiling application...')
         build_app(fmap, db)
 
 
