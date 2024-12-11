@@ -70,8 +70,8 @@ def attach_stop_lines(gtfs_db: sqlite3.Connection) -> None:
 
 
 # noinspection SqlNoDataSourceInspection
-def attach_route_stops(gtfs_db: sqlite3.Connection) -> None:
-    print('    Attaching stop codes to routes... ', end='')
+def attach_line_stops(gtfs_db: sqlite3.Connection) -> None:
+    print('    Attaching stop codes to lines... ', end='')
     cursor: sqlite3.Cursor = gtfs_db.cursor()
     cursor.execute('SELECT route_id, trip_id, stop_code '
                    'FROM trips JOIN stop_times USING (trip_id) JOIN stops USING (stop_id)'
@@ -79,36 +79,36 @@ def attach_route_stops(gtfs_db: sqlite3.Connection) -> None:
                    'GROUP BY route_id, trip_id, shape_id, stop_sequence '
                    'ORDER BY CAST(route_id AS INTEGER), trip_id, CAST(stop_sequence AS INTEGER)')
 
-    route_stops: dict[str, dict[str, list[str]]] = {}
+    line_stops: dict[str, dict[str, list[str]]] = {}
     for record in cursor.fetchall():
         route_id, trip_id, stop_code = record
-        if route_id not in route_stops:
-            route_stops[route_id] = {}
-        if trip_id not in route_stops[route_id]:
-            route_stops[route_id][trip_id] = []
-        route_stops[route_id][trip_id].append(stop_code)
+        if route_id not in line_stops:
+            line_stops[route_id] = {}
+        if trip_id not in line_stops[route_id]:
+            line_stops[route_id][trip_id] = []
+        line_stops[route_id][trip_id].append(stop_code)
 
-    route_stops_unique: dict[str, list[list[str]]] = {}
-    for route_id, trips in route_stops.items():
+    line_stops_unique: dict[str, list[list[str]]] = {}
+    for route_id, trips in line_stops.items():
         for trip_id, trip_stops in trips.items():
-            if route_id not in route_stops_unique:
-                route_stops_unique[route_id] = []
-            if ((trip_id.startswith('1_') or not any(filter(lambda t: t.startswith('1_'), route_stops[route_id].keys())))
-                    and trip_stops not in route_stops_unique[route_id]):
-                route_stops_unique[route_id].append(trip_stops)
+            if route_id not in line_stops_unique:
+                line_stops_unique[route_id] = []
+            if ((trip_id.startswith('1_') or not any(filter(lambda t: t.startswith('1_'), line_stops[route_id].keys())))
+                    and trip_stops not in line_stops_unique[route_id]):
+                line_stops_unique[route_id].append(trip_stops)
 
     routes_header_row: list[str]
     routes_data: list[list[str]]
-    with open(ref.rawdata_routes, 'r') as file:
+    with open(ref.rawdata_lines, 'r') as file:
         reader: csv.reader = csv.reader(file)
         routes_header_row = next(reader)
         routes_data = list(reader)
 
-    with open(prepare_path(ref.rawdata_routes), 'w') as file:
+    with open(prepare_path(ref.rawdata_lines), 'w') as file:
         writer: csv.writer = csv.writer(file)
         writer.writerow([*routes_header_row, 'stops'])
         for route in routes_data:
-            writer.writerow([*route, '|'.join(map(lambda stops: '&'.join(stops), route_stops_unique[route[0]]))])
+            writer.writerow([*route, '|'.join(map(lambda stops: '&'.join(stops), line_stops_unique[route[0]]))])
 
     cursor.close()
     print('Done!')
@@ -117,17 +117,17 @@ def attach_route_stops(gtfs_db: sqlite3.Connection) -> None:
 def make_update_report(old_data: Database, new_data: Database) -> None:
     added_stops: set[Stop] = {s for s in new_data.stops.values() if s not in old_data.stops.values()}
     removed_stops: set[Stop] = {s for s in old_data.stops.values() if s not in new_data.stops.values()}
-    added_routes: set[str] = {r for r in new_data.routes.keys() if r not in old_data.routes.keys()}
-    removed_routes: set[str] = {r for r in old_data.routes.keys() if r not in new_data.routes.keys()}
-    changed_routes: set[str] = {r for r in new_data.routes.keys()
-                                if r in old_data.routes.keys() and new_data.routes[r].stops != old_data.routes[r].stops}
-    if not added_stops and not removed_stops and not added_routes and not removed_routes and not changed_routes:
+    added_lines: set[str] = {r for r in new_data.lines.keys() if r not in old_data.lines.keys()}
+    removed_lines: set[str] = {r for r in old_data.lines.keys() if r not in new_data.lines.keys()}
+    changed_lines: set[str] = {r for r in new_data.lines.keys()
+                               if r in old_data.lines.keys() and new_data.lines[r].stops != old_data.lines[r].stops}
+    if not added_stops and not removed_stops and not added_lines and not removed_lines and not changed_lines:
         print('  No changes, no report created.')
     else:
         print('  Data has changed, creating report... ', end='')
-        routes: int = max(len(added_routes), len(removed_routes), len(changed_routes))
+        lines: int = max(len(added_lines), len(removed_lines), len(changed_lines))
         lexmap: dict[str, float] = create_lexicographic_mapping(file_to_string(ref.lexmap_polish))
-        line_key = lambda line: int(line) if line.isdigit() else int(re.sub(r'\D', '', line)) - routes
+        line_key = lambda line: int(line) if line.isdigit() else int(re.sub(r'\D', '', line)) - lines
         stop_key = lambda stop: lexicographic_sequence(f'{stop.full_name}{stop.short_name}', lexmap)
         with open(prepare_path(ref.report_gtfs), 'w') as file:
             if added_stops:
@@ -136,12 +136,12 @@ def make_update_report(old_data: Database, new_data: Database) -> None:
             if removed_stops:
                 file.write(f'Removed stops:\n- {'\n- '.join(f'{s.full_name} [{s.short_name}]'
                                                             for s in sorted(removed_stops, key=stop_key))}\n')
-            if added_routes:
-                file.write(f'Added routes:\n- {"\n- ".join(sorted(added_routes, key=line_key))}\n')
-            if removed_routes:
-                file.write(f'Removed routes:\n- {"\n- ".join(sorted(removed_routes, key=line_key))}\n')
-            if changed_routes:
-                file.write(f'Changed routes:\n- {"\n- ".join(sorted(changed_routes, key=line_key))}\n')
+            if added_lines:
+                file.write(f'Added lines:\n- {"\n- ".join(sorted(added_lines, key=line_key))}\n')
+            if removed_lines:
+                file.write(f'Removed lines:\n- {"\n- ".join(sorted(removed_lines, key=line_key))}\n')
+            if changed_lines:
+                file.write(f'Changed lines:\n- {"\n- ".join(sorted(changed_lines, key=line_key))}\n')
         print(f'Report stored in {ref.report_gtfs}!')
         system_open(ref.report_gtfs)
 
@@ -151,8 +151,8 @@ def update_gtfs_data(first_update: bool, initial_db: Database) -> None:
     if not first_update:
         if os.path.exists(ref.rawdata_stops):
             old_db.add_collection('stops', Stop.read_stops(ref.rawdata_stops, initial_db)[0])
-        if os.path.exists(ref.rawdata_routes):
-            old_db.add_collection('routes', Line.read_dict(ref.rawdata_routes))
+        if os.path.exists(ref.rawdata_lines):
+            old_db.add_collection('lines', Line.read_dict(ref.rawdata_lines))
     print(f'  Downloading latest GTFS data from {ref.url_ztm_gtfs}... ', end='')
     try:
         response: requests.Response = requests.get(ref.url_ztm_gtfs)
@@ -170,22 +170,22 @@ def update_gtfs_data(first_update: bool, initial_db: Database) -> None:
         zip_ref.extract_as('stops.txt', ref.rawdata_stops)
         zip_ref.extract_as('stop_times.txt', ref.rawdata_stop_times)
         zip_ref.extract_as('trips.txt', ref.rawdata_trips)
-        zip_ref.extract_as('routes.txt', ref.rawdata_routes)
+        zip_ref.extract_as('routes.txt', ref.rawdata_lines)
     os.remove(ref.tmpdata_gtfs)
     print('Done!')
     print('  Processing GTFS data... ')
     gtfs_db: sqlite3.Connection = create_gtfs_database()
     attach_stop_lines(gtfs_db)
-    attach_route_stops(gtfs_db)
+    attach_line_stops(gtfs_db)
     os.remove(ref.rawdata_stop_times)
     os.remove(ref.rawdata_trips)
 
     new_stops, new_stop_groups = Stop.read_stops(ref.rawdata_stops, initial_db)
-    new_routes = Route.read_dict(ref.rawdata_routes)
+    new_lines = Line.read_dict(ref.rawdata_lines)
 
     initial_db.add_collection('stops', new_stops)
     initial_db.add_collection('stop_groups', new_stop_groups)
-    initial_db.add_collection('routes', new_routes)
+    initial_db.add_collection('lines', new_lines)
 
     if first_update:
         print('  GTFS database created.')
@@ -276,17 +276,17 @@ def load_data(initial_db: Database) -> Database:
     players: list[Player] = initial_db.players
     regions: dict[str, Region] = initial_db.regions
     district: Region = initial_db.district
-    if not initial_db.has_collection('stops') or not initial_db.has_collection('routes'):
+    if not initial_db.has_collection('stops') or not initial_db.has_collection('lines'):
         initial_db.add_collection('stops', (stops_and_groups := Stop.read_stops(ref.rawdata_stops, initial_db))[0])
         initial_db.add_collection('stop_groups', stops_and_groups[1])
-        initial_db.add_collection('routes', Route.read_dict(ref.rawdata_routes))
+        initial_db.add_collection('lines', Line.read_dict(ref.rawdata_lines))
     stops: dict[str, Stop] = initial_db.stops
     stop_groups: dict[str, set[str]] = initial_db.stop_groups
     terminals: list[Terminal] = Terminal.read_list(ref.rawdata_terminals, stops)
     carriers: dict[str, Carrier] = Carrier.read_dict(ref.rawdata_carriers)
     models: dict[str, VehicleModel] = VehicleModel.read_dict(ref.rawdata_vehicle_models)
     vehicles: dict[str, Vehicle] = Vehicle.read_dict(ref.rawdata_vehicles, carriers, models)
-    routes: dict[str, Route] = initial_db.routes
+    lines: dict[str, Line] = initial_db.lines
 
     process_players_data(players, stops, terminals, vehicles)
 
@@ -308,7 +308,7 @@ def load_data(initial_db: Database) -> Database:
         }
     }
 
-    return Database(players, progress, stops, stop_groups, terminals, carriers, regions, district, vehicles, models, routes)
+    return Database(players, progress, stops, stop_groups, terminals, carriers, regions, district, vehicles, models, lines)
 
 
 def next_midpoint(previous_dir: vector2f, current_point: vector2f, next_point: vector2f) -> tuple[vector2f, vector2f]:
@@ -356,12 +356,12 @@ def midpoints(sequence: list[vector2f]) -> list[vector2f]:
     return new_sequence
 
 
-def create_route_map(route: Route, db: Database):
+def create_route_map(line: Line, db: Database):
     variant: int = 0
-    for route_variant in route.stops:
+    for line_variant in line.stops:
         variant += 1
         stops: list[Stop] = []
-        for stop_id in route_variant:
+        for stop_id in line_variant:
             stop: Stop = db.stops[stop_id]
             if not any(stop.full_name == s.full_name for s in stops):
                 stops.append(stop)
@@ -376,7 +376,7 @@ def create_route_map(route: Route, db: Database):
         scale_factor: float = 1000 / coord_range
         points = [vector2f(12 + (s.longitude - lon_min) * scale_factor, 12 + (lat_max - s.latitude) * scale_factor)
                   for s in stops_locations]
-        with open(prepare_path(f'{ref.mapdata_path}/{route.number}/{variant}.svg'), 'w') as file:
+        with open(prepare_path(f'{ref.mapdata_path}/{line.number}/{variant}.svg'), 'w') as file:
             file.write(f'<svg'
                        f' width="{24 + 1000 * lon_range / coord_range:.1f}"'
                        f' height="{24 + 1000 * lat_range / coord_range:.1f}"'
@@ -391,12 +391,12 @@ def create_route_map(route: Route, db: Database):
             file.write(f'<style>\n{to_css({
                 'circle': {
                     'fill': 'white',
-                    'stroke': f'#{route.background_color}' if route.background_color.lower() != 'ffffff' else 'black',
+                    'stroke': f'#{line.background_color}' if line.background_color.lower() != 'ffffff' else 'black',
                     'stroke-width': '4'
                 },
                 'path': {
                     'fill': 'none',
-                    'stroke': f'#{route.background_color}',
+                    'stroke': f'#{line.background_color}',
                     'stroke-width': '8'
                 }
             })}</style>\n')
@@ -471,8 +471,8 @@ def build_app(fmap: folium.Map, db: Database) -> None:
         file.write(f'const carriers = {{\n{'\n'.join(map(Carrier.json_entry, db.carriers.values()))}\n}};\n')
         file.write(f'const vehicles = {{\n{'\n'.join(map(Vehicle.json_entry, db.vehicles.values()))}\n}};')
 
-    with open(prepare_path(ref.compileddata_routes), 'w') as file:
-        file.write(f'const routes = {{\n{'\n'.join(map(Route.json_entry, db.routes.values()))}\n}};')
+    with open(prepare_path(ref.compileddata_lines), 'w') as file:
+        file.write(f'const lines = {{\n{'\n'.join(map(Line.json_entry, db.lines.values()))}\n}};')
 
     with open(prepare_path(ref.compileddata_players), 'w') as file:
         file.write(f'const players = {{\n{'\n'.join(map(lambda p: Player.json_entry(p, db), db.players))}\n}};')
@@ -511,8 +511,8 @@ def main() -> None:
         if not os.path.exists(ref.rawdata_stops):
             raise FileNotFoundError(f'{ref.rawdata_stops} not found. '
                                     f'Run the script with the --update flag to download the latest data.')
-        if not os.path.exists(ref.rawdata_routes):
-            raise FileNotFoundError(f'{ref.rawdata_routes} not found. '
+        if not os.path.exists(ref.rawdata_lines):
+            raise FileNotFoundError(f'{ref.rawdata_lines} not found. '
                                     f'Run the script with the --update flag to download the latest data.')
 
     print('Building full database...')
@@ -520,8 +520,8 @@ def main() -> None:
     del initial_db
 
     if update_ztm_stops:
-        for route in db.routes.values():
-            create_route_map(route, db)
+        for line in db.lines.values():
+            create_route_map(line, db)
 
     if update_map:
         print('Generating map data...')

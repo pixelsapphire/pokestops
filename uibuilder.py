@@ -438,7 +438,7 @@ def create_stops_page(db: Database) -> Div:
     )
 
 
-def create_line_preview(line: Route) -> Div:
+def create_line_preview(line: Line) -> Div:
     return Div(
         [Class('line-preview'), CustomHtmlTagAttribute('data-line-number', line.number)],
         [
@@ -460,7 +460,7 @@ def create_lines_page(db: Database) -> Div:
         [
             Div(
                 [Class('content-section'), Id('lines-index')],
-                [create_line_preview(line) for line in sorted(db.routes.values())],
+                [create_line_preview(line) for line in sorted(db.lines.values())],
             ),
             Div(
                 [Class('content-section object-view'), Id('line-view')],
@@ -543,7 +543,7 @@ def create_archive(db: Database) -> Html:
                     Link([Rel('stylesheet'), Type('text/css'), Href(ref.stylesheet_archive)]),
                     Script([Src(ref.compileddata_stops)]),
                     Script([Src(ref.compileddata_vehicles)]),
-                    Script([Src(ref.compileddata_routes)]),
+                    Script([Src(ref.compileddata_lines)]),
                     Script([Src(ref.compileddata_players)]),
                     Script([Src(ref.controller_archive)]),
                 ],

@@ -330,7 +330,7 @@ class Vehicle(JsonSerializable):
                 f'}},')
 
 
-class Route(JsonSerializable):
+class Line(JsonSerializable):
     def __init__(self, number: str, terminals: str, description: str,
                  background_color: str, text_color: str, stops: list[list[str]]):
         self.number: str = number
@@ -365,10 +365,10 @@ class Route(JsonSerializable):
         return 'suburban bus'
 
     @staticmethod
-    def read_dict(source: str) -> dict[str, 'Route']:
+    def read_dict(source: str) -> dict[str, 'Line']:
         print(f'  Reading routes data from {source}... ', end='')
-        constructor = lambda *row: Route(row[2], row[3].split('|')[0], row[4].split('|')[0].split('^')[0], row[6], row[7],
-                                         list(map(lambda seq: seq.split('&'), row[8].split('|'))))
+        constructor = lambda *row: Line(row[2], row[3].split('|')[0], row[4].split('|')[0].split('^')[0], row[6], row[7],
+                                        list(map(lambda seq: seq.split('&'), row[8].split('|'))))
         return __read_collection__(source, {}, constructor, lambda c, v: c.update({v.number: v}))
 
     def __cmp_key__(self):
@@ -515,13 +515,13 @@ class Region:
 
 class Database:
     type CollectionName = Literal[
-        'players', 'progress', 'stops', 'stop_groups', 'terminals', 'carriers', 'regions', 'vehicles', 'models', 'routes']
+        'players', 'progress', 'stops', 'stop_groups', 'terminals', 'carriers', 'regions', 'vehicles', 'models', 'lines']
     __stars__: dict[tuple[int, int], int] = {(1, 1): 1, (2, 2): 2, (3, 4): 3, (5, 7): 4, (8, 100): 5}
 
     def __init__(self, players: list[Player], progress: dict[str, dict[str, float]],
                  stops: dict[str, Stop], stop_groups: dict[str, set[str]], terminals: list[Terminal],
                  carriers: dict[str, Carrier], regions: dict[str, Region], district: Region,
-                 vehicles: dict[str, Vehicle], models: dict[str, VehicleModel], routes: dict[str, Route]):
+                 vehicles: dict[str, Vehicle], models: dict[str, VehicleModel], lines: dict[str, Line]):
         self.players: list[Player] = players
         self.progress: dict[str, dict[str, float]] = progress
         self.stops: dict[str, Stop] = stops
@@ -532,7 +532,7 @@ class Database:
         self.district: Region = district
         self.vehicles: dict[str, Vehicle] = vehicles
         self.models: dict[str, VehicleModel] = models
-        self.routes: dict[str, Route] = routes
+        self.lines: dict[str, Line] = lines
 
     @staticmethod
     def partial(players: list[Player] | None = None, progress: dict[str, dict[str, float]] | None = None,
@@ -540,7 +540,7 @@ class Database:
                 terminals: list[Terminal] | None = None, carriers: dict[str, Carrier] | None = None,
                 regions: dict[str, Region] | None = None, district: Region | None = None,
                 vehicles: dict[str, Vehicle] | None = None, models: dict[str, VehicleModel] | None = None,
-                routes: dict[str, Route] | None = None) -> 'Database':
+                routes: dict[str, Line] | None = None) -> 'Database':
         return Database(players or [], progress or {}, stops or {}, stop_groups or {}, terminals or [],
                         carriers or {}, regions or {}, district or Region(0, '', '', lambda _: False),
                         vehicles or {}, models or {}, routes or {})

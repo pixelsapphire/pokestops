@@ -21,7 +21,7 @@ function selectStop(stopPreview, ctrl) {
     ctrl.stopLinesField.innerHTML = '';
     stops[stopId].l.forEach(line => {
         const [number, destination] = line;
-        const style = `background-color: #${routes[number].b}; color: #${routes[number].t}`;
+        const style = `background-color: #${lines[number].b}; color: #${lines[number].t}`;
         ctrl.stopLinesField.innerHTML += `<div class="line-view"><span class="line-number" style="${style}">${number}</span><span class="line-destination">${destination}</span></div>`;
     });
     const coordinates = `${stop.lt},${stop.ln}`;
@@ -39,7 +39,7 @@ function selectLine(linePreview, ctrl) {
     ctrl.lineDetails.classList.remove('hidden');
     ctrl.lineNumberLabel.parentElement.classList.remove('hidden');
     const lineNumber = linePreview.getAttribute('data-line-number');
-    const line = routes[lineNumber];
+    const line = lines[lineNumber];
     ctrl.lineNumberLabel.innerHTML = `${lineNumber}`;
     ctrl.lineNumberLabel.style.backgroundColor = `#${line.b}`;
     ctrl.lineNumberLabel.style.color = `#${line.t}`;
