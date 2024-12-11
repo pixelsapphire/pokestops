@@ -1,3 +1,15 @@
+Array.prototype.containsBS = function (target) {
+    let left = 0;
+    let right = this.length - 1;
+    while (left <= right) {
+        const mid = Math.floor((left + right) / 2);
+        if (this[mid] === target) return true;
+        if (this[mid] < target) left = mid + 1;
+        else right = mid - 1;
+    }
+    return false;
+};
+
 function openTab(tile, tab) {
     document.querySelectorAll('.navigation-tile, .content-container').forEach(e => e.classList.remove('selected'));
     tile.classList.add('selected');
@@ -13,6 +25,13 @@ function makeAddress(address) {
     return `${road}${suburb}${address.postcode} ${town}`;
 }
 
+function cropSVG(svgImage, margin) {
+    const bbox = svgImage.getBBox();
+    svgImage.setAttribute("viewBox", `${bbox.x - margin} ${bbox.y - margin} ${bbox.width + 2 * margin} ${bbox.height + 2 * margin}`);
+    svgImage.setAttribute("width", bbox.width + 2 * margin);
+    svgImage.setAttribute("height", bbox.height + 2 * margin);
+}
+
 function selectStop(stopPreview, ctrl) {
     ctrl.stopDetails.classList.remove('hidden');
     const stopId = stopPreview.getAttribute('data-stop-id');
@@ -21,7 +40,7 @@ function selectStop(stopPreview, ctrl) {
     ctrl.stopLinesField.innerHTML = '';
     stops[stopId].l.forEach(line => {
         const [number, destination] = line;
-        const style = `background-color: #${lines[number].b}; color: #${lines[number].t}`;
+        const style = `background-color: #${lines[number].bc}; color: #${lines[number].tc}`;
         ctrl.stopLinesField.innerHTML += `<div class="line-view"><span class="line-number" style="${style}">${number}</span><span class="line-destination">${destination}</span></div>`;
     });
     const coordinates = `${stop.lt},${stop.ln}`;
@@ -41,11 +60,44 @@ function selectLine(linePreview, ctrl) {
     const lineNumber = linePreview.getAttribute('data-line-number');
     const line = lines[lineNumber];
     ctrl.lineNumberLabel.innerHTML = `${lineNumber}`;
-    ctrl.lineNumberLabel.style.backgroundColor = `#${line.b}`;
-    ctrl.lineNumberLabel.style.color = `#${line.t}`;
-    ctrl.lineTerminalsLabel.innerHTML = line.d;
+    ctrl.lineNumberLabel.style.backgroundColor = `#${line.bc}`;
+    ctrl.lineNumberLabel.style.color = `#${line.tc}`;
+    ctrl.lineTerminalsLabel.innerHTML = line.t;
     ctrl.lineKindLabel.innerHTML = `${line.k} line`;
-    ctrl.lineRouteLabel.innerHTML = line.r;
+    ctrl.lineRouteLabel.innerHTML = line.rd;
+    ctrl.lineRoutesContainer.innerHTML = '';
+    {
+        const stopSpacing = 48;
+        const stopRadius = 14;
+        const strokeWidth = 6;
+        for (const route of line.r) {
+            const routeImage = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            let y = -stopSpacing / 2;
+            const stopsAxis = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            Object.entries({
+                'x': `${stopRadius - 4}`, 'y': `${stopSpacing / 2}`,
+                'width': `8`, 'height': `${(route.length - 1) * stopSpacing}`, 'fill': `#${lines[lineNumber].bc}`
+            }).forEach(([key, value]) => stopsAxis.setAttribute(key, value));
+            routeImage.appendChild(stopsAxis);
+            for (const stopId of route) {
+                const stop = stops[stopId];
+                const stopCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                Object.entries({
+                    'cx': `${stopRadius}`, 'cy': `${y += stopSpacing}`, 'r': `${stopRadius - strokeWidth / 2}`,
+                    'fill': 'white', 'stroke': `#${lines[lineNumber].bc}`, 'stroke-width': `${strokeWidth}`
+                }).forEach(([key, value]) => stopCircle.setAttribute(key, value));
+                routeImage.appendChild(stopCircle);
+                const stopLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                Object.entries({
+                    'x': `${stopRadius * 2 + 8}`, 'y': `${y + 6}`, 'font-size': '16', 'fill': 'white'
+                }).forEach(([key, value]) => stopLabel.setAttribute(key, value));
+                stopLabel.innerHTML = `${stop.n} [${stopId}]`;
+                routeImage.appendChild(stopLabel);
+            }
+            ctrl.lineRoutesContainer.appendChild(routeImage);
+            cropSVG(routeImage, 8);
+        }
+    }
 }
 
 function selectVehicle(vehiclePreview, ctrl) {
@@ -82,18 +134,6 @@ function selectVehicle(vehiclePreview, ctrl) {
     ctrl.vehicleDiscoveriesLabel.innerHTML = vehicle.d ? vehicle.d.map((d) => `discovered by ${d[0]} on ${d[1]}`).join('<br>') : 'not yet discovered';
 }
 
-Array.prototype.containsBS = function (target) {
-    let left = 0;
-    let right = this.length - 1;
-    while (left <= right) {
-        const mid = Math.floor((left + right) / 2);
-        if (this[mid] === target) return true;
-        if (this[mid] < target) left = mid + 1;
-        else right = mid - 1;
-    }
-    return false;
-}
-
 document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.stop-header').forEach(header => header.addEventListener('click', () => {
@@ -122,6 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
         lineTerminalsLabel: lineView.querySelector('#line-terminals'),
         lineKindLabel: lineView.querySelector('#line-kind'),
         lineRouteLabel: lineView.querySelector('#line-route'),
+        lineRoutesContainer: lineView.querySelector('#line-routes'),
     };
     document.querySelectorAll('.line-preview').forEach(preview => preview.addEventListener('click', () => selectLine(preview, lineViewControls)));
 

@@ -264,6 +264,23 @@ a {
     margin-top: min(1vh, 1dvw);
 }
 
+#line-route {
+    font-style: italic;
+    font-size: 80%;
+}
+
+#line-routes {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: start;
+}
+
+#line-routes svg {
+    margin-bottom: min(4vh, 4dvw);
+    max-width: 20vw;
+}
+
 #vehicles-index {
     flex: 2;
     display: flex;

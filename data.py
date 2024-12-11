@@ -379,11 +379,12 @@ class Line(JsonSerializable):
 
     def __json_entry__(self, _=None) -> str:
         return (f'"{self.number}":{{'
-                f'b:"{self.background_color}",'
-                f't:"{self.text_color}",'
-                f'r:"{self.description}",'
+                f'bc:"{self.background_color}",'
+                f'tc:"{self.text_color}",'
                 f'k:"{self.kind()}",'
-                f'd:"{self.terminals}",'
+                f't:"{self.terminals}",'
+                f'rd:"{self.description}",'
+                f'r:[{','.join(f'[{",".join(f"\"{stop}\"" for stop in seq)}]' for seq in self.stops)}]'
                 f'}},')
 
 

@@ -479,6 +479,7 @@ def create_lines_page(db: Database) -> Div:
                             Tr([], [Td([], 'route:'), Td([Id('line-route')])]),
                         ],
                     ),
+                    Div([Id('line-routes')]),
                 ],
             ),
         ],
