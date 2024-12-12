@@ -130,9 +130,9 @@ def create_achievement_row(achievement: AchievementProgress) -> Tr:
                 [
                     Span([Class('smaller')], 'Completed'),
                     Br(),
-                    achievement.completed if achievement.completed != '2000-01-01'
+                    achievement.completion_date if achievement.completion_date_known()
                     else Span([Class('smaller')], 'a long time ago'),
-                ] if achievement.completed
+                ] if achievement.is_completed()
                 else f'{achievement.visited}/{achievement.total}'
             )
         ]
@@ -234,8 +234,8 @@ def create_vehicle_sidebar(db: Database) -> (Div, Button):
                                 Tbody(
                                     [],
                                     [
-                                        create_vehicle_row(vehicle, date)
-                                        for vehicle, date in player.get_vehicles()
+                                        create_vehicle_row(discovery.item, discovery.date)
+                                        for discovery in player.get_vehicles()
                                     ],
                                 ),
                             ],

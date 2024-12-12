@@ -207,7 +207,7 @@ def process_players_data(players: list[Player], stops: dict[str, Stop],
                 elif not row[0].lstrip().startswith('#'):
                     stop = stops.get(row[0])
                     if stop:
-                        stop.add_visit(Discovery(player.nickname, row[1]))
+                        stop.add_visit(Discovery(player, row[1]))
                         player.add_stop(stop)
                     else:
                         print(f'Stop {row[0].lstrip()} not found, remove {player.nickname}\'s entry from her save file')
@@ -222,7 +222,7 @@ def process_players_data(players: list[Player], stops: dict[str, Stop],
                 elif not stop_id.startswith('#'):
                     stop = stops.get(stop_id)
                     if stop:
-                        stop.add_visit(Discovery(player.nickname, '2000-01-01'))
+                        stop.add_visit(Discovery(player))
                         player.add_stop(stop)
                     else:
                         print(f'Stop {stop_id} not found, remove {player.nickname}\'s entry from her EV file')
@@ -290,15 +290,15 @@ def load_data(initial_db: Database) -> Database:
 
     process_players_data(players, stops, terminals, vehicles)
 
-    ever_visited_stops: list[Stop] = list(filter(lambda s: s.visited(), stops.values()))
+    ever_visited_stops: list[Stop] = list(filter(lambda s: s.is_visited(), stops.values()))
     progress: dict[str, dict[str, float]] = {
         **{r.short_name: {
             **{
-                p.nickname: round(len(list(filter(lambda s: s in r and s.visited_by(p, False), ever_visited_stops))) /
+                p.nickname: round(len(list(filter(lambda s: s in r and s.is_visited_by(p, False), ever_visited_stops))) /
                                   len(list(filter(lambda s: s in r, stops.values()))) * 100, 1) for p in players
             },
             **{
-                f'ev-{p.nickname}': round(len(list(filter(lambda s: s in r and s.visited_by(p), ever_visited_stops))) /
+                f'ev-{p.nickname}': round(len(list(filter(lambda s: s in r and s.is_visited_by(p), ever_visited_stops))) /
                                           len(list(filter(lambda s: s in r, stops.values()))) * 100, 1) for p in players
             },
         } for r in regions.values()},
@@ -412,7 +412,7 @@ def create_route_map(line: Line, db: Database, all_variants: bool) -> None:
 
 
 def generate_map(db: Database) -> folium.Map:
-    documented_visited_stops: list[Stop] = list(filter(lambda s: s.visited(include_ev=False), db.stops.values()))
+    documented_visited_stops: list[Stop] = list(filter(lambda s: s.is_visited(include_ev=False), db.stops.values()))
     visible_stops = documented_visited_stops if len(documented_visited_stops) > 0 else db.stops.values()
     avg_lat = (min(s.location.latitude for s in visible_stops) + max(s.location.latitude for s in visible_stops)) / 2
     avg_lon = (min(s.location.longitude for s in visible_stops) + max(s.location.longitude for s in visible_stops)) / 2
@@ -423,13 +423,13 @@ def generate_map(db: Database) -> folium.Map:
         stop_visits: list[Discovery] = sorted(stop.visits)
         # noinspection PyUnresolvedReferences
         classes: str = ' '.join(
-            [f'v-{visit.name.lower()}' for visit in stop_visits] +
-            [f'ev-{visit.name.lower()}' for visit in stop_visits if visit.date == '2000-01-01'] +
+            [f'v-{visit.item.nickname.lower()}' for visit in stop_visits] +
+            [f'ev-{visit.item.nickname.lower()}' for visit in stop_visits if not visit.date] +
             [f'r-{region.short_name}' for region in stop.regions] +
             [f'tp-{player.nickname.lower()}' for _, player, _ in stop.terminals_progress]
         )
         visited_label: str = '<br>'.join(
-            [f'visited by {visit.name} {f'on {visit.date}' if visit.date != '2000-01-01' else 'a long time ago'}'
+            [f'visited by {visit.item.nickname} {f'on {visit.date}' if visit.date else 'a long time ago'}'
              for visit in sorted(stop.visits)]) if stop.visits else 'not yet visited'
         terminal_progress_label: str = '<br>'.join([f'{player.nickname}\'s closest {kind} point to {terminal.name} '
                                                     for kind, player, terminal in stop.terminals_progress])

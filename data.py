@@ -3,8 +3,8 @@ import json
 import os
 import re
 from abc import ABC
-from typing import Any, Callable, Literal, Iterable, Self, TypeVar, Union
-from util import geopoint
+from typing import Any, Callable, Generic, Literal, Iterable, Self, TypeVar, Union
+from util import geopoint, RichComparisonT, SupportsDunderGT
 
 T = TypeVar('T')
 C = TypeVar('C')
@@ -34,17 +34,24 @@ class JsonSerializable(ABC):
         return obj.__json_entry__(db)
 
 
-class Discovery:
-    def __init__(self, name: str, date: str):
-        self.name: str = name
+class Discovery(Generic[RichComparisonT]):
+    def __init__(self, item: RichComparisonT, date: str = ''):
+        self.item: RichComparisonT = item
         self.date: str = date
 
+    def date_known(self) -> bool:
+        return self.date != ''
+
     def __hash__(self):
-        return hash(self.name) + hash(self.date)
+        return hash(self.item) + hash(self.date)
 
     def __lt__(self, other: Self):
-        return False if not isinstance(other, type(self)) else (
-            self.date < other.date if self.date != other.date else self.name > other.name)
+        if not isinstance(other, type(self)):
+            return False
+        if self.date != other.date:
+            return (self.date if self.date else '0') < (other.date if other.date else '0')
+        else:
+            return self.item > other.item if isinstance(self.item, SupportsDunderGT) else not self.item < other.item
 
 
 class Stop(JsonSerializable):
@@ -69,18 +76,21 @@ class Stop(JsonSerializable):
     def in_any_of(self, towns: set[str]) -> bool:
         return '/' in self.full_name and self.full_name[:self.full_name.index('/')] in towns
 
-    def visited_by(self, player: Union[str, 'Player'], include_ev: bool = True) -> str | None:
-        name = player.nickname if isinstance(player, Player) else player
-        return next((visit.date for visit in self.visits
-                     if name == visit.name and (visit.date != '2000-01-01' or include_ev)), None)
+    def is_visited(self, include_ev: bool = True) -> bool:
+        return any(visit.date or include_ev for visit in self.visits)
 
-    def visited(self, include_ev: bool = True) -> bool:
-        return any(visit.date != '2000-01-01' or include_ev for visit in self.visits)
+    def is_visited_by(self, player: Union[str, 'Player'], include_ev: bool = True) -> bool:
+        name: str = player.nickname if isinstance(player, Player) else player
+        return any(name == visit.item.nickname and (visit.date_known() or include_ev) for visit in self.visits)
 
-    def add_visit(self, visit: Discovery):
-        if self.visited_by(visit.name):
-            print(f'{visit.name} already visited {self.short_name}, '
-                  f'remove the entry from {visit.date if visit.date != '2000-01-01' else 'her EV file'}')
+    def date_visited_by(self, player: Union[str, 'Player'], include_ev: bool = True) -> str:
+        name: str = player.nickname if isinstance(player, Player) else player
+        return next((visit.date for visit in self.visits if name == visit.item.nickname and (visit.date_known() or include_ev)))
+
+    def add_visit(self, visit: Discovery['Player']):
+        if self.is_visited_by(visit.item):
+            print(f'{visit.item.nickname} already visited {self.short_name}, '
+                  f'remove the entry from {visit.date if visit.date else 'her EV file'}')
         self.visits.add(visit)
 
     def mark_closest_arrival(self, player: 'Player', terminal: 'Terminal'):
@@ -130,7 +140,7 @@ class Stop(JsonSerializable):
                 f'lt:{self.location.latitude},'
                 f'ln:{self.location.longitude},'
                 f'l:[{','.join(f'["{line}","{destination}"]' for line, destination in self.lines)}],'
-                f'{f'v:[{','.join(f'["{visit.name}","{visit.date if visit.date != '2000-01-01' else ''}"]'
+                f'{f'v:[{','.join(f'["{visit.item.nickname}","{visit.date}"]'
                                   for visit in sorted(self.visits))}],' if self.visits else ''}'
                 f'}},')
 
@@ -141,10 +151,16 @@ class AchievementProgress:
         self.description: str = 'Collect all of the following: '
         self.visited: int = visited
         self.total: int = total
-        self.completed: str | None = completed
+        self.completion_date: str | None = completed
 
     def percentage(self) -> int:
         return int(round(self.visited / self.total * 100))
+
+    def is_completed(self) -> bool:
+        return self.visited == self.total
+
+    def completion_date_known(self) -> bool:
+        return self.completion_date is not None and self.completion_date != ''
 
 
 class Achievements:
@@ -305,11 +321,11 @@ class Vehicle(JsonSerializable):
 
     def discovered_by(self, player: Union[str, 'Player']) -> str | None:
         name = player.nickname if isinstance(player, Player) else player
-        return next((visit.date for visit in self.discoveries if name == visit.name), None)
+        return next((visit.date for visit in self.discoveries if name == visit.item), None)
 
     def add_discovery(self, visit: Discovery):
-        if self.discovered_by(visit.name):
-            print(f'{visit.name} already discovered {self.vehicle_id}, remove the entry from {visit.date}')
+        if self.discovered_by(visit.item):
+            print(f'{visit.item} already discovered {self.vehicle_id}, remove the entry from {visit.date}')
         self.discoveries.add(visit)
 
     @staticmethod
@@ -325,7 +341,7 @@ class Vehicle(JsonSerializable):
                 f'c:"{self.carrier.symbol}",'
                 f'{f'i:{f'"{self.image_url}"'},' if self.image_url else ''}'
                 f'l:"{self.lore}",'
-                f'{f'd:[{','.join(f'["{visit.name}","{visit.date}"]'
+                f'{f'd:[{','.join(f'["{visit.item.nickname}","{visit.date}"]'
                                   for visit in sorted(self.discoveries))}],' if self.discoveries else ''}'
                 f'}},')
 
@@ -399,13 +415,13 @@ class Player(JsonSerializable):
         self.terminals_file: str = terminals_file
         self.vehicles_file: str = vehicles_file
         self.__achievements__: Achievements = Achievements()
-        self.__vehicles__: list[tuple[Vehicle, str]] = []
+        self.__vehicles__: list[Discovery[Vehicle]] = []
 
     def add_stop(self, s: Stop) -> None:
         self.__achievements__.add_stop(s)
 
     def add_vehicle(self, v: Vehicle, date: str) -> None:
-        self.__vehicles__.append((v, date))
+        self.__vehicles__.append(Discovery(v, date))
 
     def get_achievements(self, stops: dict[str, Stop], stop_groups: dict[str, set[str]]) -> list[AchievementProgress]:
         prog = []
@@ -413,18 +429,18 @@ class Player(JsonSerializable):
             visited = len(self.__achievements__.stop_groups[group])
             total = len(stop_groups[group])
             if visited == total:
-                date = max(s.visited_by(self) for s in self.__achievements__.stop_groups[group])
+                date = max(s.date_visited_by(self) for s in self.__achievements__.stop_groups[group])
                 prog.append(AchievementProgress(group, visited, total, date))
             else:
                 prog.append(AchievementProgress(group, visited, total))
             prog[-1].description += ', '.join(
                 sorted(s.short_name for s in stops.values() if s.full_name == group))
-        return sorted(prog, key=lambda p: (p.percentage(), p.completed), reverse=True)
+        return sorted(prog, key=lambda p: (p.percentage(), p.completion_date), reverse=True)
 
     def get_n_achievements(self, stops: dict[str, Stop], stop_groups: dict[str, set[str]]) -> int:
-        return len(list(filter(lambda s: s.visited == s.total, self.get_achievements(stops, stop_groups))))
+        return len(list(filter(lambda ap: ap.visited == ap.total, self.get_achievements(stops, stop_groups))))
 
-    def get_vehicles(self) -> Iterable[tuple[Vehicle, str]]:
+    def get_vehicles(self) -> Iterable[Discovery[Vehicle]]:
         return reversed(self.__vehicles__)
 
     def get_n_vehicles(self) -> int:
@@ -453,9 +469,12 @@ class Player(JsonSerializable):
     def __json_entry__(self, db: 'Database' = None) -> str:
         stops: dict[str, Stop] = db.stops if db else {}
         return (f'"{self.nickname}":{{\n'
-                f'v:[{','.join(sorted(f'"{v[0].vehicle_id}"' for v in self.get_vehicles()))}],\n'
-                f's:[{','.join(sorted(f'"{s.short_name}"' for s in stops.values() if s.visited_by(self)))}],\n'
+                f'v:[{','.join(sorted(f'"{v.item.vehicle_id}"' for v in self.get_vehicles()))}],\n'
+                f's:[{','.join(sorted(f'"{s.short_name}"' for s in stops.values() if s.is_visited_by(self)))}],\n'
                 f'}},')
+
+    def __lt__(self, other):
+        return self.nickname < other.nickname if isinstance(other, type(self)) else False
 
 
 class Region:

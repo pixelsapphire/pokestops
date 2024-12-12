@@ -3,13 +3,26 @@ import platform
 import subprocess
 import zipfile
 from math import atan2, pi
-from typing import Any, Protocol, Union
+from typing import Any, Protocol, TypeVar, Union, runtime_checkable
+
+TContra = TypeVar("TContra", contravariant=True)
 
 
 class FloatVectorLike(Protocol):
-    def __getitem__(self, index: int) -> float:
-        ...
+    def __getitem__(self, index: int) -> float: ...
 
+
+@runtime_checkable
+class SupportsDunderLT(Protocol[TContra]):
+    def __lt__(self, other: TContra, /) -> bool: ...
+
+
+@runtime_checkable
+class SupportsDunderGT(Protocol[TContra]):
+    def __gt__(self, other: TContra, /) -> bool: ...
+
+
+RichComparisonT = TypeVar("RichComparisonT", bound=SupportsDunderLT[Any] | SupportsDunderGT[Any])
 
 __roman_num__: dict[int, str] = {1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V', 6: 'VI', 7: 'VII', 8: 'VIII', 9: 'IX', 10: 'X'}
 
