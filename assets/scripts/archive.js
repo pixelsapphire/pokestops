@@ -72,6 +72,7 @@ function selectLine(linePreview, ctrl) {
         const strokeWidth = 6;
         for (const route of line.r) {
             const routeImage = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            routeImage.setAttribute('preserveAspectRatio', 'xMinYMin meet');
             let y = -stopSpacing / 2;
             const stopsAxis = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
             Object.entries({

@@ -208,6 +208,7 @@ a {
 .line-destination {
     padding-left: min(1vh, 1dvw);
     padding-right: min(1.5vh, 1.5dvw);
+    font-size: min(1.75vh, 1.75dvw);
 }
 
 #stop-coordinates {
@@ -266,7 +267,7 @@ a {
 
 #line-route {
     font-style: italic;
-    font-size: 80%;
+    font-size: min(1.6vh, 1.6dvw);
 }
 
 #line-routes {
@@ -278,7 +279,8 @@ a {
 
 #line-routes svg {
     margin-bottom: min(4vh, 4dvw);
-    max-width: 20vw;
+    max-width: 23vw;
+    height: auto;
 }
 
 #vehicles-index {
