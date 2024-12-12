@@ -194,101 +194,108 @@ def update_gtfs_data(first_update: bool, initial_db: Database) -> None:
         make_update_report(old_db, initial_db)
 
 
-def process_players_data(players: list[Player], stops: dict[str, Stop],
-                         terminals: list[Terminal], vehicles: dict[str, Vehicle]):
-    for player in players:
+def get_csv_rows(file: str | os.PathLike[str]) -> tuple[list[list[str]], list[list[str]]]:
+    with open(file, 'r') as f:
+        reader = csv.reader(f)
+        next(reader)
+        rows: list[list[str]] = [row for row in reader if len(row) > 0]
+        data_rows: list[list[str]] = []
+        comment_rows: list[list[str]] = []
+        for row in rows:
+            comment_rows.append(row) if row[0].startswith('#') else data_rows.append(row)
+        return data_rows, comment_rows
+
+
+def process_players_data(db: Database):
+    for player in db.players:
         player.init_files()
-        with open(player.stops_file, 'r') as file:
-            reader = csv.reader(file)
-            next(reader)
-            for row in reader:
-                if len(row) == 0:
-                    continue
-                elif not row[0].lstrip().startswith('#'):
-                    stop = stops.get(row[0])
-                    if stop:
-                        stop.add_visit(Discovery(player, row[1]))
-                        player.add_stop(stop)
-                    else:
-                        print(f'Stop {row[0].lstrip()} not found, remove {player.nickname}\'s entry from her save file')
+
+        stop_rows, stop_comments = get_csv_rows(player.stops_file)
+        for row in stop_rows:
+            stop = db.stops.get(row[0])
+            if stop:
+                stop.add_visit(Discovery(player, row[1]))
+                player.add_stop(stop)
+            else:
+                print(f'Stop {row[0]} not found, remove {player.nickname}\'s entry from her save file')
+        for row in stop_comments:
+            stop_id = row[0].replace('#', '').lstrip()
+            if db.stops.get(stop_id):
+                print(f'Found a commented out {player.nickname}\'s {stop_id} save file entry, restore it')
+
+        ev_stop_rows, ev_stop_comments = get_csv_rows(player.ev_file)
+        for row in ev_stop_rows:
+            stop = db.stops.get(row[0])
+            if stop:
+                stop.add_visit(Discovery(player))
+                player.add_stop(stop)
+            else:
+                print(f'Stop {row[0]} not found, remove {player.nickname}\'s entry from her EV file')
+        for row in ev_stop_comments:
+            stop_id = row[0].replace('#', '').lstrip()
+            if db.stops.get(stop_id):
+                print(f'Found a commented out {player.nickname}\'s {stop_id} EV file entry, restore it')
+
+        terminal_rows, _ = get_csv_rows(player.terminals_file)
+        for row in terminal_rows:
+            terminal = next((t for t in db.terminals if t.id == row[0]), None)
+            if terminal:
+                closest_arrival: Stop = db.stops.get(row[1])
+                closest_departure: Stop = db.stops.get(row[2])
+                terminal.add_player_progress(player, closest_arrival, closest_departure)
+            else:
+                print(f'Terminal {row[0]} not found, remove {player.nickname}\'s entry from her terminals file')
+
+        line_rows, line_comments = get_csv_rows(player.lines_file)
+        for row in line_rows:
+            line = db.lines.get(row[0])
+            if line:
+                player.add_line(line, row[1])
+            else:
+                print(f'Line {row[0]} not found, remove {player.nickname}\'s entry from her lines file')
+        for row in line_comments:
+            line_id = row[0].replace('#', '').lstrip()
+            if db.lines.get(line_id):
+                print(f'Found a commented out {player.nickname}\'s {line_id} lines file entry, restore it')
+
+        vehicle_rows, vehicle_comments = get_csv_rows(player.vehicles_file)
+        for row in vehicle_rows:
+            vehicle = db.vehicles.get(row[0])
+            if vehicle:
+                vehicle.add_discovery(Discovery(player, row[1]))
+                player.add_vehicle(vehicle, row[1])
+            else:
+                combined: str | None = next((v for v in db.vehicles.keys() if
+                                             v.startswith(f'{row[0]}+') or v.endswith(f'+{row[0]}') or
+                                             v == f'{"+".join(row[0].split("+")[::-1])}'), None)
+                if combined:
+                    print(f'Vehicle #{row[0]} not found, but there is vehicle #{combined},'
+                          f' modify {player.nickname}\'s entry in her vehicles file')
                 else:
-                    stop_id = row[0].replace('#', '').lstrip()
-                    if stops.get(stop_id):
-                        print(f'Found a commented out {player.nickname}\'s {stop_id} save file entry, restore it')
-        with open(player.ev_file) as file:
-            for stop_id in map(lambda s: s.strip(), file.readlines()):
-                if len(stop_id) == 0:
-                    continue
-                elif not stop_id.startswith('#'):
-                    stop = stops.get(stop_id)
-                    if stop:
-                        stop.add_visit(Discovery(player))
-                        player.add_stop(stop)
-                    else:
-                        print(f'Stop {stop_id} not found, remove {player.nickname}\'s entry from her EV file')
-                else:
-                    stop_id = stop_id.replace('#', '').lstrip()
-                    if stops.get(stop_id):
-                        print(f'Found a commented out {player.nickname}\'s {stop_id} EV file entry, restore it')
-        with open(player.terminals_file, 'r') as file:
-            reader = csv.reader(file)
-            next(reader)
-            for row in reader:
-                if len(row) == 0:
-                    continue
-                elif not row[0].lstrip().startswith('#'):
-                    terminal = next((t for t in terminals if t.id == row[0]), None)
-                    if terminal:
-                        closest_arrival: Stop = stops.get(row[1])
-                        closest_departure: Stop = stops.get(row[2])
-                        terminal.add_player_progress(player, closest_arrival, closest_departure)
-                    else:
-                        print(f'Terminal {row[0]} not found, remove {player.nickname}\'s entry from her terminals file')
-        with open(player.vehicles_file, 'r') as file:
-            reader = csv.reader(file)
-            next(reader)
-            for row in reader:
-                if len(row) == 0:
-                    continue
-                elif not row[0].lstrip().startswith('#'):
-                    vehicle_id = row[0].lstrip()
-                    vehicle = vehicles.get(vehicle_id)
-                    if vehicle:
-                        vehicle.add_discovery(Discovery(player.nickname, row[1]))
-                        player.add_vehicle(vehicle, row[1])
-                    else:
-                        combined: str | None = next((v for v in vehicles.keys() if
-                                                     v.startswith(f'{vehicle_id}+') or v.endswith(f'+{vehicle_id}') or
-                                                     v == f'{'+'.join(vehicle_id.split('+')[::-1])}'), None)
-                        if combined:
-                            print(f'Vehicle #{vehicle_id} not found, but there is vehicle #{combined},'
-                                  f' modify {player.nickname}\'s entry in her vehicles file')
-                        else:
-                            print(f'Vehicle #{vehicle_id} not found, remove {player.nickname}\'s '
-                                  f'entry from her vehicles file or add a definition to vehicles.csv')
-                else:
-                    vehicle_id = row[0].replace('#', '').lstrip()
-                    if vehicles.get(vehicle_id):
-                        print(f'Found a commented out {player.nickname}\'s {vehicle_id} vehicles file entry, restore it')
+                    print(f'Vehicle #{row[0]} not found, remove {player.nickname}\'s '
+                          f'entry from her vehicles file or add a definition to {ref.rawdata_vehicles}')
+        for row in vehicle_comments:
+            vehicle_id = row[0].replace('#', '').lstrip()
+            if db.vehicles.get(vehicle_id):
+                print(f'Found a commented out {player.nickname}\'s {vehicle_id} vehicles file entry, restore it')
 
 
 def load_data(initial_db: Database) -> Database:
     players: list[Player] = initial_db.players
     regions: dict[str, Region] = initial_db.regions
-    district: Region = initial_db.district
     if not initial_db.has_collection('stops') or not initial_db.has_collection('lines'):
         initial_db.add_collection('stops', (stops_and_groups := Stop.read_stops(ref.rawdata_stops, initial_db))[0])
         initial_db.add_collection('stop_groups', stops_and_groups[1])
         initial_db.add_collection('lines', Line.read_dict(ref.rawdata_lines))
     stops: dict[str, Stop] = initial_db.stops
-    stop_groups: dict[str, set[str]] = initial_db.stop_groups
     terminals: list[Terminal] = Terminal.read_list(ref.rawdata_terminals, stops)
     carriers: dict[str, Carrier] = Carrier.read_dict(ref.rawdata_carriers)
     models: dict[str, VehicleModel] = VehicleModel.read_dict(ref.rawdata_vehicle_models)
     vehicles: dict[str, Vehicle] = Vehicle.read_dict(ref.rawdata_vehicles, carriers, models)
-    lines: dict[str, Line] = initial_db.lines
 
-    process_players_data(players, stops, terminals, vehicles)
+    initial_db.add_collection('terminals', terminals)
+    initial_db.add_collection('vehicles', vehicles)
+    process_players_data(initial_db)
 
     ever_visited_stops: list[Stop] = list(filter(lambda s: s.is_visited(), stops.values()))
     progress: dict[str, dict[str, float]] = {
@@ -308,7 +315,8 @@ def load_data(initial_db: Database) -> Database:
         }
     }
 
-    return Database(players, progress, stops, stop_groups, terminals, carriers, regions, district, vehicles, models, lines)
+    return Database(players, progress, stops, initial_db.stop_groups, terminals,
+                    carriers, regions, initial_db.district, vehicles, models, initial_db.lines)
 
 
 def next_midpoint(previous_dir: vector2f, current_point: vector2f, next_point: vector2f,

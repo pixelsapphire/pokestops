@@ -406,22 +406,27 @@ class Line(JsonSerializable):
 
 class Player(JsonSerializable):
     def __init__(self, nickname: str, primary_color: str, tint_color: str,
-                 stops_file: str, ev_file: str, terminals_file: str, vehicles_file: str):
+                 stops_file: str, ev_file: str, terminals_file: str, lines_file: str, vehicles_file: str):
         self.nickname: str = nickname
         self.primary_color: str = primary_color
         self.tint_color: str = tint_color
         self.stops_file: str = stops_file
         self.ev_file: str = ev_file
         self.terminals_file: str = terminals_file
+        self.lines_file: str = lines_file
         self.vehicles_file: str = vehicles_file
         self.__achievements__: Achievements = Achievements()
+        self.__lines__: list[Discovery[Line]] = []
         self.__vehicles__: list[Discovery[Vehicle]] = []
 
-    def add_stop(self, s: Stop) -> None:
-        self.__achievements__.add_stop(s)
+    def add_stop(self, stop: Stop) -> None:
+        self.__achievements__.add_stop(stop)
 
-    def add_vehicle(self, v: Vehicle, date: str) -> None:
-        self.__vehicles__.append(Discovery(v, date))
+    def add_line(self, line: Line, date: str) -> None:
+        self.__lines__.append(Discovery(line, date))
+
+    def add_vehicle(self, vehicle: Vehicle, date: str) -> None:
+        self.__vehicles__.append(Discovery(vehicle, date))
 
     def get_achievements(self, stops: dict[str, Stop], stop_groups: dict[str, set[str]]) -> list[AchievementProgress]:
         prog = []
@@ -440,6 +445,9 @@ class Player(JsonSerializable):
     def get_n_achievements(self, stops: dict[str, Stop], stop_groups: dict[str, set[str]]) -> int:
         return len(list(filter(lambda ap: ap.visited == ap.total, self.get_achievements(stops, stop_groups))))
 
+    def get_lines(self) -> Iterable[Discovery[Line]]:
+        return reversed(self.__lines__)
+
     def get_vehicles(self) -> Iterable[Discovery[Vehicle]]:
         return reversed(self.__vehicles__)
 
@@ -457,6 +465,7 @@ class Player(JsonSerializable):
         self.init_file(self.stops_file, 'stop_id,date_visited\n')
         self.init_file(self.ev_file)
         self.init_file(self.terminals_file, 'terminal_id,closest_arrival,closest_departure\n')
+        self.init_file(self.lines_file, 'line_number,date_discovered\n')
         self.init_file(self.vehicles_file, 'vehicle_id,date_discovered\n')
 
     @staticmethod
