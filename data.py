@@ -4,6 +4,8 @@ import os
 import re
 from abc import ABC
 from typing import Any, Callable, Generic, Literal, Iterable, Self, TypeVar, Union
+
+import ref
 from util import geopoint, RichComparisonT, SupportsDunderGT
 
 T = TypeVar('T')
@@ -405,16 +407,16 @@ class Line(JsonSerializable):
 
 
 class Player(JsonSerializable):
-    def __init__(self, nickname: str, primary_color: str, tint_color: str,
-                 stops_file: str, ev_file: str, terminals_file: str, lines_file: str, vehicles_file: str):
+    def __init__(self, nickname: str, primary_color: str, tint_color: str):
+        nickname_lowercase: str = nickname.lower()
         self.nickname: str = nickname
         self.primary_color: str = primary_color
         self.tint_color: str = tint_color
-        self.stops_file: str = stops_file
-        self.ev_file: str = ev_file
-        self.terminals_file: str = terminals_file
-        self.lines_file: str = lines_file
-        self.vehicles_file: str = vehicles_file
+        self.stops_file: str = f'{ref.playerdata_path}/{nickname_lowercase}/{ref.playerdata_file_stops}'
+        self.ev_file: str = f'{ref.playerdata_path}/{nickname_lowercase}/{ref.playerdata_file_ev_stops}'
+        self.terminals_file: str = f'{ref.playerdata_path}/{nickname_lowercase}/{ref.playerdata_file_terminals}'
+        self.lines_file: str = f'{ref.playerdata_path}/{nickname_lowercase}/{ref.playerdata_file_lines}'
+        self.vehicles_file: str = f'{ref.playerdata_path}/{nickname_lowercase}/{ref.playerdata_file_vehicles}'
         self.__achievements__: Achievements = Achievements()
         self.__lines__: list[Discovery[Line]] = []
         self.__vehicles__: list[Discovery[Vehicle]] = []

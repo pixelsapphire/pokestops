@@ -20,6 +20,13 @@ lexmap_polish: str = 'assets/lang/alphabet/pl_pl.txt'
 
 mapdata_path: str = 'data/map'
 
+playerdata_file_ev_stops: str = 'ev_stops.csv'
+playerdata_file_lines: str = 'lines.csv'
+playerdata_file_stops: str = 'stops.csv'
+playerdata_file_terminals: str = 'terminals.csv'
+playerdata_file_vehicles: str = 'vehicles.csv'
+playerdata_path: str = 'playerdata'
+
 report_gtfs: str = 'reports/gtfs_update.txt'
 
 stylesheet_archive: str = 'assets/stylesheets/archive.css'
