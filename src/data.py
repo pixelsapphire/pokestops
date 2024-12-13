@@ -1,12 +1,13 @@
-import csv
+from __future__ import annotations
 import json
-import os
+import ref
 import re
 from abc import ABC
-from typing import Any, Callable, Generic, Literal, Iterable, Self, TypeVar, Union
+from typing import Callable, Generic, Literal, Self, TYPE_CHECKING
+from util import *
 
-import ref
-from util import geopoint, RichComparisonT, SupportsDunderGT
+if TYPE_CHECKING:
+    from player import Player
 
 T = TypeVar('T')
 C = TypeVar('C')
@@ -28,11 +29,11 @@ def __read_collection__(source: str, identity: C, mapper: Callable[..., T], comb
 
 
 class JsonSerializable(ABC):
-    def __json_entry__(self, db: Union['Database', None] = None) -> str:
+    def __json_entry__(self, db: Database | None = None) -> str:
         pass
 
     @staticmethod
-    def json_entry(obj: 'JsonSerializable', db: Union['Database', None] = None) -> str:
+    def json_entry(obj: JsonSerializable, db: Database | None = None) -> str:
         return obj.__json_entry__(db)
 
 
@@ -40,9 +41,6 @@ class Discovery(Generic[RichComparisonT]):
     def __init__(self, item: RichComparisonT, date: str = ''):
         self.item: RichComparisonT = item
         self.date: str = date
-
-    def date_known(self) -> bool:
-        return self.date != ''
 
     def __hash__(self):
         return hash(self.item) + hash(self.date)
@@ -54,6 +52,9 @@ class Discovery(Generic[RichComparisonT]):
             return (self.date if self.date else '0') < (other.date if other.date else '0')
         else:
             return self.item > other.item if isinstance(self.item, SupportsDunderGT) else not self.item < other.item
+
+    def date_known(self) -> bool:
+        return self.date != ''
 
 
 class Stop(JsonSerializable):
@@ -81,24 +82,26 @@ class Stop(JsonSerializable):
     def is_visited(self, include_ev: bool = True) -> bool:
         return any(visit.date or include_ev for visit in self.visits)
 
-    def is_visited_by(self, player: Union[str, 'Player'], include_ev: bool = True) -> bool:
+    def is_visited_by(self, player: str | Player, include_ev: bool = True) -> bool:
+        from player import Player
         name: str = player.nickname if isinstance(player, Player) else player
         return any(name == visit.item.nickname and (visit.date_known() or include_ev) for visit in self.visits)
 
-    def date_visited_by(self, player: Union[str, 'Player'], include_ev: bool = True) -> str:
+    def date_visited_by(self, player: str | Player, include_ev: bool = True) -> str:
+        from player import Player
         name: str = player.nickname if isinstance(player, Player) else player
         return next((visit.date for visit in self.visits if name == visit.item.nickname and (visit.date_known() or include_ev)))
 
-    def add_visit(self, visit: Discovery['Player']):
+    def add_visit(self, visit: Discovery[Player]):
         if self.is_visited_by(visit.item):
             print(f'{visit.item.nickname} already visited {self.short_name}, '
                   f'remove the entry from {visit.date if visit.date else 'her EV file'}')
         self.visits.add(visit)
 
-    def mark_closest_arrival(self, player: 'Player', terminal: 'Terminal'):
+    def mark_closest_arrival(self, player: Player, terminal: Terminal):
         self.terminals_progress.append(('arrival', player, terminal))
 
-    def mark_closest_departure(self, player: 'Player', terminal: 'Terminal'):
+    def mark_closest_departure(self, player: Player, terminal: Terminal):
         self.terminals_progress.append(('departure', player, terminal))
 
     def marker(self) -> str:
@@ -115,7 +118,7 @@ class Stop(JsonSerializable):
             return 'E'
 
     @staticmethod
-    def read_stops(source: str, db: 'Database') -> tuple[dict[str, 'Stop'], dict[str, set[str]]]:
+    def read_stops(source: str, db: Database) -> tuple[dict[str, Stop], dict[str, set[str]]]:
         print(f'  Reading stops data from {source}... ', end='')
         stops: dict[str, Stop] = {}
         stop_groups: dict[str, set[str]] = {}
@@ -147,36 +150,8 @@ class Stop(JsonSerializable):
                 f'}},')
 
 
-class AchievementProgress:
-    def __init__(self, name: str, visited: int, total: int, completed: str | None = None):
-        self.name: str = name
-        self.description: str = 'Collect all of the following: '
-        self.visited: int = visited
-        self.total: int = total
-        self.completion_date: str | None = completed
-
-    def percentage(self) -> int:
-        return int(round(self.visited / self.total * 100))
-
-    def is_completed(self) -> bool:
-        return self.visited == self.total
-
-    def completion_date_known(self) -> bool:
-        return self.completion_date is not None and self.completion_date != ''
-
-
-class Achievements:
-    def __init__(self):
-        self.stop_groups: dict[str, set[Stop]] = {}
-
-    def add_stop(self, s: Stop) -> None:
-        if s.full_name not in self.stop_groups:
-            self.stop_groups[s.full_name] = set()
-        self.stop_groups[s.full_name].add(s)
-
-
 class TerminalProgress:
-    def __init__(self, terminal: 'Terminal', player: 'Player', closest_arrival: Stop, closest_departure: Stop):
+    def __init__(self, terminal: Terminal, player: Player, closest_arrival: Stop, closest_departure: Stop):
         self.terminal: Terminal = terminal
         self.player: Player = player
         self.closest_arrival: Stop = closest_arrival
@@ -205,17 +180,23 @@ class Terminal(JsonSerializable):
         self.departure_stop: Stop = departure_stop
         self.progress: list[TerminalProgress] = []
 
-    def reached_by(self, player: 'Player') -> bool:
+    def __hash__(self):
+        return hash(self.id)
+
+    def __eq__(self, other):
+        return self.id == other.id if isinstance(other, type(self)) else False
+
+    def reached_by(self, player: Player) -> bool:
         return any(p.reached() for p in self.progress if p.player == player)
 
     def anybody_reached(self) -> bool:
         return any(p.reached() for p in self.progress)
 
-    def completed_by(self, player: 'Player') -> bool:
+    def completed_by(self, player: Player) -> bool:
         progress: TerminalProgress = next((p for p in self.progress if p.player == player), None)
         return progress and progress.completed()
 
-    def add_player_progress(self, player: 'Player', closest_arrival: Stop, closest_departure: Stop) -> None:
+    def add_player_progress(self, player: Player, closest_arrival: Stop, closest_departure: Stop) -> None:
         progress: TerminalProgress = TerminalProgress(self, player, closest_arrival, closest_departure)
         self.progress.append(progress)
         if not progress.arrived():
@@ -223,14 +204,8 @@ class Terminal(JsonSerializable):
         if not progress.departed():
             closest_departure.mark_closest_departure(player, self)
 
-    def __hash__(self):
-        return hash(self.id)
-
-    def __eq__(self, other):
-        return self.id == other.id if isinstance(other, type(self)) else False
-
     @staticmethod
-    def read_list(source: str, stops: dict[str, Stop]) -> list['Terminal']:
+    def read_list(source: str, stops: dict[str, Stop]) -> list[Terminal]:
         print(f'  Reading terminals data from {source}... ', end='')
         constructor = lambda *row: Terminal(row[0], row[1], row[2], row[3], stops.get(row[4]), stops.get(row[5]))
         # warning caused by Pycharm issue PY-70668
@@ -258,7 +233,7 @@ class Carrier(JsonSerializable):
         return self.symbol == other.symbol if isinstance(other, type(self)) else False
 
     @staticmethod
-    def read_dict(source: str) -> dict[str, 'Carrier']:
+    def read_dict(source: str) -> dict[str, Carrier]:
         print(f'  Reading carriers data from {source}... ', end='')
         return __read_collection__(source, {}, Carrier, lambda c, v: c.update({v.symbol: v}))
 
@@ -315,13 +290,14 @@ class Vehicle(JsonSerializable):
     def __eq__(self, other):
         return self.vehicle_id == other.vehicle_id if isinstance(other, type(self)) else False
 
-    def __cmp_key__(self):
-        return int(self.vehicle_id) if self.vehicle_id.isdigit() else int(self.vehicle_id[:self.vehicle_id.index('+')])
-
     def __lt__(self, other):
         return self.__cmp_key__() < other.__cmp_key__() if isinstance(other, type(self)) else False
 
-    def discovered_by(self, player: Union[str, 'Player']) -> str | None:
+    def __cmp_key__(self):
+        return int(self.vehicle_id) if self.vehicle_id.isdigit() else int(self.vehicle_id[:self.vehicle_id.index('+')])
+
+    def discovered_by(self, player: str | Player) -> str | None:
+        from player import Player
         name = player.nickname if isinstance(player, Player) else player
         return next((visit.date for visit in self.discoveries if name == visit.item), None)
 
@@ -331,7 +307,7 @@ class Vehicle(JsonSerializable):
         self.discoveries.add(visit)
 
     @staticmethod
-    def read_dict(source: str, carriers: dict[str, Carrier], models: dict[str, VehicleModel]) -> dict[str, 'Vehicle']:
+    def read_dict(source: str, carriers: dict[str, Carrier], models: dict[str, VehicleModel]) -> dict[str, Vehicle]:
         print(f'  Reading vehicles data from {source}... ', end='')
         constructor = lambda *row: Vehicle(row[0], row[1], carriers.get(row[2]), models.get(row[3]), row[4], row[5])
         return __read_collection__(source, {}, constructor, lambda c, v: c.update({v.vehicle_id: v}))
@@ -358,6 +334,12 @@ class Line(JsonSerializable):
         self.text_color: str = text_color
         self.stops: list[list[str]] = stops
 
+    def __lt__(self, other):
+        return self.__cmp_key__() < other.__cmp_key__() if isinstance(other, type(self)) else False
+
+    def __cmp_key__(self):
+        return int(self.number) if self.number.isdigit() else int(re.sub(r'\D', '', self.number)) - 1000
+
     def kind(self) -> str:
         if self.number.startswith('T'):
             return 'substitute'
@@ -383,17 +365,11 @@ class Line(JsonSerializable):
         return 'suburban bus'
 
     @staticmethod
-    def read_dict(source: str) -> dict[str, 'Line']:
+    def read_dict(source: str) -> dict[str, Line]:
         print(f'  Reading routes data from {source}... ', end='')
         constructor = lambda *row: Line(row[2], row[3].split('|')[0], row[4].split('|')[0].split('^')[0], row[6], row[7],
                                         list(map(lambda seq: seq.split('&'), row[8].split('|'))))
         return __read_collection__(source, {}, constructor, lambda c, v: c.update({v.number: v}))
-
-    def __cmp_key__(self):
-        return int(self.number) if self.number.isdigit() else int(re.sub(r'\D', '', self.number)) - 1000
-
-    def __lt__(self, other):
-        return self.__cmp_key__() < other.__cmp_key__() if isinstance(other, type(self)) else False
 
     def __json_entry__(self, _=None) -> str:
         return (f'"{self.number}":{{'
@@ -406,88 +382,6 @@ class Line(JsonSerializable):
                 f'}},')
 
 
-class Player(JsonSerializable):
-    def __init__(self, nickname: str, primary_color: str, tint_color: str):
-        nickname_lowercase: str = nickname.lower()
-        self.nickname: str = nickname
-        self.primary_color: str = primary_color
-        self.tint_color: str = tint_color
-        self.stops_file: str = f'{ref.playerdata_path}/{nickname_lowercase}/{ref.playerdata_file_stops}'
-        self.ev_file: str = f'{ref.playerdata_path}/{nickname_lowercase}/{ref.playerdata_file_ev_stops}'
-        self.terminals_file: str = f'{ref.playerdata_path}/{nickname_lowercase}/{ref.playerdata_file_terminals}'
-        self.lines_file: str = f'{ref.playerdata_path}/{nickname_lowercase}/{ref.playerdata_file_lines}'
-        self.vehicles_file: str = f'{ref.playerdata_path}/{nickname_lowercase}/{ref.playerdata_file_vehicles}'
-        self.__achievements__: Achievements = Achievements()
-        self.__lines__: list[Discovery[Line]] = []
-        self.__vehicles__: list[Discovery[Vehicle]] = []
-
-    def add_stop(self, stop: Stop) -> None:
-        self.__achievements__.add_stop(stop)
-
-    def add_line(self, line: Line, date: str) -> None:
-        self.__lines__.append(Discovery(line, date))
-
-    def add_vehicle(self, vehicle: Vehicle, date: str) -> None:
-        self.__vehicles__.append(Discovery(vehicle, date))
-
-    def get_achievements(self, stops: dict[str, Stop], stop_groups: dict[str, set[str]]) -> list[AchievementProgress]:
-        prog = []
-        for group in self.__achievements__.stop_groups:
-            visited = len(self.__achievements__.stop_groups[group])
-            total = len(stop_groups[group])
-            if visited == total:
-                date = max(s.date_visited_by(self) for s in self.__achievements__.stop_groups[group])
-                prog.append(AchievementProgress(group, visited, total, date))
-            else:
-                prog.append(AchievementProgress(group, visited, total))
-            prog[-1].description += ', '.join(
-                sorted(s.short_name for s in stops.values() if s.full_name == group))
-        return sorted(prog, key=lambda p: (p.percentage(), p.completion_date), reverse=True)
-
-    def get_n_achievements(self, stops: dict[str, Stop], stop_groups: dict[str, set[str]]) -> int:
-        return len(list(filter(lambda ap: ap.visited == ap.total, self.get_achievements(stops, stop_groups))))
-
-    def get_lines(self) -> Iterable[Discovery[Line]]:
-        return reversed(self.__lines__)
-
-    def get_vehicles(self) -> Iterable[Discovery[Vehicle]]:
-        return reversed(self.__vehicles__)
-
-    def get_n_vehicles(self) -> int:
-        return len(self.__vehicles__)
-
-    @staticmethod
-    def init_file(path: str, initial_content: str = '') -> None:
-        if not os.path.exists(path):
-            os.makedirs(os.path.dirname(path), exist_ok=True)
-            with open(path, 'x') as new_file:
-                new_file.write(initial_content)
-
-    def init_files(self) -> None:
-        self.init_file(self.stops_file, 'stop_id,date_visited\n')
-        self.init_file(self.ev_file)
-        self.init_file(self.terminals_file, 'terminal_id,closest_arrival,closest_departure\n')
-        self.init_file(self.lines_file, 'line_number,date_discovered\n')
-        self.init_file(self.vehicles_file, 'vehicle_id,date_discovered\n')
-
-    @staticmethod
-    def read_list(source: str) -> list['Player']:
-        print(f'  Reading players data from {source}... ', end='')
-        # warning caused by Pycharm issue PY-70668
-        # noinspection PyTypeChecker
-        return __read_collection__(source, [], Player, list.append)
-
-    def __json_entry__(self, db: 'Database' = None) -> str:
-        stops: dict[str, Stop] = db.stops if db else {}
-        return (f'"{self.nickname}":{{\n'
-                f'v:[{','.join(sorted(f'"{v.item.vehicle_id}"' for v in self.get_vehicles()))}],\n'
-                f's:[{','.join(sorted(f'"{s.short_name}"' for s in stops.values() if s.is_visited_by(self)))}],\n'
-                f'}},')
-
-    def __lt__(self, other):
-        return self.nickname < other.nickname if isinstance(other, type(self)) else False
-
-
 class Region:
     def __init__(self, number: int, short_name: str, full_name: str, predicate: Callable[[Stop], bool]):
         self.number: int = number
@@ -495,10 +389,6 @@ class Region:
         self.full_name: str = full_name
         self.predicate: Callable[[Stop], bool] = predicate
         self.stops: set[Stop] = set()
-
-    def add_stop(self, s: Stop) -> None:
-        self.stops.add(s)
-        s.regions.append(self)
 
     def __contains__(self, stop: Stop) -> bool:
         return self.predicate(stop)
@@ -511,6 +401,10 @@ class Region:
 
     def __eq__(self, other):
         return self.short_name == other.short_name if isinstance(other, type(self)) else False
+
+    def add_stop(self, s: Stop) -> None:
+        self.stops.add(s)
+        s.regions.append(self)
 
     @staticmethod
     def __resolve_predicate__(predicate_object: dict[str, Any]) -> Callable[[Stop], bool]:
@@ -529,7 +423,7 @@ class Region:
             raise ValueError(f'Unknown predicate type: {predicate_type}')
 
     @staticmethod
-    def read_regions(source: str) -> tuple['Region', dict[str, 'Region']]:
+    def read_regions(source: str) -> tuple[Region, dict[str, Region]]:
         print(f'  Reading regions data from {source}... ', end='')
         with (open(source, 'r') as file):
             index = json.load(file)
@@ -571,7 +465,7 @@ class Database:
                 terminals: list[Terminal] | None = None, carriers: dict[str, Carrier] | None = None,
                 regions: dict[str, Region] | None = None, district: Region | None = None,
                 vehicles: dict[str, Vehicle] | None = None, models: dict[str, VehicleModel] | None = None,
-                routes: dict[str, Line] | None = None) -> 'Database':
+                routes: dict[str, Line] | None = None) -> Database:
         return Database(players or [], progress or {}, stops or {}, stop_groups or {}, terminals or [],
                         carriers or {}, regions or {}, district or Region(0, '', '', lambda _: False),
                         vehicles or {}, models or {}, routes or {})
@@ -596,3 +490,36 @@ class Database:
         stops = list(map(lambda stop_id: self.stops[stop_id], self.stop_groups[stop.full_name]))
         return geopoint(sum(s.location.latitude for s in stops) / len(stops),
                         sum(s.location.longitude for s in stops) / len(stops))
+
+    @staticmethod
+    def make_update_report(old_data: Database, new_data: Database) -> None:
+        added_stops: set[Stop] = {s for s in new_data.stops.values() if s not in old_data.stops.values()}
+        removed_stops: set[Stop] = {s for s in old_data.stops.values() if s not in new_data.stops.values()}
+        added_lines: set[str] = {r for r in new_data.lines.keys() if r not in old_data.lines.keys()}
+        removed_lines: set[str] = {r for r in old_data.lines.keys() if r not in new_data.lines.keys()}
+        changed_lines: set[str] = {r for r in new_data.lines.keys()
+                                   if r in old_data.lines.keys() and new_data.lines[r].stops != old_data.lines[r].stops}
+        if not added_stops and not removed_stops and not added_lines and not removed_lines and not changed_lines:
+            print('  No changes, no report created.')
+        else:
+            print('  Data has changed, creating report... ', end='')
+            lines: int = max(len(added_lines), len(removed_lines), len(changed_lines))
+            lexmap: dict[str, float] = create_lexicographic_mapping(file_to_string(ref.lexmap_polish))
+            line_key = lambda line: int(line) if line.isdigit() else int(re.sub(r'\D', '', line)) - lines
+            stop_key = lambda stop: lexicographic_sequence(f'{stop.full_name}{stop.short_name}', lexmap)
+            with open(prepare_path(ref.report_gtfs), 'w') as file:
+                file.write('GTFS database updated.\n')
+                if added_stops:
+                    file.write(f'Added stops:\n- {'\n- '.join(f'{s.full_name} [{s.short_name}]'
+                                                              for s in sorted(added_stops, key=stop_key))}\n')
+                if removed_stops:
+                    file.write(f'Removed stops:\n- {'\n- '.join(f'{s.full_name} [{s.short_name}]'
+                                                                for s in sorted(removed_stops, key=stop_key))}\n')
+                if added_lines:
+                    file.write(f'Added lines:\n- {"\n- ".join(sorted(added_lines, key=line_key))}\n')
+                if removed_lines:
+                    file.write(f'Removed lines:\n- {"\n- ".join(sorted(removed_lines, key=line_key))}\n')
+                if changed_lines:
+                    file.write(f'Changed lines:\n- {"\n- ".join(sorted(changed_lines, key=line_key))}\n')
+            print(f'Report stored in {ref.report_gtfs}!')
+            system_open(ref.report_gtfs)

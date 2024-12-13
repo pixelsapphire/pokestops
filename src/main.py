@@ -1,283 +1,9 @@
 import folium
-import requests
-import sqlite3
+import gtfs
 import sys
 from postprocess import *
 from uibuilder import *
 from util import *
-
-
-# noinspection SqlNoDataSourceInspection,DuplicatedCode,SqlInsertValues
-def create_gtfs_database() -> sqlite3.Connection:
-    print('    Creating temporary SQL database... ')
-    db: sqlite3.Connection = sqlite3.connect(':memory:')
-
-    with open(ref.rawdata_stops, 'r') as file:
-        print(f'      Reading stops data from {ref.rawdata_stops}... ', end='')
-        reader = csv.reader(file)
-        header_row = next(reader)
-        db.execute(f'CREATE TABLE stops ({", ".join(f'{col} TEXT' for col in header_row)})')
-        db.executemany(f'INSERT INTO stops VALUES ({','.join('?' * len(header_row))})', reader)
-        print('Done!')
-
-    with open(ref.rawdata_stop_times, 'r') as file:
-        print(f'      Reading stop times data from {ref.rawdata_stop_times}... ', end='')
-        reader = csv.reader(file)
-        header_row = next(reader)
-        db.execute(f'CREATE TABLE stop_times ({", ".join(f'{col} TEXT' for col in header_row)})')
-        db.executemany(f'INSERT INTO stop_times VALUES ({','.join('?' * len(header_row))})', reader)
-        print('Done!')
-
-    with open(ref.rawdata_trips, 'r') as file:
-        print(f'      Reading trips data from {ref.rawdata_trips}... ', end='')
-        reader = csv.reader(file)
-        header_row = next(reader)
-        db.execute(f'CREATE TABLE trips ({", ".join(f'{col} TEXT' for col in header_row)})')
-        db.executemany(f'INSERT INTO trips VALUES ({','.join('?' * len(header_row))})', reader)
-        print('Done!')
-
-    return db
-
-
-# noinspection SqlNoDataSourceInspection
-def attach_stop_lines(gtfs_db: sqlite3.Connection) -> None:
-    print('    Attaching line nubmers to stops... ', end='')
-    cursor: sqlite3.Cursor = gtfs_db.cursor()
-    cursor.execute('WITH stop_routes_groupped AS'
-                   '(WITH stop_routes_ungroupped AS '
-                   ' (SELECT stop_id, route_id, trip_headsign'
-                   '  FROM stop_times JOIN trips USING(trip_id)'
-                   '  WHERE trip_id LIKE \'%+\''
-                   '  GROUP BY stop_id, route_id, trip_headsign '
-                   '  ORDER BY CAST(route_id AS NUMBER))'
-                   ' SELECT stop_id, GROUP_CONCAT(route_id || \':\' || trip_headsign, \'&\') AS routes'
-                   ' FROM stop_routes_ungroupped'
-                   ' GROUP BY stop_id)'
-                   'SELECT stops.*, routes '
-                   'FROM stops JOIN stop_routes_groupped USING(stop_id)')
-
-    stops_header_row: list[str]
-    with open(ref.rawdata_stops, 'r') as file:
-        stops_header_row = next(csv.reader(file))
-
-    with open(prepare_path(ref.rawdata_stops), 'w') as file:
-        writer = csv.writer(file)
-        writer.writerow([*stops_header_row, 'routes'])
-        writer.writerows(cursor.fetchall())
-
-    cursor.close()
-    print('Done!')
-
-
-# noinspection SqlNoDataSourceInspection
-def attach_line_stops(gtfs_db: sqlite3.Connection) -> None:
-    print('    Attaching stop codes to lines... ', end='')
-    cursor: sqlite3.Cursor = gtfs_db.cursor()
-    cursor.execute('SELECT route_id, trip_id, stop_code '
-                   'FROM trips JOIN stop_times USING (trip_id) JOIN stops USING (stop_id)'
-                   'WHERE trip_id LIKE \'%+\''
-                   'GROUP BY route_id, trip_id, shape_id, stop_sequence '
-                   'ORDER BY CAST(route_id AS INTEGER), trip_id, CAST(stop_sequence AS INTEGER)')
-
-    line_stops: dict[str, dict[str, list[str]]] = {}
-    for record in cursor.fetchall():
-        route_id, trip_id, stop_code = record
-        if route_id not in line_stops:
-            line_stops[route_id] = {}
-        if trip_id not in line_stops[route_id]:
-            line_stops[route_id][trip_id] = []
-        line_stops[route_id][trip_id].append(stop_code)
-
-    line_stops_unique: dict[str, list[list[str]]] = {}
-    for route_id, trips in line_stops.items():
-        for trip_id, trip_stops in trips.items():
-            if route_id not in line_stops_unique:
-                line_stops_unique[route_id] = []
-            if ((trip_id.startswith('1_') or not any(filter(lambda t: t.startswith('1_'), line_stops[route_id].keys())))
-                    and trip_stops not in line_stops_unique[route_id]):
-                line_stops_unique[route_id].append(trip_stops)
-
-    routes_header_row: list[str]
-    routes_data: list[list[str]]
-    with open(ref.rawdata_lines, 'r') as file:
-        reader: csv.reader = csv.reader(file)
-        routes_header_row = next(reader)
-        routes_data = list(reader)
-
-    with open(prepare_path(ref.rawdata_lines), 'w') as file:
-        writer: csv.writer = csv.writer(file)
-        writer.writerow([*routes_header_row, 'stops'])
-        for route in routes_data:
-            writer.writerow([*route, '|'.join(map(lambda stops: '&'.join(stops), line_stops_unique[route[0]]))])
-
-    cursor.close()
-    print('Done!')
-
-
-def make_update_report(old_data: Database, new_data: Database) -> None:
-    added_stops: set[Stop] = {s for s in new_data.stops.values() if s not in old_data.stops.values()}
-    removed_stops: set[Stop] = {s for s in old_data.stops.values() if s not in new_data.stops.values()}
-    added_lines: set[str] = {r for r in new_data.lines.keys() if r not in old_data.lines.keys()}
-    removed_lines: set[str] = {r for r in old_data.lines.keys() if r not in new_data.lines.keys()}
-    changed_lines: set[str] = {r for r in new_data.lines.keys()
-                               if r in old_data.lines.keys() and new_data.lines[r].stops != old_data.lines[r].stops}
-    if not added_stops and not removed_stops and not added_lines and not removed_lines and not changed_lines:
-        print('  No changes, no report created.')
-    else:
-        print('  Data has changed, creating report... ', end='')
-        lines: int = max(len(added_lines), len(removed_lines), len(changed_lines))
-        lexmap: dict[str, float] = create_lexicographic_mapping(file_to_string(ref.lexmap_polish))
-        line_key = lambda line: int(line) if line.isdigit() else int(re.sub(r'\D', '', line)) - lines
-        stop_key = lambda stop: lexicographic_sequence(f'{stop.full_name}{stop.short_name}', lexmap)
-        with open(prepare_path(ref.report_gtfs), 'w') as file:
-            if added_stops:
-                file.write(f'Added stops:\n- {'\n- '.join(f'{s.full_name} [{s.short_name}]'
-                                                          for s in sorted(added_stops, key=stop_key))}\n')
-            if removed_stops:
-                file.write(f'Removed stops:\n- {'\n- '.join(f'{s.full_name} [{s.short_name}]'
-                                                            for s in sorted(removed_stops, key=stop_key))}\n')
-            if added_lines:
-                file.write(f'Added lines:\n- {"\n- ".join(sorted(added_lines, key=line_key))}\n')
-            if removed_lines:
-                file.write(f'Removed lines:\n- {"\n- ".join(sorted(removed_lines, key=line_key))}\n')
-            if changed_lines:
-                file.write(f'Changed lines:\n- {"\n- ".join(sorted(changed_lines, key=line_key))}\n')
-        print(f'Report stored in {ref.report_gtfs}!')
-        system_open(ref.report_gtfs)
-
-
-def update_gtfs_data(first_update: bool, initial_db: Database) -> None:
-    old_db: Database = Database.partial()
-    if not first_update:
-        if os.path.exists(ref.rawdata_stops):
-            old_db.add_collection('stops', Stop.read_stops(ref.rawdata_stops, initial_db)[0])
-        if os.path.exists(ref.rawdata_lines):
-            old_db.add_collection('lines', Line.read_dict(ref.rawdata_lines))
-    print(f'  Downloading latest GTFS data from {ref.url_ztm_gtfs}... ', end='')
-    try:
-        response: requests.Response = requests.get(ref.url_ztm_gtfs)
-    except requests.RequestException as e:
-        print(f'Failed!\n  Connection error: {e}')
-        return
-    if response.status_code != 200:
-        print(f'Failed!\n  Request error: {response.reason}')
-        return
-    print('Done!')
-    print('  Extracting GTFS data... ', end='')
-    with open(prepare_path(ref.tmpdata_gtfs), 'wb') as file:
-        file.write(response.content)
-    with util.zip_file(ref.tmpdata_gtfs, 'r') as zip_ref:
-        zip_ref.extract_as('stops.txt', ref.rawdata_stops)
-        zip_ref.extract_as('stop_times.txt', ref.rawdata_stop_times)
-        zip_ref.extract_as('trips.txt', ref.rawdata_trips)
-        zip_ref.extract_as('routes.txt', ref.rawdata_lines)
-    os.remove(ref.tmpdata_gtfs)
-    print('Done!')
-    print('  Processing GTFS data... ')
-    gtfs_db: sqlite3.Connection = create_gtfs_database()
-    attach_stop_lines(gtfs_db)
-    attach_line_stops(gtfs_db)
-    os.remove(ref.rawdata_stop_times)
-    os.remove(ref.rawdata_trips)
-
-    new_stops, new_stop_groups = Stop.read_stops(ref.rawdata_stops, initial_db)
-    new_lines = Line.read_dict(ref.rawdata_lines)
-
-    initial_db.add_collection('stops', new_stops)
-    initial_db.add_collection('stop_groups', new_stop_groups)
-    initial_db.add_collection('lines', new_lines)
-
-    if first_update:
-        print('  GTFS database created.')
-    else:
-        print('  GTFS database updated.')
-        make_update_report(old_db, initial_db)
-
-
-def get_csv_rows(file: str | os.PathLike[str]) -> tuple[list[list[str]], list[list[str]]]:
-    with open(file, 'r') as f:
-        reader = csv.reader(f)
-        next(reader)
-        rows: list[list[str]] = [row for row in reader if len(row) > 0]
-        data_rows: list[list[str]] = []
-        comment_rows: list[list[str]] = []
-        for row in rows:
-            comment_rows.append(row) if row[0].startswith('#') else data_rows.append(row)
-        return data_rows, comment_rows
-
-
-def process_players_data(db: Database):
-    for player in db.players:
-        player.init_files()
-
-        stop_rows, stop_comments = get_csv_rows(player.stops_file)
-        for row in stop_rows:
-            stop = db.stops.get(row[0])
-            if stop:
-                stop.add_visit(Discovery(player, row[1]))
-                player.add_stop(stop)
-            else:
-                print(f'Stop {row[0]} not found, remove {player.nickname}\'s entry from her save file')
-        for row in stop_comments:
-            stop_id = row[0].replace('#', '').lstrip()
-            if db.stops.get(stop_id):
-                print(f'Found a commented out {player.nickname}\'s {stop_id} save file entry, restore it')
-
-        ev_stop_rows, ev_stop_comments = get_csv_rows(player.ev_file)
-        for row in ev_stop_rows:
-            stop = db.stops.get(row[0])
-            if stop:
-                stop.add_visit(Discovery(player))
-                player.add_stop(stop)
-            else:
-                print(f'Stop {row[0]} not found, remove {player.nickname}\'s entry from her EV file')
-        for row in ev_stop_comments:
-            stop_id = row[0].replace('#', '').lstrip()
-            if db.stops.get(stop_id):
-                print(f'Found a commented out {player.nickname}\'s {stop_id} EV file entry, restore it')
-
-        terminal_rows, _ = get_csv_rows(player.terminals_file)
-        for row in terminal_rows:
-            terminal = next((t for t in db.terminals if t.id == row[0]), None)
-            if terminal:
-                closest_arrival: Stop = db.stops.get(row[1])
-                closest_departure: Stop = db.stops.get(row[2])
-                terminal.add_player_progress(player, closest_arrival, closest_departure)
-            else:
-                print(f'Terminal {row[0]} not found, remove {player.nickname}\'s entry from her terminals file')
-
-        line_rows, line_comments = get_csv_rows(player.lines_file)
-        for row in line_rows:
-            line = db.lines.get(row[0])
-            if line:
-                player.add_line(line, row[1])
-            else:
-                print(f'Line {row[0]} not found, remove {player.nickname}\'s entry from her lines file')
-        for row in line_comments:
-            line_id = row[0].replace('#', '').lstrip()
-            if db.lines.get(line_id):
-                print(f'Found a commented out {player.nickname}\'s {line_id} lines file entry, restore it')
-
-        vehicle_rows, vehicle_comments = get_csv_rows(player.vehicles_file)
-        for row in vehicle_rows:
-            vehicle = db.vehicles.get(row[0])
-            if vehicle:
-                vehicle.add_discovery(Discovery(player, row[1]))
-                player.add_vehicle(vehicle, row[1])
-            else:
-                combined: str | None = next((v for v in db.vehicles.keys() if
-                                             v.startswith(f'{row[0]}+') or v.endswith(f'+{row[0]}') or
-                                             v == f'{"+".join(row[0].split("+")[::-1])}'), None)
-                if combined:
-                    print(f'Vehicle #{row[0]} not found, but there is vehicle #{combined},'
-                          f' modify {player.nickname}\'s entry in her vehicles file')
-                else:
-                    print(f'Vehicle #{row[0]} not found, remove {player.nickname}\'s '
-                          f'entry from her vehicles file or add a definition to {ref.rawdata_vehicles}')
-        for row in vehicle_comments:
-            vehicle_id = row[0].replace('#', '').lstrip()
-            if db.vehicles.get(vehicle_id):
-                print(f'Found a commented out {player.nickname}\'s {vehicle_id} vehicles file entry, restore it')
 
 
 def load_data(initial_db: Database) -> Database:
@@ -295,7 +21,8 @@ def load_data(initial_db: Database) -> Database:
 
     initial_db.add_collection('terminals', terminals)
     initial_db.add_collection('vehicles', vehicles)
-    process_players_data(initial_db)
+    for player in initial_db.players:
+        player.load_data(initial_db)
 
     ever_visited_stops: list[Stop] = list(filter(lambda s: s.is_visited(), stops.values()))
     progress: dict[str, dict[str, float]] = {
@@ -476,6 +203,7 @@ def generate_map(db: Database) -> folium.Map:
 
 
 def build_app(fmap: folium.Map, db: Database) -> None:
+    from player import Player
     print('  Compiling data to JavaScript... ', end='')
 
     with open(prepare_path(ref.compileddata_stops), 'w') as file:
@@ -515,6 +243,7 @@ def build_app(fmap: folium.Map, db: Database) -> None:
 
 
 def main() -> None:
+    from player import Player
     print('Building initial database...')
     district, regions = Region.read_regions(ref.rawdata_regions)
     players: list[Player] = Player.read_list(ref.rawdata_players)
@@ -522,7 +251,7 @@ def main() -> None:
 
     if update_ztm_stops:
         print('Updating GTFS data...')
-        update_gtfs_data(not os.path.exists(ref.rawdata_stops), initial_db)
+        gtfs.update_gtfs_data(not os.path.exists(ref.rawdata_stops), initial_db)
     else:
         if not os.path.exists(ref.rawdata_stops):
             raise FileNotFoundError(f'{ref.rawdata_stops} not found. '
@@ -551,4 +280,5 @@ def main() -> None:
 update_ztm_stops = '--update' in sys.argv or '-u' in sys.argv
 update_map = '--map' in sys.argv or '-m' in sys.argv
 if __name__ == '__main__':
+    os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     main()

@@ -1,9 +1,12 @@
+from __future__ import annotations
+import csv
 import os
 import platform
 import subprocess
 import zipfile
+from htmlBuilder.attributes import HtmlTagAttribute
 from math import atan2, pi
-from typing import Any, Protocol, TypeVar, Union, runtime_checkable
+from typing import Any, Protocol, TypeVar, runtime_checkable
 
 TContra = TypeVar("TContra", contravariant=True)
 
@@ -63,6 +66,21 @@ def file_to_string(file_path: str | os.PathLike[str]) -> str:
         return file.read()
 
 
+def get_csv_rows(file: str | os.PathLike[str]) -> tuple[list[list[str]], list[list[str]]]:
+    with open(file, 'r') as f:
+        try:
+            reader = csv.reader(f)
+            next(reader)
+            rows: list[list[str]] = [row for row in reader if len(row) > 0]
+            data_rows: list[list[str]] = []
+            comment_rows: list[list[str]] = []
+            for row in rows:
+                comment_rows.append(row) if row[0].startswith('#') else data_rows.append(row)
+            return data_rows, comment_rows
+        except StopIteration:
+            print(f'File {os.path.abspath(file)} is empty')
+
+
 def create_lexicographic_mapping(mapping_data: str) -> dict[str, float]:
     mapping: dict[str, float] = {}
     character_sets = mapping_data.split()
@@ -97,7 +115,7 @@ class geopoint:
     def __repr__(self):
         return f'geopoint({self.latitude}, {self.longitude})'
 
-    def __eq__(self, other: 'geopoint'):
+    def __eq__(self, other: geopoint):
         return self.latitude == other.latitude and self.longitude == other.longitude if isinstance(other, geopoint) else False
 
     def __hash__(self):
@@ -125,7 +143,7 @@ class vector2f:
         return atan2(self.y, self.x) % (2 * pi)
 
     @staticmethod
-    def angle_offset(a: 'vector2f', b: 'vector2f') -> float:
+    def angle_offset(a: vector2f, b: vector2f) -> float:
         return abs(atan2(a.y, a.x) - atan2(b.y, b.x)) % pi
 
     def __str__(self):
@@ -134,7 +152,7 @@ class vector2f:
     def __repr__(self):
         return f'point({self.x}, {self.y})'
 
-    def __eq__(self, other: Union['vector2f', FloatVectorLike]):
+    def __eq__(self, other: vector2f | FloatVectorLike):
         return self.x == other.x and self.y == other.y \
             if isinstance(other, vector2f) else self.x == other[0] and self.y == other[1]
 
@@ -144,11 +162,11 @@ class vector2f:
     def __neg__(self):
         return vector2f(-self.x, -self.y)
 
-    def __add__(self, other: Union['vector2f', FloatVectorLike]):
+    def __add__(self, other: vector2f | FloatVectorLike):
         return vector2f(self.x + other.x, self.y + other.y) \
             if isinstance(other, vector2f) else vector2f(self.x + other[0], self.y + other[1])
 
-    def __sub__(self, other: Union['vector2f', FloatVectorLike]):
+    def __sub__(self, other: vector2f | FloatVectorLike):
         return vector2f(self.x - other.x, self.y - other.y) \
             if isinstance(other, vector2f) else vector2f(self.x - other[0], self.y - other[1])
 
@@ -176,3 +194,11 @@ class vector2f:
 
     def __getitem__(self, index: int):
         return self.x if index == 0 else self.y if index == 1 else None
+
+
+class CustomHtmlTagAttribute(HtmlTagAttribute):
+    def __init__(self, name: str, value: str | bool | None):
+        if isinstance(value, bool):
+            value = 'true' if value else 'false'
+        super().__init__(value)
+        self._name = name

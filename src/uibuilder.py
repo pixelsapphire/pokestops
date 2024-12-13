@@ -1,17 +1,10 @@
-import ref
 import util
 from data import *
 from htmlBuilder.attributes import *
 from htmlBuilder.attributes import Style as InlineStyle
 from htmlBuilder.tags import *
-
-
-class CustomHtmlTagAttribute(HtmlTagAttribute):
-    def __init__(self, name: str, value: str | bool | None):
-        if isinstance(value, bool):
-            value = 'true' if value else 'false'
-        super().__init__(value)
-        self._name = name
+from player import AchievementProgress
+from util import CustomHtmlTagAttribute
 
 
 def create_switch_row(label: str, switch_id: str, onclick: str, label_new: bool = False) -> Tr:
@@ -153,7 +146,7 @@ def create_achievements_sidebar(db: Database) -> (Div, Button):
                     [
                         P(
                             [Class('center')],
-                            [f'Achievements completed: {player.get_n_achievements(db.stops, db.stop_groups)}'],
+                            [f'Achievements completed: {player.logbook.get_n_achievements(db.stops, db.stop_groups)}'],
                         ),
                         Table(
                             [],
@@ -162,7 +155,7 @@ def create_achievements_sidebar(db: Database) -> (Div, Button):
                                     [],
                                     [
                                         create_achievement_row(achievement)
-                                        for achievement in player.get_achievements(db.stops, db.stop_groups)
+                                        for achievement in player.logbook.get_achievements(db.stops, db.stop_groups)
                                     ],
                                 ),
                             ],
@@ -227,7 +220,7 @@ def create_vehicle_sidebar(db: Database) -> (Div, Button):
                         InlineStyle('display:none;' if player.nickname != db.players[0].nickname else ''),
                     ],
                     [
-                        P([Class('center')], [f'Vehicles discovered: {player.get_n_vehicles()}']),
+                        P([Class('center')], [f'Vehicles discovered: {player.logbook.get_n_vehicles()}']),
                         Table(
                             [],
                             [
@@ -235,7 +228,7 @@ def create_vehicle_sidebar(db: Database) -> (Div, Button):
                                     [],
                                     [
                                         create_vehicle_row(discovery.item, discovery.date)
-                                        for discovery in player.get_vehicles()
+                                        for discovery in player.logbook.get_vehicles()
                                     ],
                                 ),
                             ],
