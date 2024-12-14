@@ -99,6 +99,7 @@ function selectLine(linePreview, ctrl) {
             cropSVG(routeImage, 8);
         }
     }
+    ctrl.lineDiscoveriesLabel.innerHTML = line.d ? line.d.map((d) => `discovered by ${d[0]} on ${d[1]}`).join('<br>') : 'not yet discovered';
 }
 
 function selectVehicle(vehiclePreview, ctrl) {
@@ -164,6 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
         lineKindLabel: lineView.querySelector('#line-kind'),
         lineRouteLabel: lineView.querySelector('#line-route'),
         lineRoutesContainer: lineView.querySelector('#line-routes'),
+        lineDiscoveriesLabel: lineView.querySelector('#line-discoveries'),
     };
     document.querySelectorAll('.line-preview').forEach(preview => preview.addEventListener('click', () => selectLine(preview, lineViewControls)));
 
@@ -196,5 +198,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.vehicle-preview').forEach(preview => {
         const id = preview.getAttribute('data-vehicle-id');
         if (!activePlayer.v.containsBS(id)) preview.classList.add('undiscovered');
+    });
+    document.querySelectorAll('.line-preview').forEach(preview => {
+        const id = preview.getAttribute('data-line-number');
+        if (!activePlayer.l.containsBS(id)) preview.classList.add('undiscovered');
     });
 });

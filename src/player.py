@@ -143,6 +143,7 @@ class Player(JsonSerializable):
         for row in line_rows:
             line = db.lines.get(row[0])
             if line:
+                line.add_discovery(Discovery(self, row[1]))
                 self.logbook.add_line(line, row[1])
             else:
                 print(f'Line {row[0]} not found, remove {self.nickname}\'s entry from her lines file')
@@ -191,6 +192,7 @@ class Player(JsonSerializable):
     def __json_entry__(self, db: Database = None) -> str:
         stops: dict[str, Stop] = db.stops if db else {}
         return (f'"{self.nickname}":{{\n'
-                f'v:[{','.join(sorted(f'"{v.item.vehicle_id}"' for v in self.logbook.get_vehicles()))}],\n'
                 f's:[{','.join(sorted(f'"{s.short_name}"' for s in stops.values() if s.is_visited_by(self)))}],\n'
+                f'l:[{','.join(sorted(f'"{l.item.number}"' for l in self.logbook.get_lines()))}],\n'
+                f'v:[{','.join(sorted(f'"{v.item.vehicle_id}"' for v in self.logbook.get_vehicles()))}],\n'
                 f'}},')

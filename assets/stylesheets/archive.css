@@ -278,7 +278,7 @@ a {
 }
 
 #line-routes svg {
-    margin-bottom: min(4vh, 4dvw);
+    margin-bottom: min(1vh, 1dvw);
     max-width: 23vw;
     height: auto;
 }
@@ -378,6 +378,7 @@ a {
 }
 
 .lore-label {
+    font-size: min(1.7vh, 1.7dvw);
     font-style: italic;
     opacity: 0.8;
     line-height: 1.25;
@@ -389,4 +390,5 @@ a {
 
 .discoveries-label {
     margin-top: min(1vh, 1dvw);
+    font-size: min(1.7vh, 1.7dvw);
 }

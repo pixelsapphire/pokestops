@@ -282,7 +282,7 @@ class Vehicle(JsonSerializable):
         self.model: VehicleModel = model
         self.image_url: str | None = image_url if image_url else None
         self.lore: str = lore
-        self.discoveries: set[Discovery] = set()
+        self.discoveries: list[Discovery] = []
 
     def __hash__(self):
         return hash(self.vehicle_id)
@@ -303,8 +303,8 @@ class Vehicle(JsonSerializable):
 
     def add_discovery(self, visit: Discovery):
         if self.discovered_by(visit.item):
-            print(f'{visit.item} already discovered {self.vehicle_id}, remove the entry from {visit.date}')
-        self.discoveries.add(visit)
+            print(f'{visit.item} already discovered vehicle #{self.vehicle_id}, remove the entry from {visit.date}')
+        self.discoveries.append(visit)
 
     @staticmethod
     def read_dict(source: str, carriers: dict[str, Carrier], models: dict[str, VehicleModel]) -> dict[str, Vehicle]:
@@ -333,12 +333,23 @@ class Line(JsonSerializable):
         self.background_color: str = background_color
         self.text_color: str = text_color
         self.stops: list[list[str]] = stops
+        self.discoveries: list[Discovery] = []
 
     def __lt__(self, other):
         return self.__cmp_key__() < other.__cmp_key__() if isinstance(other, type(self)) else False
 
     def __cmp_key__(self):
         return int(self.number) if self.number.isdigit() else int(re.sub(r'\D', '', self.number)) - 1000
+
+    def discovered_by(self, player: str | Player) -> str | None:
+        from player import Player
+        name = player.nickname if isinstance(player, Player) else player
+        return next((visit.date for visit in self.discoveries if name == visit.item), None)
+
+    def add_discovery(self, visit: Discovery):
+        if self.discovered_by(visit.item):
+            print(f'{visit.item} already discovered line {self.number}, remove the entry from {visit.date}')
+        self.discoveries.append(visit)
 
     def kind(self) -> str:
         if self.number.startswith('T'):
@@ -378,7 +389,9 @@ class Line(JsonSerializable):
                 f'k:"{self.kind()}",'
                 f't:"{self.terminals}",'
                 f'rd:"{self.description}",'
-                f'r:[{','.join(f'[{",".join(f"\"{stop}\"" for stop in seq)}]' for seq in self.stops)}]'
+                f'r:[{','.join(f'[{",".join(f"\"{stop}\"" for stop in seq)}]' for seq in self.stops)}],'
+                f'{f'd:[{','.join(f'["{visit.item.nickname}","{visit.date}"]'
+                                  for visit in sorted(self.discoveries))}],' if self.discoveries else ''}'
                 f'}},')
 
 

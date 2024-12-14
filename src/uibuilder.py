@@ -473,6 +473,7 @@ def create_lines_page(db: Database) -> Div:
                         ],
                     ),
                     Div([Id('line-routes')]),
+                    Div([Id('line-discoveries'), Class('discoveries-label')]),
                 ],
             ),
         ],
