@@ -122,10 +122,12 @@ def update_gtfs_data(first_update: bool, initial_db: Database) -> None:
     try:
         response: requests.Response = requests.get(ref.url_ztm_gtfs)
     except requests.RequestException as e:
-        print(f'Failed!\n  Connection error: {e}')
+        print(f'Failed due to a connection error!')
+        error(f'Connection error while downloading GTFS data: {e}')
         return
     if response.status_code != 200:
-        print(f'Failed!\n  Request error: {response.reason}')
+        print(f'Failed due to a request error!')
+        error(f'Request error while downloading GTFS data: {response.reason}')
         return
     print('Done!')
     print('  Extracting GTFS data... ', end='')
@@ -153,7 +155,7 @@ def update_gtfs_data(first_update: bool, initial_db: Database) -> None:
     initial_db.add_collection('lines', new_lines)
 
     if first_update:
-        print('  GTFS database created.')
+        print('  GTFS database created.', end='')
     else:
-        print('  GTFS database updated.')
+        print('  GTFS database updated.', end='')
         Database.make_update_report(old_db, initial_db)

@@ -23,7 +23,7 @@ def __read_collection__(source: str, identity: C, mapper: Callable[..., T], comb
                 try:
                     combiner(collection, mapper(*row))
                 except (IndexError, TypeError) as e:
-                    print(f'Error while processing row {row}: {e}')
+                    error(f'Error while processing row {row}: {e}')
         print('Done!')
         return collection
 
@@ -94,8 +94,8 @@ class Stop(JsonSerializable):
 
     def add_visit(self, visit: Discovery[Player]):
         if self.is_visited_by(visit.item):
-            print(f'{visit.item.nickname} already visited {self.short_name}, '
-                  f'remove the entry from {visit.date if visit.date else 'her EV file'}')
+            error(f'{visit.item.nickname} has already visited stop {self.short_name}, '
+                  f'remove the {f'{visit.date} ' if visit.date else ''}entry from her {'' if visit.date else 'EV '}stops file')
         self.visits.add(visit)
 
     def mark_closest_arrival(self, player: Player, terminal: Terminal):
@@ -299,11 +299,12 @@ class Vehicle(JsonSerializable):
     def discovered_by(self, player: str | Player) -> str | None:
         from player import Player
         name = player.nickname if isinstance(player, Player) else player
-        return next((visit.date for visit in self.discoveries if name == visit.item), None)
+        return next((visit.date for visit in self.discoveries if name == visit.item.nickname), None)
 
     def add_discovery(self, visit: Discovery):
         if self.discovered_by(visit.item):
-            print(f'{visit.item} already discovered vehicle #{self.vehicle_id}, remove the entry from {visit.date}')
+            error(f'{visit.item.nickname} has already discovered vehicle #{self.vehicle_id}, '
+                  f'remove the {visit.date} entry from her vehicles file')
         self.discoveries.append(visit)
 
     @staticmethod
@@ -344,11 +345,12 @@ class Line(JsonSerializable):
     def discovered_by(self, player: str | Player) -> str | None:
         from player import Player
         name = player.nickname if isinstance(player, Player) else player
-        return next((visit.date for visit in self.discoveries if name == visit.item), None)
+        return next((visit.date for visit in self.discoveries if name == visit.item.nickname), None)
 
     def add_discovery(self, visit: Discovery):
         if self.discovered_by(visit.item):
-            print(f'{visit.item} already discovered line {self.number}, remove the entry from {visit.date}')
+            error(f'{visit.item.nickname} already discovered line {self.number}, '
+                  f'remove the {visit.date} entry from her lines file')
         self.discoveries.append(visit)
 
     def kind(self) -> str:
@@ -513,9 +515,9 @@ class Database:
         changed_lines: set[str] = {r for r in new_data.lines.keys()
                                    if r in old_data.lines.keys() and new_data.lines[r].stops != old_data.lines[r].stops}
         if not added_stops and not removed_stops and not added_lines and not removed_lines and not changed_lines:
-            print('  No changes, no report created.')
+            print(' No changes, no report created.')
         else:
-            print('  Data has changed, creating report... ', end='')
+            print(' Data has changed, creating report... ', end='')
             lines: int = max(len(added_lines), len(removed_lines), len(changed_lines))
             lexmap: dict[str, float] = create_lexicographic_mapping(file_to_string(ref.lexmap_polish))
             line_key = lambda line: int(line) if line.isdigit() else int(re.sub(r'\D', '', line)) - lines

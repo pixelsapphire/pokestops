@@ -107,11 +107,13 @@ class Player(JsonSerializable):
                 stop.add_visit(Discovery(self, row[1]))
                 self.logbook.add_stop(stop)
             else:
-                print(f'Stop {row[0]} not found, remove {self.nickname}\'s entry from her save file')
+                error(f'{self.nickname} has visited stop {row[0]}, which is currently not in the database, '
+                      f'comment or remove the {row[1]} entry from her stops file')
         for row in stop_comments:
             stop_id = row[0].replace('#', '').lstrip()
             if db.stops.get(stop_id):
-                print(f'Found a commented out {self.nickname}\'s {stop_id} save file entry, restore it')
+                error(f'{self.nickname} has visited stop {stop_id}, which is now in the database, '
+                      f'restore the {row[1]} entry in her stops file')
 
     def __load_ev_stops__(self, db: Database) -> None:
         ev_stop_rows, ev_stop_comments = get_csv_rows(self.__ev_file__)
@@ -121,14 +123,16 @@ class Player(JsonSerializable):
                 stop.add_visit(Discovery(self))
                 self.logbook.add_stop(stop)
             else:
-                print(f'Stop {row[0]} not found, remove {self.nickname}\'s entry from her EV file')
+                error(f'{self.nickname} has visited stop {row[0]}, which is currently not in the database, '
+                      f'comment or remove the entry from her EV stops file')
         for row in ev_stop_comments:
             stop_id = row[0].replace('#', '').lstrip()
             if db.stops.get(stop_id):
-                print(f'Found a commented out {self.nickname}\'s {stop_id} EV file entry, restore it')
+                error(f'{self.nickname} has visited stop {stop_id}, which is now in the database, '
+                      f'restore the entry in her EV stops file')
 
     def __load_terminals__(self, db: Database) -> None:
-        terminal_rows, _ = get_csv_rows(self.__terminals_file__)
+        terminal_rows, terminal_comments = get_csv_rows(self.__terminals_file__)
         for row in terminal_rows:
             terminal = next((t for t in db.terminals if t.id == row[0]), None)
             if terminal:
@@ -136,7 +140,13 @@ class Player(JsonSerializable):
                 closest_departure: Stop = db.stops.get(row[2])
                 terminal.add_player_progress(self, closest_arrival, closest_departure)
             else:
-                print(f'Terminal {row[0]} not found, remove {self.nickname}\'s entry from her terminals file')
+                error(f'{self.nickname} has visited terminal {row[0]}, which is currently not in the database, '
+                      f'comment or remove the entry from her terminals file')
+        for row in terminal_comments:
+            terminal_id = row[0].replace('#', '').lstrip()
+            if next((t for t in db.terminals if t.id == terminal_id), None):
+                error(f'{self.nickname} has visited terminal {terminal_id}, which is now in the database, '
+                      f'restore the entry in her terminals file')
 
     def __load_lines__(self, db: Database) -> None:
         line_rows, line_comments = get_csv_rows(self.__lines_file__)
@@ -146,11 +156,13 @@ class Player(JsonSerializable):
                 line.add_discovery(Discovery(self, row[1]))
                 self.logbook.add_line(line, row[1])
             else:
-                print(f'Line {row[0]} not found, remove {self.nickname}\'s entry from her lines file')
+                error(f'{self.nickname} has discovered line {row[0]}, which is currently not in the database, '
+                      f'comment or remove the {row[1]} entry from her lines file')
         for row in line_comments:
             line_id = row[0].replace('#', '').lstrip()
             if db.lines.get(line_id):
-                print(f'Found a commented out {self.nickname}\'s {line_id} lines file entry, restore it')
+                error(f'{self.nickname} has discovered line {line_id}, which is now in the database, '
+                      f'restore the {row[1]} entry in her lines file')
 
     def __load_vehicles__(self, db: Database) -> None:
         vehicle_rows, vehicle_comments = get_csv_rows(self.__vehicles_file__)
@@ -164,15 +176,16 @@ class Player(JsonSerializable):
                                              v.startswith(f'{row[0]}+') or v.endswith(f'+{row[0]}') or
                                              v == f'{"+".join(row[0].split("+")[::-1])}'), None)
                 if combined:
-                    print(f'Vehicle #{row[0]} not found, but there is vehicle #{combined},'
-                          f' modify {self.nickname}\'s entry in her vehicles file')
+                    error(f'{self.nickname} has discovered vehicle #{row[0]}, which is part of a combined vehicle #{combined}, '
+                          f'change the {row[1]} entry in her vehicles file')
                 else:
-                    print(f'Vehicle #{row[0]} not found, remove {self.nickname}\'s '
-                          f'entry from her vehicles file or add a definition to {ref.rawdata_vehicles}')
+                    error(f'{self.nickname} has discovered vehicle #{row[0]}, which is currently not in the database, '
+                          f'comment or remove the {row[1]} entry from her vehicles file')
         for row in vehicle_comments:
             vehicle_id = row[0].replace('#', '').lstrip()
             if db.vehicles.get(vehicle_id):
-                print(f'Found a commented out {self.nickname}\'s {vehicle_id} vehicles file entry, restore it')
+                error(f'{self.nickname} has discovered vehicle #{vehicle_id}, which is now in the database, '
+                      f'restore the {row[1]} entry in her vehicles file')
 
     def load_data(self, db: Database) -> None:
         self.__init_files__()

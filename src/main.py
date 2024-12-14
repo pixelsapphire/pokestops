@@ -1,6 +1,5 @@
 import folium
 import gtfs
-import sys
 from postprocess import *
 from uibuilder import *
 from util import *
@@ -21,8 +20,10 @@ def load_data(initial_db: Database) -> Database:
 
     initial_db.add_collection('terminals', terminals)
     initial_db.add_collection('vehicles', vehicles)
+    print('  Reading players save data from their respective directories... ', end='')
     for player in initial_db.players:
         player.load_data(initial_db)
+    print('Done!')
 
     ever_visited_stops: list[Stop] = list(filter(lambda s: s.is_visited(), stops.values()))
     progress: dict[str, dict[str, float]] = {
@@ -239,8 +240,6 @@ def build_app(fmap: folium.Map, db: Database) -> None:
     with open(prepare_path(ref.document_archive), 'w') as file:
         file.write(rendered_archive)
 
-    print('Done!')
-
 
 def main() -> None:
     from player import Player
@@ -275,10 +274,12 @@ def main() -> None:
         fmap: folium.Map = generate_map(db)
         print('Compiling application...')
         build_app(fmap, db)
+        print('Done!')
 
 
-update_ztm_stops = '--update' in sys.argv or '-u' in sys.argv
-update_map = '--map' in sys.argv or '-m' in sys.argv
+update_ztm_stops: bool = '--update' in sys.argv or '-u' in sys.argv
+update_map: bool = '--map' in sys.argv or '-m' in sys.argv
 if __name__ == '__main__':
     os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     main()
+    print_errors()

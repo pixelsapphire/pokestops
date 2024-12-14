@@ -3,6 +3,7 @@ import csv
 import os
 import platform
 import subprocess
+import sys
 import zipfile
 from htmlBuilder.attributes import HtmlTagAttribute
 from math import atan2, pi
@@ -45,6 +46,18 @@ def to_css(stylesheet: dict[str, dict[str, str]]) -> str:
     )
 
 
+__error_log__: list[str] = []
+
+
+def error(*args: Any) -> None:
+    __error_log__.append(' '.join(map(str, args)))
+
+
+def print_errors() -> None:
+    for message in __error_log__:
+        print(message, file=sys.stderr)
+
+
 def prepare_path(file_path: str | os.PathLike[str]) -> str | os.PathLike[str]:
     directory_path = os.path.dirname(os.path.abspath(file_path))
     if not os.path.exists(directory_path):
@@ -78,7 +91,7 @@ def get_csv_rows(file: str | os.PathLike[str]) -> tuple[list[list[str]], list[li
                 comment_rows.append(row) if row[0].startswith('#') else data_rows.append(row)
             return data_rows, comment_rows
         except StopIteration:
-            print(f'File {os.path.abspath(file)} is empty')
+            error(f'File {os.path.abspath(file)} is empty')
 
 
 def create_lexicographic_mapping(mapping_data: str) -> dict[str, float]:

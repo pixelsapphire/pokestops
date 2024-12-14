@@ -175,7 +175,7 @@ def create_achievements_sidebar(db: Database) -> (Div, Button):
 def create_vehicle_row(vehicle: Vehicle, date: str) -> Tr:
     model: VehicleModel = vehicle.model
     if model is None:
-        print('Vehicle without specified model marked as found:', vehicle.vehicle_id)
+        error('Vehicle without specified model marked as found:', vehicle.vehicle_id)
         model = VehicleModel('?', 'bus', '?', '?', '?', 0, '')
     return Tr(
         [],
