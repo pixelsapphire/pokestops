@@ -110,9 +110,8 @@ class Player(JsonSerializable):
                 error(f'{self.nickname} has visited stop {row[0]}, which is currently not in the database, '
                       f'comment or remove the {row[1]} entry from her stops file')
         for row in stop_comments:
-            stop_id = row[0].replace('#', '').lstrip()
-            if db.stops.get(stop_id):
-                error(f'{self.nickname} has visited stop {stop_id}, which is now in the database, '
+            if db.stops.get(row[0]):
+                error(f'{self.nickname} has visited stop {row[0]}, which is now in the database, '
                       f'restore the {row[1]} entry in her stops file')
 
     def __load_ev_stops__(self, db: Database) -> None:
@@ -126,9 +125,8 @@ class Player(JsonSerializable):
                 error(f'{self.nickname} has visited stop {row[0]}, which is currently not in the database, '
                       f'comment or remove the entry from her EV stops file')
         for row in ev_stop_comments:
-            stop_id = row[0].replace('#', '').lstrip()
-            if db.stops.get(stop_id):
-                error(f'{self.nickname} has visited stop {stop_id}, which is now in the database, '
+            if db.stops.get(row[0]):
+                error(f'{self.nickname} has visited stop {row[0]}, which is now in the database, '
                       f'restore the entry in her EV stops file')
 
     def __load_terminals__(self, db: Database) -> None:
@@ -143,9 +141,8 @@ class Player(JsonSerializable):
                 error(f'{self.nickname} has visited terminal {row[0]}, which is currently not in the database, '
                       f'comment or remove the entry from her terminals file')
         for row in terminal_comments:
-            terminal_id = row[0].replace('#', '').lstrip()
-            if next((t for t in db.terminals if t.id == terminal_id), None):
-                error(f'{self.nickname} has visited terminal {terminal_id}, which is now in the database, '
+            if next((t for t in db.terminals if t.id == row[0]), None):
+                error(f'{self.nickname} has visited terminal {row[0]}, which is now in the database, '
                       f'restore the entry in her terminals file')
 
     def __load_lines__(self, db: Database) -> None:
@@ -159,9 +156,8 @@ class Player(JsonSerializable):
                 error(f'{self.nickname} has discovered line {row[0]}, which is currently not in the database, '
                       f'comment or remove the {row[1]} entry from her lines file')
         for row in line_comments:
-            line_id = row[0].replace('#', '').lstrip()
-            if db.lines.get(line_id):
-                error(f'{self.nickname} has discovered line {line_id}, which is now in the database, '
+            if db.lines.get(row[0]):
+                error(f'{self.nickname} has discovered line {row[0]}, which is now in the database, '
                       f'restore the {row[1]} entry in her lines file')
 
     def __load_vehicles__(self, db: Database) -> None:
@@ -182,9 +178,8 @@ class Player(JsonSerializable):
                     error(f'{self.nickname} has discovered vehicle #{row[0]}, which is currently not in the database, '
                           f'comment or remove the {row[1]} entry from her vehicles file')
         for row in vehicle_comments:
-            vehicle_id = row[0].replace('#', '').lstrip()
-            if db.vehicles.get(vehicle_id):
-                error(f'{self.nickname} has discovered vehicle #{vehicle_id}, which is now in the database, '
+            if db.vehicles.get(row[0]):
+                error(f'{self.nickname} has discovered vehicle #{row[0]}, which is now in the database, '
                       f'restore the {row[1]} entry in her vehicles file')
 
     def load_data(self, db: Database) -> None:

@@ -88,7 +88,11 @@ def get_csv_rows(file: str | os.PathLike[str]) -> tuple[list[list[str]], list[li
             data_rows: list[list[str]] = []
             comment_rows: list[list[str]] = []
             for row in rows:
-                comment_rows.append(row) if row[0].startswith('#') else data_rows.append(row)
+                if not row[0].lstrip().startswith('#'):
+                    data_rows.append(row)
+                elif not row[0].lstrip().startswith('##'):
+                    row[0] = row[0].lstrip().lstrip('#').lstrip()
+                    comment_rows.append(row)
             return data_rows, comment_rows
         except StopIteration:
             error(f'File {os.path.abspath(file)} is empty')

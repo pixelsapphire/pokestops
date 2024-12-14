@@ -1,5 +1,5 @@
 stop_id
-# SAN REGION
+## SAN REGION
 TCPET01
 CECME01
 CECME02
@@ -33,7 +33,7 @@ KZLIP01
 KZOSK01
 KZOSK02
 
-# YON REGION
+## YON REGION
 # JAOGR01
 # JAASF01
 # JAASF02
@@ -43,7 +43,7 @@ SDKUP04
 ZAOSL01
 ZAOSL92
 
-# GO REGION
+## GO REGION
 JRMAG01
 JRSKL01
 JRSKL02
@@ -51,7 +51,7 @@ KDNIE01
 KDNIE02
 ZMKOS02
 
-# ROKU REGION
+## ROKU REGION
 MORON01
 MORON02
 MODWK01
@@ -80,7 +80,7 @@ LUSTP02
 # LUCME01
 # LUCME02
 
-# SHICHI REGION
+## SHICHI REGION
 ROPKM01
 RODWO02
 SZDWO01
@@ -111,15 +111,15 @@ KOWIR02
 KOMAL01
 KNPET02
 
-# POZNAŃ CITY
-# Unii Lubelskiej
+## POZNAŃ CITY
+## Unii Lubelskiej
 UNLU01
 UNLU02
 UNLU03
 UNLU04
 UNLU41
 UNLU42
-# Głuszyna i Starołęka
+## Głuszyna i Starołęka
 SYPN02
 OZAR01
 OZAR02
@@ -135,7 +135,7 @@ STMA01
 STMA02
 STMA41
 STMA42
-# Krzesiny, Pokrzywno & surroundings
+## Krzesiny, Pokrzywno & surroundings
 SWKI02
 CHRZ01
 CHRZ02
@@ -160,7 +160,7 @@ URSZ02
 TORW01
 TORW02
 TORW03
-# Franowo
+## Franowo
 KRGO01
 KLEN02
 SZWA41
@@ -171,7 +171,7 @@ FRWO03
 FRWO04
 FRWO41
 FRWO42
-# Kobylepole & Antoninek
+## Kobylepole & Antoninek
 ZELA01
 ZELA02
 FONA01
@@ -186,7 +186,7 @@ ZIEM01
 ZIEM02
 SWIA01
 SWIA02
-# Chartowo
+## Chartowo
 OSZO01
 OSZO02
 KURL01
@@ -202,14 +202,14 @@ DYMK03
 SSZP01
 SSZP02
 SSZP04
-# Janikowo & surroundings
+## Janikowo & surroundings
 JANI01
 JANI02
 PRZA01
 PRZA02
 JANZ01
 JANZ02
-# Malta, Warszawska & surroundings
+## Malta, Warszawska & surroundings
 # ZOO02
 # TORM01
 # TORM02
@@ -230,7 +230,7 @@ WOLK01
 WOLK02
 KOWO01
 KOWO02
-# Zawady, Komandoria, Główna, Gdyńska, Bałtycka & surroundings
+## Zawady, Komandoria, Główna, Gdyńska, Bałtycka & surroundings
 KATE01
 KATE02
 KATE41
@@ -259,7 +259,7 @@ CZEA01
 CZEA02
 KAIN01
 KAIN02
-# Old Market Square & surroundings
+## Old Market Square & surroundings
 MAGA01
 MAGA04
 GRLA02
@@ -291,7 +291,7 @@ POZN41
 POZN42
 URMA01
 URMA02
-# Wilda
+## Wilda
 BIEL01
 BIEL02
 DRDE01
@@ -333,7 +333,7 @@ WSPO41
 WSPO42
 NIED01
 NIED02
-# Dębiec
+## Dębiec
 DEEC01
 DEEC02
 DEEC09
@@ -349,7 +349,7 @@ KORF01
 KORF02
 SWIE02
 SWIE03
-# Górczyn, Fabianowo, Kotowo & surroundings
+## Górczyn, Fabianowo, Kotowo & surroundings
 KOLE01
 KOLE02
 KRAU71
@@ -371,14 +371,14 @@ KMNZ02
 KOWI02
 # SYCH01
 SYCH02
-# Junikowo, Osiedle Kwiatowe
+## Junikowo, Osiedle Kwiatowe
 JUNI30
 JUNI41
 JUNI42
 KWIA01
 MALW01
 MALW02
-# Grunwald
+## Grunwald
 MATE02
 MATE42
 MATE71
@@ -406,7 +406,7 @@ PROM01
 PROM02
 ARCI41
 ARCI42
-# Jeżyce
+## Jeżyce
 KRAS01
 KRAS02
 KRAS71
@@ -425,15 +425,15 @@ PONA72
 ZERO71
 ZERO72
 # ZERO92
-# Golęcin, Sołacz
+## Golęcin, Sołacz
 NIES02
 GOLE01
 GOLE02
-# Podolany
+## Podolany
 STLI02
 STNZ02
 STKA02
-# Winiary, Winogrady
+## Winiary, Winogrady
 LUSZ02
 TROJ02
 KORA02
@@ -458,7 +458,7 @@ OKOS01
 OKOS02
 ARPO01
 ARPO42
-# Piątkowo, Morasko
+## Piątkowo, Morasko
 OSBA03
 # UAMF92
 OJLY01
