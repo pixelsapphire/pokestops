@@ -115,7 +115,10 @@ def create_achievement_row(achievement: AchievementProgress) -> Tr:
                 [
                     achievement.name,
                     Br(),
-                    P([Class('achievement-description')], achievement.description),
+                    P(
+                        [Class('achievement-description')],
+                        f'Collect all of the following: {', '.join(sorted(achievement.stops_list))}',
+                    ),
                 ],
             ),
             Td(
@@ -123,7 +126,7 @@ def create_achievement_row(achievement: AchievementProgress) -> Tr:
                 [
                     Span([Class('smaller')], 'Completed'),
                     Br(),
-                    achievement.completion_date if achievement.completion_date_known()
+                    achievement.completion_date.to_string(number=False) if achievement.completion_date.is_known()
                     else Span([Class('smaller')], 'a long time ago'),
                 ] if achievement.is_completed()
                 else f'{achievement.visited}/{achievement.total}'
@@ -146,7 +149,7 @@ def create_achievements_sidebar(db: Database) -> (Div, Button):
                     [
                         P(
                             [Class('center')],
-                            [f'Achievements completed: {player.logbook.get_n_achievements(db.stops, db.stop_groups)}'],
+                            [f'Achievements completed: {player.logbook.get_n_achievements(db)}'],
                         ),
                         Table(
                             [],
@@ -155,7 +158,7 @@ def create_achievements_sidebar(db: Database) -> (Div, Button):
                                     [],
                                     [
                                         create_achievement_row(achievement)
-                                        for achievement in player.logbook.get_achievements(db.stops, db.stop_groups)
+                                        for achievement in player.logbook.get_achievements(db)
                                     ],
                                 ),
                             ],
@@ -172,7 +175,7 @@ def create_achievements_sidebar(db: Database) -> (Div, Button):
     )
 
 
-def create_vehicle_row(vehicle: Vehicle, date: str) -> Tr:
+def create_vehicle_row(vehicle: Vehicle, date: DateAndOrder) -> Tr:
     model: VehicleModel = vehicle.model
     if model is None:
         error('Vehicle without specified model marked as found:', vehicle.vehicle_id)
@@ -202,7 +205,7 @@ def create_vehicle_row(vehicle: Vehicle, date: str) -> Tr:
             ),
             Td(
                 [Class('achievement-progress')],
-                date,
+                date.to_string(number=False),
             ),
         ],
     )
@@ -336,9 +339,8 @@ def create_navigation() -> Div:
     )
 
 
-def create_stop_group_view(db: Database, group: str, stop_names: set[str]) -> Div:
-    stops: list[Stop] = list(sorted((db.stops[stop] for stop in stop_names), key=lambda s: s.short_name))
-    region: Region = db.region_of(db.stops.get(next(iter(stop_names), None)))
+def create_stop_group_view(db: Database, group: str, stops: SortedSet[Stop]) -> Div:
+    region: Region = db.region_of(next(iter(stops), None))
     return Div(
         [Class('stop-group-view')],
         [

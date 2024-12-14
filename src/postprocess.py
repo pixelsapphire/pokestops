@@ -1,7 +1,6 @@
 import re
-from typing import Callable, Match
-
 import rjsmin
+from typing import Callable, Match
 
 map_name: str = 'm'
 

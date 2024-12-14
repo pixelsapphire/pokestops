@@ -97,12 +97,12 @@ def attach_line_stops(gtfs_db: sqlite3.Connection) -> None:
     routes_header_row: list[str]
     routes_data: list[list[str]]
     with open(ref.rawdata_lines, 'r') as file:
-        reader: csv.reader = csv.reader(file)
+        reader = csv.reader(file)
         routes_header_row = next(reader)
         routes_data = list(reader)
 
     with open(prepare_path(ref.rawdata_lines), 'w') as file:
-        writer: csv.writer = csv.writer(file)
+        writer = csv.writer(file)
         writer.writerow([*routes_header_row, 'stops'])
         for route in routes_data:
             writer.writerow([*route, '|'.join(map(lambda stops: '&'.join(stops), line_stops_unique[route[0]]))])
@@ -115,9 +115,9 @@ def update_gtfs_data(first_update: bool, initial_db: Database) -> None:
     old_db: Database = Database.partial()
     if not first_update:
         if os.path.exists(ref.rawdata_stops):
-            old_db.add_collection('stops', Stop.read_stops(ref.rawdata_stops, initial_db)[0])
+            old_db.stops = Stop.read_stops(ref.rawdata_stops, initial_db)[0]
         if os.path.exists(ref.rawdata_lines):
-            old_db.add_collection('lines', Line.read_dict(ref.rawdata_lines))
+            old_db.lines = Line.read_dict(ref.rawdata_lines)
     print(f'  Downloading latest GTFS data from {ref.url_ztm_gtfs}... ', end='')
     try:
         response: requests.Response = requests.get(ref.url_ztm_gtfs)
@@ -150,9 +150,9 @@ def update_gtfs_data(first_update: bool, initial_db: Database) -> None:
     new_stops, new_stop_groups = Stop.read_stops(ref.rawdata_stops, initial_db)
     new_lines = Line.read_dict(ref.rawdata_lines)
 
-    initial_db.add_collection('stops', new_stops)
-    initial_db.add_collection('stop_groups', new_stop_groups)
-    initial_db.add_collection('lines', new_lines)
+    initial_db.stops = new_stops
+    initial_db.stop_groups = new_stop_groups
+    initial_db.lines = new_lines
 
     if first_update:
         print('  GTFS database created.', end='')

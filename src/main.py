@@ -8,18 +8,18 @@ from util import *
 def load_data(initial_db: Database) -> Database:
     players: list[Player] = initial_db.players
     regions: dict[str, Region] = initial_db.regions
-    if not initial_db.has_collection('stops') or not initial_db.has_collection('lines'):
-        initial_db.add_collection('stops', (stops_and_groups := Stop.read_stops(ref.rawdata_stops, initial_db))[0])
-        initial_db.add_collection('stop_groups', stops_and_groups[1])
-        initial_db.add_collection('lines', Line.read_dict(ref.rawdata_lines))
+    if 'stops' not in initial_db or 'lines' not in initial_db:
+        initial_db.stops = (stops_and_groups := Stop.read_stops(ref.rawdata_stops, initial_db))[0]
+        initial_db.stop_groups = stops_and_groups[1]
+        initial_db.lines = Line.read_dict(ref.rawdata_lines)
     stops: dict[str, Stop] = initial_db.stops
     terminals: list[Terminal] = Terminal.read_list(ref.rawdata_terminals, stops)
     carriers: dict[str, Carrier] = Carrier.read_dict(ref.rawdata_carriers)
     models: dict[str, VehicleModel] = VehicleModel.read_dict(ref.rawdata_vehicle_models)
     vehicles: dict[str, Vehicle] = Vehicle.read_dict(ref.rawdata_vehicles, carriers, models)
 
-    initial_db.add_collection('terminals', terminals)
-    initial_db.add_collection('vehicles', vehicles)
+    initial_db.terminals = terminals
+    initial_db.vehicles = vehicles
     print('  Reading players save data from their respective directories... ', end='')
     for player in initial_db.players:
         player.load_data(initial_db)
@@ -157,15 +157,14 @@ def generate_map(db: Database) -> folium.Map:
     print('  Placing markers... ', end='')
     for stop in db.stops.values():
         stop_visits: list[Discovery] = sorted(stop.visits)
-        # noinspection PyUnresolvedReferences
         classes: str = ' '.join(
             [f'v-{visit.item.nickname.lower()}' for visit in stop_visits] +
-            [f'ev-{visit.item.nickname.lower()}' for visit in stop_visits if not visit.date] +
+            [f'ev-{visit.item.nickname.lower()}' for visit in stop_visits if not visit.date.is_known()] +
             [f'r-{region.short_name}' for region in stop.regions] +
             [f'tp-{player.nickname.lower()}' for _, player, _ in stop.terminals_progress]
         )
         visited_label: str = '<br>'.join(
-            [f'visited by {visit.item.nickname} {f'on {visit.date}' if visit.date else 'a long time ago'}'
+            [f'visited by {visit.item.nickname} {f'on {visit.date:y-m-d}' if visit.date.is_known() else 'a long time ago'}'
              for visit in sorted(stop.visits)]) if stop.visits else 'not yet visited'
         terminal_progress_label: str = '<br>'.join([f'{player.nickname}\'s closest {kind} point to {terminal.name} '
                                                     for kind, player, terminal in stop.terminals_progress])
@@ -176,7 +175,6 @@ def generate_map(db: Database) -> folium.Map:
         popup: folium.Popup = folium.Popup(f'<span class="stop-name">{stop.full_name} [{stop.short_name}]</span>'
                                            f'<span class="stop-visitors"><br>{visited_label}</span>'
                                            f'<span class="stop-tp"><br>{terminal_progress_label}</span>')
-        # noinspection PyTypeChecker
         folium.Marker(location=stop.location, popup=popup, icon=marker).add_to(fmap)
 
     def tp_message(tp: TerminalProgress) -> str:
@@ -220,7 +218,7 @@ def build_app(fmap: folium.Map, db: Database) -> None:
         file.write(f'const lines = {{\n{'\n'.join(map(Line.json_entry, db.lines.values()))}\n}};')
 
     with open(prepare_path(ref.compileddata_players), 'w') as file:
-        file.write(f'const players = {{\n{'\n'.join(map(lambda p: Player.json_entry(p, db), db.players))}\n}};')
+        file.write(f'const players = {{\n{'\n'.join(map(Player.json_entry, db.players))}\n}};')
 
     folium_html: str = fmap.get_root().render()
     map_script: str = folium_html[folium_html.rfind('<script>') + 8:folium_html.rfind('</script>')]
