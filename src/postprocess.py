@@ -31,7 +31,8 @@ def clean_html(html: str) -> str:
     html = re.sub(r'(<[a-zA-Z0-9][^/>]*>)([^<]*)(</[a-zA-Z0-9]+>)', fold_tag, html)  # fold trivial tags
     html = re.sub(r'([^<\s]*)\s*<br\s*/?>\s*(<[a-zA-Z0-9][^/>]*>)', strip_whitespace_around_br, html)  # text<br><tag[stuff]>
     html = re.sub(r'(</[a-zA-Z0-9]*>)\s*<br\s*/?>\s*([^<\s]*)', strip_whitespace_around_br, html)  # </tag><br>text
-    html = re.sub(r'( *)((<[a-zA-Z0-9]+ )[a-zA-Z][^/>]*(data-[a-zA-Z][^/>]*)+>)([^<]*)(</[a-zA-Z0-9]+>)', data_on_new_lines, html)
+    html = re.sub(r'( *)((<[a-zA-Z0-9]+ )[a-zA-Z][^/>]*(data-[a-zA-Z][^/>]*)+>)([^<]*)(</[a-zA-Z0-9]+>)', data_on_new_lines,
+                  html)
     html = re.sub(r'(<td[^>]*>)([\s\S]*?)(?=</td>)', fold_table_cell, html)
     return html
 
@@ -47,21 +48,27 @@ def clean_js(js: str) -> str:
 
     marker_id: int = 0
     popup_id: int = 0
+    line_id: int = 0
     markers: dict[str, str] = {}
     popups: dict[str, str] = {}
+    lines: dict[str, str] = {}
 
     def mangle(match: Match) -> str:
-        nonlocal marker_id, popup_id
+        nonlocal marker_id, popup_id, line_id
         object_name: str = match.group(0)
-        object_type: str = object_name[0]
-        if object_type == 'm':
+        object_type: str = object_name[0:3]
+        if object_type == 'mar':
             if object_name not in markers:
                 markers[object_name] = f'm{(marker_id := marker_id + 1)}'
             return markers[object_name]
-        elif object_type == 'p':
+        elif object_type == 'pop':
             if object_name not in popups:
                 popups[object_name] = f'p{(popup_id := popup_id + 1)}'
             return popups[object_name]
+        elif object_type == 'pol':
+            if object_name not in lines:
+                lines[object_name] = f'l{(line_id := line_id + 1)}'
+            return lines[object_name]
         else:
             return object_name
 
@@ -91,7 +98,7 @@ def clean_js(js: str) -> str:
                 inline_function('setIcon'), js)
     js = re.sub(r'var html_[0-9a-f]{32} = (.*);\n\s+(popup_[0-9a-f]{32})\.setContent\(html_[0-9a-f]{32}\);',
                 inline_function('setContent'), js)
-    js = re.sub(r'(popup|marker)_[0-9a-f]{32}', mangle, js)
+    js = re.sub(r'(popup|marker|poly_line)_[0-9a-f]{32}', mangle, js)
     js = re.sub(r'id="html_[0-9a-f]{32}" ', '', js)
     js = rjsmin.jsmin(js)
     js = insert_newline_after_semicolons(js)

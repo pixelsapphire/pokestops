@@ -4,6 +4,7 @@ __pycache__/
 deploy.sh
 server.sh
 data/raw/lines.csv
+data/raw/routes.csv
 data/raw/stops.csv
 test.py
 reports/

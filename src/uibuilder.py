@@ -11,7 +11,7 @@ def create_switch_row(label: str, switch_id: str, onclick: str, label_new: bool 
     return Tr(
         [],
         [
-            Td([], Div([Class('label-new')] if label_new else [], label)),
+            Td([], Div([Class('switch-label')] + ([Class('label-new')] if label_new else []), label)),
             Td(
                 [],
                 Div(
@@ -34,22 +34,37 @@ def create_control_section(db: Database) -> Div:
     return Div(
         [Id('control'), Class('hud')],
         [
-            Table(
-                [],
-                Tbody(
-                    [],
-                    [
-                        create_switch_row('Show unvisited', 'visited-switch', 'toggleUnvisited()'),
-                        create_switch_row('Show ever visited', 'ev-switch', 'toggleEV()'),
-                        create_switch_row('Stellar Voyage', 'sv-switch', 'toggleSV()', label_new=True),
-                    ],
-                ),
-            ),
             Label(
                 [Id('player-selection')],
                 Select(
                     [Class('dropdown hud'), Onchange('selectPlayer()')],
                     [Option([Value(p.nickname)], p.nickname) for p in players],
+                ),
+            ),
+            Label(
+                [Id('mode-selection')],
+                Select(
+                    [Class('dropdown hud'), Onchange('selectMode()')],
+                    [Option([Value(n.lower().replace(' ', '-'))], n) for n in ['Pokestops', 'Pokelines', 'Stellar Voyage']],
+                ),
+            ),
+            Table(
+                [Id('controls-pokestops'), Class('hud-controls')],
+                Tbody(
+                    [],
+                    [
+                        create_switch_row('Show unvisited', 'visited-switch', 'toggleUnvisited()'),
+                        create_switch_row('Show ever visited', 'ev-switch', 'toggleEV()'),
+                    ],
+                ),
+            ),
+            Table(
+                [Id('controls-pokelines'), Class('hud-controls'), InlineStyle('display:none;')],
+                Tbody(
+                    [],
+                    [
+                        create_switch_row('Show undiscovered', 'discovered-switch', 'toggleUndiscovered()'),
+                    ],
                 ),
             ),
         ],
@@ -85,6 +100,10 @@ def create_region_exploration_section(db: Database) -> (P, Img):
                                       for nick in
                                       [p.nickname for p in db.players] + [f'ev-{p.nickname}' for p in db.players]
                                       for r in sorted(db.regions.values())
+                                  ] + [
+                                      CustomHtmlTagAttribute(f'data-lines-{p.nickname.lower()}',
+                                                             f'{db.progress['LN'][p.nickname]}')
+                                      for p in db.players
                                   ] + [
                                       CustomHtmlTagAttribute(f'data-sv-{p.nickname.lower()}',
                                                              f'{db.progress['SV'][p.nickname]}')
@@ -255,7 +274,7 @@ def create_archive_button() -> Button:
     )
 
 
-def create_application(initial_html: str, db: Database) -> Html:
+def create_map(initial_html: str, db: Database) -> Html:
     return Html(
         [Lang('en')],
         [

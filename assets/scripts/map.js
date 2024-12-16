@@ -1,7 +1,8 @@
-let showUnvisited = false;
-let showEverVisited = false;
-let stellarVoyage = false;
+let showUnvisitedStops = false;
+let showEverVisitedStops = false;
+let showUndiscoveredLines = false;
 let activePlayer = 'Zorie';
+let activeMode = 'pokestops';
 let activeRegion = 'POZ';
 let darkMode = true;
 
@@ -31,61 +32,101 @@ function injectThemeSwitcher() {
     zoomControl.insertBefore(themeSwitch, zoomControl.firstChild);
 }
 
-function refreshMap() {
+function preparePokestops() {
+
+    document.getElementById('region-selection').style.display = null;
+    document.querySelectorAll('path.leaflet-interactive').forEach(l => {
+        l.style.display = 'none';
+    });
+
+    document.querySelectorAll(`.marker.v-${activePlayer.toLowerCase()}.r-${activeRegion}:not(.ev-${activePlayer.toLowerCase()})`).forEach(m => {
+        m.style.color = colors[activePlayer][primary];
+        m.parentElement.style.display = null;
+    });
+    const everVisitedMarkers = document.querySelectorAll(`.marker.ev-${activePlayer.toLowerCase()}.r-${activeRegion}`);
+    if (showEverVisitedStops)
+        everVisitedMarkers.forEach(m => {
+            m.style.color = colors[activePlayer][tint];
+            m.parentElement.style.display = null;
+        });
+    else
+        everVisitedMarkers.forEach(m => {
+            m.style.color = 'red';
+            m.parentElement.style.display = showUnvisitedStops ? null : 'none';
+        });
+    document.querySelectorAll(`.marker:not(.v-${activePlayer.toLowerCase()})`).forEach(m => {
+        m.style.color = 'red';
+        m.parentElement.style.display = showUnvisitedStops ? null : 'none';
+    });
+    document.querySelectorAll(`.marker:not(.r-${activeRegion})`).forEach(m => {
+        m.parentElement.style.display = 'none';
+    });
+    document.querySelectorAll(`.marker.terminal`).forEach(m => {
+        m.parentElement.style.display = 'none';
+    });
 
     const percentage = document.querySelector('#exploration-percentage');
-    document.body.classList.toggle('stellar-voyage', stellarVoyage);
+    percentage.innerHTML = `${percentage.getAttribute(`data-${activeRegion.toLowerCase()}-${showEverVisitedStops ? 'ev-' : ''}${activePlayer.toLowerCase()}`)} %`;
+}
 
-    if (!stellarVoyage) {
+function preparePokelines() {
 
-        document.querySelectorAll(`.marker.v-${activePlayer.toLowerCase()}.r-${activeRegion}:not(.ev-${activePlayer.toLowerCase()})`).forEach(m => {
-            m.style.color = colors[activePlayer][primary];
-            m.parentElement.style.display = null;
-        });
-        const everVisitedMarkers = document.querySelectorAll(`.marker.ev-${activePlayer.toLowerCase()}.r-${activeRegion}`);
-        if (showEverVisited)
-            everVisitedMarkers.forEach(m => {
-                m.style.color = colors[activePlayer][tint];
-                m.parentElement.style.display = null;
-            });
-        else
-            everVisitedMarkers.forEach(m => {
-                m.style.color = 'red';
-                m.parentElement.style.display = showUnvisited ? null : 'none';
-            });
-        document.querySelectorAll(`.marker:not(.v-${activePlayer.toLowerCase()})`).forEach(m => {
-            m.style.color = 'red';
-            m.parentElement.style.display = showUnvisited ? null : 'none';
-        });
-        document.querySelectorAll(`.marker:not(.r-${activeRegion})`).forEach(m => {
-            m.parentElement.style.display = 'none';
-        });
-        document.querySelectorAll(`.marker.terminal`).forEach(m => {
-            m.parentElement.style.display = 'none';
-        });
+    document.getElementById('region-selection').style.display = 'none';
+    document.querySelectorAll('.marker').forEach(m => {
+        m.parentElement.style.display = 'none';
+    });
+    document.querySelectorAll('path.leaflet-interactive').forEach(l => {
+        if (l.getAttribute('fill').includes('v-') || showUndiscoveredLines) l.style.display = null;
+        if (l.getAttribute('fill').includes(`v-${activePlayer.toLowerCase()}`)) l.setAttribute('stroke', colors[activePlayer][primary]);
+        else {
+            if (showUndiscoveredLines) l.setAttribute('stroke', 'red');
+            else l.style.display = 'none';
+        }
+    });
 
-        percentage.innerHTML = `${percentage.getAttribute(`data-${activeRegion.toLowerCase()}-${showEverVisited ? 'ev-' : ''}${activePlayer.toLowerCase()}`)} %`;
+    const percentage = document.querySelector('#exploration-percentage');
+    percentage.innerHTML = `${percentage.getAttribute(`data-lines-${activePlayer.toLowerCase()}`)} %`;
+}
 
-    } else {
-        document.querySelectorAll(`.marker.terminal`).forEach(m => {
-            if (m.classList.contains(`reached-${activePlayer.toLowerCase()}`)) m.style.color = colors[activePlayer][primary];
-            else m.style.color = 'red';
-            m.parentElement.style.display = null;
-        });
-        document.querySelectorAll(`.marker.tp-${activePlayer.toLowerCase()}`).forEach(m => {
-            m.parentElement.style.display = null;
-            if (m.classList.contains(`v-${activePlayer.toLowerCase()}`)) m.style.color = colors[activePlayer][tint];
-            else m.style.color = 'red';
-        });
-        document.querySelectorAll(`.marker:not(.terminal):not(.tp-${activePlayer.toLowerCase()})`).forEach(m => {
-            m.parentElement.style.display = 'none';
-        });
+function prepareStellarVoyage() {
 
-        percentage.innerHTML = `${percentage.getAttribute(`data-sv-${activePlayer.toLowerCase()}`)} %`;
-    }
+    document.getElementById('region-selection').style.display = 'none';
+    document.querySelectorAll('path.leaflet-interactive').forEach(l => {
+        l.style.display = 'none';
+    });
 
-    document.querySelectorAll('.progress-list').forEach(
-        list => list.style.display = list.getAttribute('data-player') === activePlayer.toLowerCase() ? null : 'none');
+    document.querySelectorAll(`.marker.terminal`).forEach(m => {
+        if (m.classList.contains(`reached-${activePlayer.toLowerCase()}`)) m.style.color = colors[activePlayer][primary];
+        else m.style.color = 'red';
+        m.parentElement.style.display = null;
+    });
+    document.querySelectorAll(`.marker.tp-${activePlayer.toLowerCase()}`).forEach(m => {
+        m.parentElement.style.display = null;
+        if (m.classList.contains(`v-${activePlayer.toLowerCase()}`)) m.style.color = colors[activePlayer][tint];
+        else m.style.color = 'red';
+    });
+    document.querySelectorAll(`.marker:not(.terminal):not(.tp-${activePlayer.toLowerCase()})`).forEach(m => {
+        m.parentElement.style.display = 'none';
+    });
+
+    const percentage = document.querySelector('#exploration-percentage');
+    percentage.innerHTML = `${percentage.getAttribute(`data-sv-${activePlayer.toLowerCase()}`)} %`;
+}
+
+function refreshMap() {
+
+    document.body.classList.toggle('stellar-voyage', activeMode === 'stellar-voyage');
+
+    document.querySelectorAll('.hud-controls').forEach(hud => {
+        if (hud.id === `controls-${activeMode}`) hud.style.display = null;
+        else hud.style.display = 'none';
+    });
+    if (activeMode === 'pokestops') preparePokestops();
+    else if (activeMode === 'pokelines') preparePokelines();
+    else if (activeMode === 'stellar-voyage') prepareStellarVoyage();
+
+    document.querySelectorAll('.progress-list')
+        .forEach(list => list.style.display = list.getAttribute('data-player') === activePlayer.toLowerCase() ? null : 'none');
 
     document.querySelectorAll('.leaflet-layer,.leaflet-control-zoom-in,.leaflet-control-zoom-out,.leaflet-control-attribution,.leaflet-control-theme')
         .forEach(e => e.style.filter = darkMode ? 'invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)' : null);
@@ -93,23 +134,29 @@ function refreshMap() {
 }
 
 function toggleUnvisited() {
-    showUnvisited = document.querySelector("#visited-switch").checked;
+    showUnvisitedStops = document.querySelector("#visited-switch").checked;
     refreshMap();
 }
 
 function toggleEV() {
-    showEverVisited = document.querySelector("#ev-switch").checked;
+    showEverVisitedStops = document.querySelector("#ev-switch").checked;
     refreshMap();
 }
 
-function toggleSV() {
-    stellarVoyage = document.querySelector("#sv-switch").checked;
+function toggleUndiscovered() {
+    showUndiscoveredLines = document.querySelector("#discovered-switch").checked;
     refreshMap();
 }
 
 function selectPlayer() {
     activePlayer = document.querySelector("#player-selection select").value;
     localStorage.setItem('activePlayer', activePlayer);
+    refreshMap();
+}
+
+function selectMode() {
+    activeMode = document.querySelector("#mode-selection select").value;
+    localStorage.setItem('activeMode', activeMode);
     refreshMap();
 }
 
@@ -125,11 +172,13 @@ function toggleSidebar(sidebar) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    activePlayer = localStorage.getItem('activePlayer') || 'Zorie';
+    activePlayer = localStorage.getItem('activePlayer') || activePlayer;
     document.querySelector("#player-selection select").value = activePlayer;
-    activeRegion = localStorage.getItem('activeRegion') || 'POZ';
+    activeRegion = localStorage.getItem('activeRegion') || activeRegion;
     document.querySelector("#region-selection select").value = activeRegion;
     darkMode = localStorage.getItem('darkMode') !== 'false';
     injectThemeSwitcher();
+    activeMode = localStorage.getItem('activeMode') || activeMode;
+    document.querySelector("#mode-selection select").value = activeMode;
     refreshMap();
 });

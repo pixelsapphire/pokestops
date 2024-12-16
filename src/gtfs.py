@@ -61,8 +61,37 @@ def attach_stop_lines(gtfs_db: sqlite3.Connection) -> None:
         writer = csv.writer(file)
         writer.writerow([*stops_header_row, 'routes'])
         writer.writerows(cursor.fetchall())
-
     cursor.close()
+
+    print('Done!')
+
+
+def attach_line_routes(gtfs_db: sqlite3.Connection) -> None:
+    print('    Attaching route ids to lines... ', end='')
+    cursor: sqlite3.Cursor = gtfs_db.cursor()
+    cursor.execute('SELECT route_id, shape_id '
+                   'FROM trips '
+                   'WHERE trip_id LIKE \'%+\''
+                   'GROUP BY shape_id, route_id;')
+
+    line_routes: dict[str, list[str]] = defaultdict(list)
+    for route_id, shape_id in cursor.fetchall():
+        line_routes[route_id].append(shape_id)
+    cursor.close()
+
+    lines_header_row: list[str]
+    lines_data: list[list[str]]
+    with open(ref.rawdata_lines, 'r') as file:
+        reader = csv.reader(file)
+        lines_header_row = next(reader)
+        lines_data = list(reader)
+
+    with open(prepare_path(ref.rawdata_lines), 'w') as file:
+        writer = csv.writer(file)
+        writer.writerow([*lines_header_row, 'stops'])
+        for line in lines_data:
+            writer.writerow([*line, '&'.join(line_routes[line[0]])])
+
     print('Done!')
 
 
@@ -76,38 +105,32 @@ def attach_line_stops(gtfs_db: sqlite3.Connection) -> None:
                    'GROUP BY route_id, trip_id, shape_id, stop_sequence '
                    'ORDER BY CAST(route_id AS INTEGER), trip_id, CAST(stop_sequence AS INTEGER)')
 
-    line_stops: dict[str, dict[str, list[str]]] = {}
+    line_stops: dict[str, dict[str, list[str]]] = defaultdict(lambda: defaultdict(list))
     for record in cursor.fetchall():
-        route_id, trip_id, stop_code = record
-        if route_id not in line_stops:
-            line_stops[route_id] = {}
-        if trip_id not in line_stops[route_id]:
-            line_stops[route_id][trip_id] = []
-        line_stops[route_id][trip_id].append(stop_code)
+        line_id, trip_id, stop_code = record
+        line_stops[line_id][trip_id].append(stop_code)
+    cursor.close()
 
-    line_stops_unique: dict[str, list[list[str]]] = {}
-    for route_id, trips in line_stops.items():
+    line_stops_unique: dict[str, list[list[str]]] = defaultdict(list)
+    for line_id, trips in line_stops.items():
         for trip_id, trip_stops in trips.items():
-            if route_id not in line_stops_unique:
-                line_stops_unique[route_id] = []
-            if ((trip_id.startswith('1_') or not any(filter(lambda t: t.startswith('1_'), line_stops[route_id].keys())))
-                    and trip_stops not in line_stops_unique[route_id]):
-                line_stops_unique[route_id].append(trip_stops)
+            if ((trip_id.startswith('1_') or not any(filter(lambda t: t.startswith('1_'), line_stops[line_id].keys())))
+                    and trip_stops not in line_stops_unique[line_id]):
+                line_stops_unique[line_id].append(trip_stops)
 
-    routes_header_row: list[str]
-    routes_data: list[list[str]]
+    lines_header_row: list[str]
+    lines_data: list[list[str]]
     with open(ref.rawdata_lines, 'r') as file:
         reader = csv.reader(file)
-        routes_header_row = next(reader)
-        routes_data = list(reader)
+        lines_header_row = next(reader)
+        lines_data = list(reader)
 
     with open(prepare_path(ref.rawdata_lines), 'w') as file:
         writer = csv.writer(file)
-        writer.writerow([*routes_header_row, 'stops'])
-        for route in routes_data:
-            writer.writerow([*route, '|'.join(map(lambda stops: '&'.join(stops), line_stops_unique[route[0]]))])
+        writer.writerow([*lines_header_row, 'stops'])
+        for line in lines_data:
+            writer.writerow([*line, '|'.join(map(lambda stops: '&'.join(stops), line_stops_unique[line[0]]))])
 
-    cursor.close()
     print('Done!')
 
 
@@ -133,26 +156,25 @@ def update_gtfs_data(first_update: bool, initial_db: Database) -> None:
     print('  Extracting GTFS data... ', end='')
     with open(prepare_path(ref.tmpdata_gtfs), 'wb') as file:
         file.write(response.content)
-    with zip_file(ref.tmpdata_gtfs, 'r') as zip_ref:
-        zip_ref.extract_as('stops.txt', ref.rawdata_stops)
-        zip_ref.extract_as('stop_times.txt', ref.rawdata_stop_times)
-        zip_ref.extract_as('trips.txt', ref.rawdata_trips)
-        zip_ref.extract_as('routes.txt', ref.rawdata_lines)
+    with zip_file(ref.tmpdata_gtfs, 'r') as gtfs_zip:
+        gtfs_zip.extract_as('stops.txt', ref.rawdata_stops)
+        gtfs_zip.extract_as('stop_times.txt', ref.rawdata_stop_times)
+        gtfs_zip.extract_as('trips.txt', ref.rawdata_trips)
+        gtfs_zip.extract_as('shapes.txt', ref.rawdata_routes)
+        gtfs_zip.extract_as('routes.txt', ref.rawdata_lines)
     os.remove(ref.tmpdata_gtfs)
     print('Done!')
     print('  Processing GTFS data... ')
     gtfs_db: sqlite3.Connection = create_gtfs_database()
     attach_stop_lines(gtfs_db)
+    attach_line_routes(gtfs_db)
     attach_line_stops(gtfs_db)
     os.remove(ref.rawdata_stop_times)
     os.remove(ref.rawdata_trips)
 
-    new_stops, new_stop_groups = Stop.read_stops(ref.rawdata_stops, initial_db)
-    new_lines = Line.read_dict(ref.rawdata_lines)
-
-    initial_db.stops = new_stops
-    initial_db.stop_groups = new_stop_groups
-    initial_db.lines = new_lines
+    initial_db.stops, initial_db.stop_groups = Stop.read_stops(ref.rawdata_stops, initial_db)
+    initial_db.routes = Route.read_dict(ref.rawdata_routes)
+    initial_db.lines = Line.read_dict(ref.rawdata_lines)
 
     if first_update:
         print('  GTFS database created.', end='')

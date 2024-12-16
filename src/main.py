@@ -11,6 +11,7 @@ def load_data(initial_db: Database) -> Database:
     if 'stops' not in initial_db or 'lines' not in initial_db:
         initial_db.stops = (stops_and_groups := Stop.read_stops(ref.rawdata_stops, initial_db))[0]
         initial_db.stop_groups = stops_and_groups[1]
+        initial_db.routes = Route.read_dict(ref.rawdata_routes)
         initial_db.lines = Line.read_dict(ref.rawdata_lines)
     stops: dict[str, Stop] = initial_db.stops
     terminals: list[Terminal] = Terminal.read_list(ref.rawdata_terminals, stops)
@@ -37,6 +38,10 @@ def load_data(initial_db: Database) -> Database:
                                           len(list(filter(lambda s: s in r, stops.values()))) * 100, 1) for p in players
             },
         } for r in regions.values()},
+        'LN': {
+            f'{p.nickname}': round(sum(1 if ln.discovered_by(p) else 0
+                                       for ln in initial_db.lines.values()) / len(initial_db.lines) * 100, 1) for p in players
+        },
         'SV': {
             f'{p.nickname}': round(sum(1 if t.completed_by(p) else 0.5 if t.reached_by(p) else 0
                                        for t in terminals) / len(terminals) * 100, 1) for p in players
@@ -44,7 +49,7 @@ def load_data(initial_db: Database) -> Database:
     }
 
     return Database(players, progress, stops, initial_db.stop_groups, terminals,
-                    carriers, regions, initial_db.district, vehicles, models, initial_db.lines)
+                    carriers, regions, initial_db.district, vehicles, models, initial_db.lines, initial_db.routes)
 
 
 def next_midpoint(previous_dir: vector2f, current_point: vector2f, next_point: vector2f,
@@ -147,14 +152,8 @@ def create_route_map(line: Line, db: Database, all_variants: bool) -> None:
             file.write('</svg>')
 
 
-def generate_map(db: Database) -> folium.Map:
-    documented_visited_stops: list[Stop] = list(filter(lambda s: s.is_visited(include_ev=False), db.stops.values()))
-    visible_stops = documented_visited_stops if len(documented_visited_stops) > 0 else db.stops.values()
-    avg_lat = (min(s.location.latitude for s in visible_stops) + max(s.location.latitude for s in visible_stops)) / 2
-    avg_lon = (min(s.location.longitude for s in visible_stops) + max(s.location.longitude for s in visible_stops)) / 2
-    fmap: folium.Map = folium.Map(location=(avg_lat, avg_lon), zoom_start=12, prefer_canvas=True, zoom_control='bottomleft')
-
-    print('  Placing markers... ', end='')
+def place_stop_markers(db: Database, fmap: folium.Map) -> None:
+    print('  Placing Pokestops markers... ', end='')
     for stop in db.stops.values():
         stop_visits: list[Discovery] = sorted(stop.visits)
         classes: str = ' '.join(
@@ -176,13 +175,39 @@ def generate_map(db: Database) -> folium.Map:
                                            f'<span class="stop-visitors"><br>{visited_label}</span>'
                                            f'<span class="stop-tp"><br>{terminal_progress_label}</span>')
         folium.Marker(location=stop.location, popup=popup, icon=marker).add_to(fmap)
+    print('Done!')
 
+
+def place_line_markers(db: Database, fmap: folium.Map) -> None:
+    print('  Placing Pokelines markers... ', end='')
+    for line in [line for line in db.lines.values() if not line.is_discovered()]:
+        for route in line.routes:
+            folium.PolyLine(locations=[db.routes[route].points], color='red', weight=3, fill_opacity=0,
+                            fill_color=f'unvisited',  # see: https://github.com/python-visualization/folium/issues/2055
+                            bubbling_mouse_events=False).add_to(fmap)
+    for line in [line for line in db.lines.values() if line.is_discovered()]:
+        classes: str = ' '.join([f'v-{discovery.item.nickname.lower()}' for discovery in line.discoveries])
+        for route in line.routes:
+            folium.PolyLine(
+                locations=[db.routes[route].points],
+                color='white',
+                fill_opacity=0,
+                fill_color=f'{classes}',  # see: https://github.com/python-visualization/folium/issues/2055
+                bubbling_mouse_events=False,
+                weight=3,
+            ).add_to(fmap)
+
+    print('Done!')
+
+
+def place_terminal_markers(db: Database, fmap: folium.Map) -> None:
     def tp_message(tp: TerminalProgress) -> str:
         if tp.completed():
             return f'{tp.player.nickname} has completed this terminal'
         else:
             return f'{tp.player.nickname} has {'arrived at' if tp.arrived() else 'departed from'} this terminal'
 
+    print('  Placing Stellar Voyage markers... ', end='')
     for terminal in db.terminals:
         classes: list[str] = [f'reached-{player.nickname.lower()}' for player in db.players if terminal.reached_by(player)]
         visited_label: str = '<br>'.join([tp_message(tp) for tp in terminal.progress if tp.reached()]
@@ -195,8 +220,19 @@ def generate_map(db: Database) -> folium.Map:
                                            f'<br><span class="stop-tp">{visited_label}</span>')
         # noinspection PyTypeChecker
         folium.Marker(location=(terminal.latitude, terminal.longitude), popup=popup, icon=marker).add_to(fmap)
-
     print('Done!')
+
+
+def generate_map(db: Database) -> folium.Map:
+    documented_visited_stops: list[Stop] = list(filter(lambda s: s.is_visited(include_ev=False), db.stops.values()))
+    visible_stops = documented_visited_stops if len(documented_visited_stops) > 0 else db.stops.values()
+    avg_lat = (min(s.location.latitude for s in visible_stops) + max(s.location.latitude for s in visible_stops)) / 2
+    avg_lon = (min(s.location.longitude for s in visible_stops) + max(s.location.longitude for s in visible_stops)) / 2
+    fmap: folium.Map = folium.Map(location=(avg_lat, avg_lon), zoom_start=12, prefer_canvas=False, zoom_control='bottomleft')
+
+    place_stop_markers(db, fmap)
+    place_line_markers(db, fmap)
+    place_terminal_markers(db, fmap)
 
     return fmap
 
@@ -228,7 +264,7 @@ def build_app(fmap: folium.Map, db: Database) -> None:
     print('Done!')
     print('  Building HTML documents... ', end='')
 
-    html_application: Html = create_application(folium_html, db)
+    html_application: Html = create_map(folium_html, db)
     rendered_application: str = clean_html(html_application.render(True, True))
     with open(prepare_path(ref.document_map), 'w') as file:
         file.write(rendered_application)
@@ -252,6 +288,9 @@ def main() -> None:
     else:
         if not os.path.exists(ref.rawdata_stops):
             raise FileNotFoundError(f'{ref.rawdata_stops} not found. '
+                                    f'Run the script with the --update flag to download the latest data.')
+        if not os.path.exists(ref.rawdata_routes):
+            raise FileNotFoundError(f'{ref.rawdata_routes} not found. '
                                     f'Run the script with the --update flag to download the latest data.')
         if not os.path.exists(ref.rawdata_lines):
             raise FileNotFoundError(f'{ref.rawdata_lines} not found. '

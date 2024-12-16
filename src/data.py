@@ -3,8 +3,9 @@ import json
 import ref
 import re
 from abc import ABC
+from collections import defaultdict
 from sortedcontainers import SortedSet
-from typing import Callable, Literal, TYPE_CHECKING
+from typing import Literal, TYPE_CHECKING
 from util import *
 
 if TYPE_CHECKING:
@@ -80,7 +81,7 @@ class Stop(JsonSerializable):
         return '/' in self.full_name and self.full_name[:self.full_name.index('/')] in towns
 
     def is_visited(self, include_ev: bool = True) -> bool:
-        return any(visit.date or include_ev for visit in self.visits)
+        return any(visit.date.is_known() or include_ev for visit in self.visits)
 
     def is_visited_by(self, player: str | Player, include_ev: bool = True) -> bool:
         from player import Player
@@ -325,14 +326,33 @@ class Vehicle(JsonSerializable):
                 f'}},')
 
 
+class Route:
+    def __init__(self, route_id, points: list[geopoint]):
+        self.route_id: str = route_id
+        self.points: list[geopoint] = points
+
+    @staticmethod
+    def read_dict(source: str) -> dict[str, Route]:
+        print(f'  Reading routes data from {source}... ', end='')
+        # warning caused by Pycharm issue PY-70668
+        # noinspection PyTypeChecker
+        points: dict[str, list[tuple[geopoint, int]]] = __read_collection__(
+            source, defaultdict(list),
+            lambda r_id, lat, lon, seq: (r_id, (geopoint(lat, lon), int(seq))), lambda c, v: c[v[0]].append(v[1])
+        )
+        return {route_id: Route(route_id, [point for point, _ in sorted(points, key=lambda p: p[1])])
+                for route_id, points in points.items()}
+
+
 class Line(JsonSerializable):
     def __init__(self, number: str, terminals: str, description: str,
-                 background_color: str, text_color: str, stops: list[list[str]]):
+                 background_color: str, text_color: str, routes: list[str], stops: list[list[str]]):
         self.number: str = number
         self.terminals: str = terminals
         self.description: str = description
         self.background_color: str = background_color
         self.text_color: str = text_color
+        self.routes: list[str] = routes
         self.stops: list[list[str]] = stops
         self.discoveries: list[Discovery] = []
 
@@ -341,6 +361,9 @@ class Line(JsonSerializable):
 
     def __cmp_key__(self):
         return int(self.number) if self.number.isdigit() else int(re.sub(r'\D', '', self.number)) - 1000
+
+    def is_discovered(self) -> bool:
+        return len(self.discoveries) > 0
 
     def discovered_by(self, player: str | Player) -> str | None:
         from player import Player
@@ -378,10 +401,10 @@ class Line(JsonSerializable):
         return 'suburban bus'
 
     @staticmethod
-    def read_dict(source: str) -> dict[str, Line]:
+    def read_dict(source: str) -> dict[str, Line]:  # TODO attach actual routes and stops instead of ids
         print(f'  Reading routes data from {source}... ', end='')
         constructor = lambda *row: Line(row[2], row[3].split('|')[0], row[4].split('|')[0].split('^')[0], row[6], row[7],
-                                        list(map(lambda seq: seq.split('&'), row[8].split('|'))))
+                                        row[8].split('&'), list(map(lambda seq: seq.split('&'), row[9].split('|'))))
         return __read_collection__(source, {}, constructor, lambda c, v: c.update({v.number: v}))
 
     def __json_entry__(self) -> str:
@@ -455,13 +478,15 @@ class Region:
 
 class Database:
     type CollectionName = Literal[
-        'players', 'progress', 'stops', 'stop_groups', 'terminals', 'carriers', 'regions', 'vehicles', 'models', 'lines']
+        'players', 'progress', 'stops', 'stop_groups', 'terminals',
+        'carriers', 'regions', 'vehicles', 'models', 'lines', 'routes']
     __stars__: dict[tuple[int, int], int] = {(1, 1): 1, (2, 2): 2, (3, 4): 3, (5, 7): 4, (8, 100): 5}
 
     def __init__(self, players: list[Player], progress: dict[str, dict[str, float]],
                  stops: dict[str, Stop], stop_groups: dict[str, SortedSet[Stop]], terminals: list[Terminal],
                  carriers: dict[str, Carrier], regions: dict[str, Region], district: Region,
-                 vehicles: dict[str, Vehicle], models: dict[str, VehicleModel], lines: dict[str, Line]):
+                 vehicles: dict[str, Vehicle], models: dict[str, VehicleModel],
+                 lines: dict[str, Line], routes: dict[str, Route]):
         self.players: list[Player] = players
         self.progress: dict[str, dict[str, float]] = progress
         self.stops: dict[str, Stop] = stops
@@ -472,6 +497,7 @@ class Database:
         self.district: Region = district
         self.vehicles: dict[str, Vehicle] = vehicles
         self.models: dict[str, VehicleModel] = models
+        self.routes: dict[str, Route] = routes
         self.lines: dict[str, Line] = lines
 
     def __contains__(self, name: CollectionName) -> bool:
@@ -483,10 +509,10 @@ class Database:
                 terminals: list[Terminal] | None = None, carriers: dict[str, Carrier] | None = None,
                 regions: dict[str, Region] | None = None, district: Region | None = None,
                 vehicles: dict[str, Vehicle] | None = None, models: dict[str, VehicleModel] | None = None,
-                routes: dict[str, Line] | None = None) -> Database:
+                lines: dict[str, Line] | None = None, routes: dict[str, Route] | None = None) -> Database:
         return Database(players or [], progress or {}, stops or {}, stop_groups or {}, terminals or [],
                         carriers or {}, regions or {}, district or Region(0, '', '', lambda _: False),
-                        vehicles or {}, models or {}, routes or {})
+                        vehicles or {}, models or {}, lines or {}, routes or {})
 
     @staticmethod
     def get_stars_for_group(size: int):

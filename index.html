@@ -45,10 +45,24 @@
   <body>
     <div class="folium-map" id="m" ></div>
     <div id='control' class='hud'>
-      <table>
+      <label id='player-selection'>
+        <select class='dropdown hud' onchange='selectPlayer()'>
+          <option value='Zorie'>Zorie</option>
+          <option value='Sapphire'>Sapphire</option>
+          <option value='Camomile'>Camomile</option>
+        </select>
+      </label>
+      <label id='mode-selection'>
+        <select class='dropdown hud' onchange='selectMode()'>
+          <option value='pokestops'>Pokestops</option>
+          <option value='pokelines'>Pokelines</option>
+          <option value='stellar-voyage'>Stellar Voyage</option>
+        </select>
+      </label>
+      <table id='controls-pokestops' class='hud-controls'>
         <tbody>
           <tr>
-            <td><div>Show unvisited</div></td>
+            <td><div class='switch-label'>Show unvisited</div></td>
             <td>
               <div>
                 <label class='toggle-switch' onclick='toggleUnvisited()'>
@@ -59,7 +73,7 @@
             </td>
           </tr>
           <tr>
-            <td><div>Show ever visited</div></td>
+            <td><div class='switch-label'>Show ever visited</div></td>
             <td>
               <div>
                 <label class='toggle-switch' onclick='toggleEV()'>
@@ -69,12 +83,16 @@
               </div>
             </td>
           </tr>
+        </tbody>
+      </table>
+      <table id='controls-pokelines' class='hud-controls' style='display:none;'>
+        <tbody>
           <tr>
-            <td><div class='label-new'>Stellar Voyage</div></td>
+            <td><div class='switch-label'>Show undiscovered</div></td>
             <td>
               <div>
-                <label class='toggle-switch' onclick='toggleSV()'>
-                  <input id='sv-switch' type='checkbox'/>
+                <label class='toggle-switch' onclick='toggleUndiscovered()'>
+                  <input id='discovered-switch' type='checkbox'/>
                   <span class='slider'></span>
                 </label>
               </div>
@@ -82,13 +100,6 @@
           </tr>
         </tbody>
       </table>
-      <label id='player-selection'>
-        <select class='dropdown hud' onchange='selectPlayer()'>
-          <option value='Zorie'>Zorie</option>
-          <option value='Sapphire'>Sapphire</option>
-          <option value='Camomile'>Camomile</option>
-        </select>
-      </label>
     </div>
     <p id='exploration' class='hud'>
       <label id='region-selection'>
@@ -160,6 +171,9 @@
               data-shr-ev-camomile='0.0' 
               data-har-ev-camomile='0.0' 
               data-kyr-ev-camomile='0.0' 
+              data-lines-zorie='8.5' 
+              data-lines-sapphire='0.0' 
+              data-lines-camomile='0.0' 
               data-sv-zorie='39.3' 
               data-sv-sapphire='71.4' 
               data-sv-camomile='0.0'>

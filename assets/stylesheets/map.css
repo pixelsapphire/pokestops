@@ -5,10 +5,14 @@
 .hud {
     color: white;
     font-family: Genshin, sans-serif;
-    font-size: min(6dvh, 6dvw);
+    font-size: min(5dvh, 5dvw);
     z-index: 1000;
     text-align: right;
     pointer-events: none;
+}
+
+.hud .switch-label {
+     font-size: min(4dvh, 4dvw);
 }
 
 .hud label, .hud input, .hud select {
@@ -109,11 +113,17 @@ body.stellar-voyage .stop-tp {
 }
 
 #control {
+    display: flex;
+    flex-direction: column;
     position: absolute;
     top: min(3dvh, 3dvw);
     right: min(5dvh, 5dvw);
     z-index: 1000;
     text-align: right;
+}
+
+#control td {
+    vertical-align: baseline;
 }
 
 #exploration {
@@ -127,7 +137,7 @@ body.stellar-voyage .stop-tp {
 }
 
 #exploration-progress {
-    font-size: min(4.5dvh, 4.5dvw);
+    font-size: min(4dvh, 4dvw);
 }
 
 @supports (-webkit-text-stroke: min(0.2dvh, 0.2dvw) black) {
