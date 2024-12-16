@@ -264,6 +264,7 @@ def create_application(initial_html: str, db: Database) -> Html:
                 [
                     (initial_html[initial_html.find('<head>') + 6:initial_html.find('</head>')]).strip(),
                     Title([], 'Pokestops'),
+                    Link([Rel('icon'), Href(ref.asset_img_compass)]),
                     Link([Rel('stylesheet'), Type('text/css'), Href(ref.url_material_icons)]),
                     Link([Rel('stylesheet'), Type('text/css'), Href(ref.stylesheet_common)]),
                     Link([Rel('stylesheet'), Type('text/css'), Href(ref.stylesheet_map)]),
@@ -535,6 +536,7 @@ def create_archive(db: Database) -> Html:
                 [],
                 [
                     Title([], 'Pokestops Archive'),
+                    Link([Rel('icon'), Href(ref.asset_img_compass)]),
                     Link([Rel('stylesheet'), Type('text/css'), Href(ref.url_material_icons)]),
                     Link([Rel('stylesheet'), Type('text/css'), Href(ref.stylesheet_common)]),
                     Link([Rel('stylesheet'), Type('text/css'), Href(ref.stylesheet_archive)]),
