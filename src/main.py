@@ -180,22 +180,38 @@ def place_stop_markers(db: Database, fmap: folium.Map) -> None:
 
 def place_line_markers(db: Database, fmap: folium.Map) -> None:
     print('  Placing Pokelines markers... ', end='')
+
+    already_drawn: set[tuple[LineSegment[geopoint], HashableSet[str]]] = set()
+
+    def draw_line(pts: Sequence[geopoint], cls: HashableSet[str]) -> None:
+        if isinstance(pts, LineSegment) and (pts, cls) in already_drawn:
+            return
+        folium.PolyLine(fill_color=' '.join(cls),  # see: https://github.com/python-visualization/folium/issues/2055
+                        locations=[pts], fill_opacity=0, weight=3, bubbling_mouse_events=False).add_to(fmap)
+
     for line in [line for line in db.lines.values() if not line.is_discovered()]:
         for route in line.routes:
-            folium.PolyLine(locations=[db.routes[route].points], color='red', weight=3, fill_opacity=0,
-                            fill_color=f'unvisited',  # see: https://github.com/python-visualization/folium/issues/2055
-                            bubbling_mouse_events=False).add_to(fmap)
+            draw_line(db.routes[route].points, HashableSet(('undiscovered',)))
+
+    segments_and_players: dict[LineSegment[geopoint], set[Player]] = defaultdict(set)
     for line in [line for line in db.lines.values() if line.is_discovered()]:
-        classes: str = ' '.join([f'v-{discovery.item.nickname.lower()}' for discovery in line.discoveries])
         for route in line.routes:
-            folium.PolyLine(
-                locations=[db.routes[route].points],
-                color='white',
-                fill_opacity=0,
-                fill_color=f'{classes}',  # see: https://github.com/python-visualization/folium/issues/2055
-                bubbling_mouse_events=False,
-                weight=3,
-            ).add_to(fmap)
+            points: list[geopoint] = db.routes[route].points
+            for i in range(len(points) - 1):
+                segments_and_players[LineSegment(points[i], points[i + 1])] |= {p for p in db.players if line.discovered_by(p)}
+    for segment, players in segments_and_players.items():
+        draw_line(segment, HashableSet(['disc'] + [f'd-{player.nickname.lower()}' for player in players]))
+
+    segments_and_lines: dict[LineSegment[geopoint], set[Line]] = defaultdict(set)
+    for line in db.lines.values():
+        for route in line.routes:
+            points: list[geopoint] = db.routes[route].points
+            for i in range(len(points) - 1):
+                segments_and_lines[LineSegment(points[i], points[i + 1])].add(line)
+    for segment, lines in segments_and_lines.items():
+        players_who_completed: list[Player] = [p for p in db.players if all(ln.discovered_by(p) for ln in lines)]
+        if len(players_who_completed) > 0:
+            draw_line(segment, HashableSet(['compl'] + [f'c-{player.nickname.lower()}' for player in players_who_completed]))
 
     print('Done!')
 

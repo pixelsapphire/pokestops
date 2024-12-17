@@ -101,5 +101,9 @@ def clean_js(js: str) -> str:
     js = re.sub(r'(popup|marker|poly_line)_[0-9a-f]{32}', mangle, js)
     js = re.sub(r'id="html_[0-9a-f]{32}" ', '', js)
     js = rjsmin.jsmin(js)
+    js = js.replace('"color":"#3388ff","dashArray":null,"dashOffset":null,"fill":true,', '')
+    js = js.replace(',"fillOpacity":0,"fillRule":"evenodd","lineCap":"round","lineJoin":"round",'
+                    '"noClip":false,"opacity":1.0,"smoothFactor":1.0,"stroke":true', '')
+    js = js.replace('fillColor', 'className')
     js = insert_newline_after_semicolons(js)
     return js

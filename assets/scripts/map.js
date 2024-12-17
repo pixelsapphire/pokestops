@@ -76,8 +76,9 @@ function preparePokelines() {
         m.parentElement.style.display = 'none';
     });
     document.querySelectorAll('path.leaflet-interactive').forEach(l => {
-        if (l.getAttribute('fill').includes('v-') || showUndiscoveredLines) l.style.display = null;
-        if (l.getAttribute('fill').includes(`v-${activePlayer.toLowerCase()}`)) l.setAttribute('stroke', colors[activePlayer][primary]);
+        if (l.classList.contains('disc') || l.classList.contains('compl') || showUndiscoveredLines) l.style.display = null;
+        if (l.classList.contains(`d-${activePlayer.toLowerCase()}`)) l.setAttribute('stroke', colors[activePlayer][tint]);
+        else if (l.classList.contains(`c-${activePlayer.toLowerCase()}`)) l.setAttribute('stroke', colors[activePlayer][primary]);
         else {
             if (showUndiscoveredLines) l.setAttribute('stroke', 'red');
             else l.style.display = 'none';

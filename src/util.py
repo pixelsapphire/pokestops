@@ -7,10 +7,12 @@ import sys
 import zipfile
 from htmlBuilder.attributes import HtmlTagAttribute
 from math import atan2, pi
+from sortedcontainers import SortedSet
 from typing import Any, Callable, Final, Iterable, Protocol, Self, Sequence, TypeVar, runtime_checkable
 
 T = TypeVar("T")
 TContra = TypeVar("TContra", contravariant=True)
+TFloatSeq = TypeVar("TFloatSeq", bound=Sequence[float])
 
 
 class FloatVectorLike(Protocol):
@@ -165,7 +167,7 @@ class geopoint(Sequence[float]):
         return self.latitude if index == 0 else self.longitude if index == 1 else None
 
 
-class vector2f:
+class vector2f(Sequence[float]):
     def __init__(self, x: float, y: float):
         self.x = x
         self.y = y
@@ -228,6 +230,40 @@ class vector2f:
 
     def __getitem__(self, index: int):
         return self.x if index == 0 else self.y if index == 1 else None
+
+
+class LineSegment[TFloatSeq](Sequence[TFloatSeq]):
+    def __init__(self, a: TFloatSeq, b: TFloatSeq):
+        self._a: TFloatSeq = a
+        self._b: TFloatSeq = b
+        if a[0] > b[0] or a[0] == b[0] and a[1] > b[1]:
+            self._a, self._b = self._b, self._a
+
+    def __eq__(self, other):
+        return (self._a, self._b) == (other._a, other._b) if isinstance(other, LineSegment) else False
+
+    def __hash__(self):
+        return hash((self._a, self._b))
+
+    def __getitem__(self, index):
+        return self._a if index == 0 else self._b if index == 1 else None
+
+    def __iter__(self):
+        return iter((self._a, self._b))
+
+    def __len__(self):
+        return 2
+
+    def __repr__(self):
+        return f'LineSegment({self._a}, {self._b})'
+
+    @property
+    def a(self) -> TFloatSeq:
+        return self._a
+
+    @property
+    def b(self) -> TFloatSeq:
+        return self._b
 
 
 class DateAndOrder:
@@ -355,3 +391,14 @@ class Comparator[T]:
 
     def sorted(self, items: Iterable[T]) -> list[T]:
         return self.__sort__(list(items))
+
+
+class HashableSet[T](SortedSet[T]):
+    def __init__(self, iterable: Iterable[T] = ()):
+        super().__init__(iterable)
+
+    def __hash__(self):
+        return hash(tuple(self))
+
+    def __repr__(self):
+        return f'HashableSet({super().__repr__()})'

@@ -112,8 +112,17 @@ class Player(JsonSerializable):
         self.__lines_file__: str = f'{ref.playerdata_path}/{nickname_lowercase}/{ref.playerdata_file_lines}'
         self.__vehicles_file__: str = f'{ref.playerdata_path}/{nickname_lowercase}/{ref.playerdata_file_vehicles}'
 
+    def __eq__(self, other):
+        return self.nickname == other.nickname if isinstance(other, type(self)) else False
+
+    def __hash__(self):
+        return hash(self.nickname)
+
     def __lt__(self, other):
         return self.nickname < other.nickname if isinstance(other, type(self)) else False
+
+    def __repr__(self):
+        return f'Player {self.nickname}'
 
     @staticmethod
     def __init_file__(path: str, header: str = '') -> None:

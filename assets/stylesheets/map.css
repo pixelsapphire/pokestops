@@ -12,7 +12,7 @@
 }
 
 .hud .switch-label {
-     font-size: min(4dvh, 4dvw);
+    font-size: min(4dvh, 4dvw);
 }
 
 .hud label, .hud input, .hud select {
@@ -108,7 +108,7 @@
     display: none;
 }
 
-body.stellar-voyage .stop-tp {
+.stellar-voyage .stop-tp {
     display: initial;
 }
 

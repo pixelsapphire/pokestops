@@ -356,6 +356,15 @@ class Line(JsonSerializable):
         self.stops: list[list[str]] = stops
         self.discoveries: list[Discovery] = []
 
+    def __eq__(self, other):
+        return self.number == other.number if isinstance(other, type(self)) else False
+
+    def __hash__(self):
+        return hash(self.number)
+
+    def __repr__(self):
+        return f'Line {self.number}'
+
     def __lt__(self, other):
         return self.__cmp_key__() < other.__cmp_key__() if isinstance(other, type(self)) else False
 
