@@ -94,13 +94,14 @@ def clean_js(js: str) -> str:
 
     js = re.sub(r'map_[0-9a-f]{32}', map_name, js)
     js = re.sub(r'tile_layer_[0-9a-f]{32}', 'tl', js)
-    js = re.sub(r'var div_icon_[0-9a-f]{32} = (.*);\n\s+(marker_[0-9a-f]{32})\.setIcon\(div_icon_[0-9a-f]{32}\);',
+    js = re.sub(r'var div_icon_[0-9a-f]{32} = ([\s\S]*?);[\n\s]+(marker_[0-9a-f]{32})\.setIcon\(div_icon_[0-9a-f]{32}\);',
                 inline_function('setIcon'), js)
-    js = re.sub(r'var html_[0-9a-f]{32} = (.*);\n\s+(popup_[0-9a-f]{32})\.setContent\(html_[0-9a-f]{32}\);',
+    js = re.sub(r'var html_[0-9a-f]{32} = (.*);[\n\s]+(popup_[0-9a-f]{32})\.setContent\(html_[0-9a-f]{32}\);',
                 inline_function('setContent'), js)
     js = re.sub(r'(popup|marker|poly_line)_[0-9a-f]{32}', mangle, js)
     js = re.sub(r'id="html_[0-9a-f]{32}" ', '', js)
     js = rjsmin.jsmin(js)
+    js = js.replace(' style="width: 100.0%; height: 100.0%;"', '')
     js = js.replace('"color":"#3388ff","dashArray":null,"dashOffset":null,"fill":true,', '')
     js = js.replace(',"fillOpacity":0,"fillRule":"evenodd","lineCap":"round","lineJoin":"round",'
                     '"noClip":false,"opacity":1.0,"smoothFactor":1.0,"stroke":true', '')
