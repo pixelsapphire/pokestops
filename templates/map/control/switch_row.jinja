@@ -1,0 +1,15 @@
+{% macro switch_row(label, switch_id, onclick) %}
+    <tr>
+        <td>
+            <div class='switch-label {%- if label_new %}label-new{% endif %}'>{{ label }}</div>
+        </td>
+        <td>
+            <div>
+                <label class='toggle-switch' onclick='{{ onclick }}'>
+                    <input id='{{ switch_id }}' type='checkbox'>
+                    <span class='slider'></span>
+                </label>
+            </div>
+        </td>
+    </tr>
+{% endmacro %}

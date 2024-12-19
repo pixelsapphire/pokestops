@@ -1,5 +1,6 @@
 import folium
 import gtfs
+from branca.element import Element
 from postprocess import *
 from uibuilder import *
 from util import *
@@ -25,6 +26,10 @@ def load_data(initial_db: Database) -> Database:
     for player in initial_db.players:
         player.load_data(initial_db)
     print('Done!')
+
+    for vehicle in vehicles.values():
+        if vehicle.is_discovered() and vehicle.model is None:
+            error('Vehicle without specified model marked as found:', vehicle.vehicle_id)
 
     ever_visited_stops: list[Stop] = list(filter(lambda s: s.is_visited(), stops.values()))
     progress: dict[str, dict[str, float]] = {
@@ -174,6 +179,8 @@ def place_stop_markers(db: Database, fmap: folium.Map) -> None:
         popup: folium.Popup = folium.Popup(f'<span class="stop-name">{stop.full_name} [{stop.short_name}]</span>'
                                            f'<span class="stop-visitors"><br>{visited_label}</span>'
                                            f'<span class="stop-tp"><br>{terminal_progress_label}</span>')
+        # see: https://github.com/python-visualization/folium/pull/2056
+        # noinspection PyTypeChecker
         folium.Marker(location=stop.location, popup=popup, icon=marker).add_to(fmap)
     print('Done!')
 
@@ -272,7 +279,8 @@ def build_app(fmap: folium.Map, db: Database) -> None:
     with open(prepare_path(ref.compileddata_players), 'w') as file:
         file.write(f'const players = {{\n{'\n'.join(map(Player.json_entry, db.players))}\n}};')
 
-    folium_html: str = fmap.get_root().render()
+    map_element: Element = fmap.get_root()
+    folium_html: str = map_element.render()
     map_script: str = folium_html[folium_html.rfind('<script>') + 8:folium_html.rfind('</script>')]
     with open(prepare_path(ref.compileddata_map), 'w') as script_file:
         script_file.write(clean_js(map_script))
@@ -280,15 +288,17 @@ def build_app(fmap: folium.Map, db: Database) -> None:
     print('Done!')
     print('  Building HTML documents... ', end='')
 
-    html_application: Html = create_map(folium_html, db)
-    rendered_application: str = clean_html(html_application.render(True, True))
-    with open(prepare_path(ref.document_map), 'w') as file:
-        file.write(rendered_application)
+    builder: UIBuilder = UIBuilder(lexmap_file=ref.lexmap_polish)
 
-    html_archive: Html = create_archive(db)
-    rendered_archive: str = clean_html(html_archive.render(True, True))
+    map_html: str = clean_html(builder.create_map(db, folium_html).render())
+    with open(prepare_path(ref.document_map), 'w') as file:
+        file.write(map_html)
+
+    rendered_archive: str = clean_html(builder.create_archive(db).render())
     with open(prepare_path(ref.document_archive), 'w') as file:
         file.write(rendered_archive)
+
+    print('Done!')
 
 
 def main() -> None:
@@ -327,7 +337,6 @@ def main() -> None:
         fmap: folium.Map = generate_map(db)
         print('Compiling application...')
         build_app(fmap, db)
-        print('Done!')
 
 
 update_ztm_stops: bool = '--update' in sys.argv or '-u' in sys.argv

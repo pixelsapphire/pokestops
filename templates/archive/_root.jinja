@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <title>Pokestops Archive</title>
+    <link rel='icon' href='{{ ref.asset_img_compass }}'>
+    <link rel='stylesheet' type='text/css' href='{{ ref.url_material_icons }}'>
+    <link rel='stylesheet' type='text/css' href='{{ ref.stylesheet_common }}'>
+    <link rel='stylesheet' type='text/css' href='{{ ref.stylesheet_archive }}'>
+    <script src='{{ ref.compileddata_stops }}'></script>
+    <script src='{{ ref.compileddata_vehicles }}'></script>
+    <script src='{{ ref.compileddata_lines }}'></script>
+    <script src='{{ ref.compileddata_players }}'></script>
+    <script src='{{ ref.controller_archive }}'></script>
+</head>
+<body>
+{% include 'archive.header' %}
+<div id='container'>
+    {% include 'archive.navigation' %}
+    {% include 'archive.pages.stops' %}
+    {% include 'archive.pages.lines' %}
+    {% include 'archive.pages.vehicles' %}
+</div>
+</body>
+</html>

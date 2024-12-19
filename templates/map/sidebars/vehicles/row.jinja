@@ -1,0 +1,21 @@
+{% if discovery.item.model %}
+    {% set model = discovery.item.model %}
+{% else %}
+    {% set model = {'kind': 'bus', 'brand': '?', 'model': '?'} %}
+{% endif %}
+<tr>
+    <td>
+        <img class='vehicle-icon' src='{{ ref.asset_path_vehicles }}/{{ model.kind }}.webp'>
+    </td>
+    <td>
+        <img class='brand-logo'
+             {%- if model.brand %}src='{{ ref.asset_path_brands }}/{{ model.brand.lower() }}.webp'{% endif %}>
+    </td>
+    <td>
+        <span class='smaller'>{{ model.brand }}</span><br>
+        <span class='{% if model.model|length >= 30 %}smaller{% endif %}'>{{ model.model }}</span><br>
+        <span class='larger'>#{{ discovery.item.vehicle_id }} </span>
+        <span class='smaller'>({{ discovery.item.carrier.short_name }})</span>
+    </td>
+    <td class='achievement-progress'>{{ discovery.date.to_string(number=False) }}</td>
+</tr>

@@ -1,0 +1,28 @@
+{% from 'map.control.switch_row' import switch_row %}
+<div id='control' class='hud'>
+    <label id='player-selection'>
+        <select class='dropdown hud' onchange='selectPlayer()'>
+            {% for player in db.players %}
+                <option value='{{ player.nickname }}'>{{ player.nickname }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <label id='mode-selection'>
+        <select class='dropdown hud' onchange='selectMode()'>
+            {% for mode in db.get_game_modes() %}
+                <option value='{{ mode.lower().replace(' ', '-') }}'>{{ mode }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <table id='controls-pokestops' class='hud-controls'>
+        <tbody>
+        {{ switch_row('Show unvisited', 'visited-switch', 'toggleUnvisited()') }}
+        {{ switch_row('Show ever visited', 'ev-switch', 'toggleEV()') }}
+        </tbody>
+    </table>
+    <table id='controls-pokelines' class='hud-controls' style='display:none;'>
+        <tbody>
+        {{ switch_row('Show undiscovered', 'discovered-switch', 'toggleUndiscovered()') }}
+        </tbody>
+    </table>
+</div>

@@ -296,6 +296,9 @@ class Vehicle(JsonSerializable):
     def __cmp_key__(self):
         return int(self.vehicle_id) if self.vehicle_id.isdigit() else int(self.vehicle_id[:self.vehicle_id.index('+')])
 
+    def is_discovered(self) -> bool:
+        return len(self.discoveries) > 0
+
     def discovered_by(self, player: str | Player) -> str | None:
         from player import Player
         name = player.nickname if isinstance(player, Player) else player
@@ -571,3 +574,7 @@ class Database:
                     file.write(f'Changed lines:\n- {"\n- ".join(sorted(changed_lines, key=line_key))}\n')
             print(f'Report stored in {ref.report_gtfs}!')
             system_open(ref.report_gtfs)
+
+    @staticmethod
+    def get_game_modes() -> list[str]:
+        return ['Pokestops', 'Pokelines', 'Stellar Voyage']

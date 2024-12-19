@@ -15,7 +15,7 @@ def clean_html(html: str) -> str:
     def strip_whitespace_around_br(match: Match) -> str:
         return f'{match.group(1)}<br>{match.group(2)}'
 
-    def data_on_new_lines(match: Match) -> str:
+    def data_linebreaks(match: Match) -> str:
         spaces: str = match.group(1)
         tag_open: str = match.group(2)
         tag_name: str = match.group(3)
@@ -31,9 +31,9 @@ def clean_html(html: str) -> str:
     html = re.sub(r'(<[a-zA-Z0-9][^/>]*>)([^<]*)(</[a-zA-Z0-9]+>)', fold_tag, html)  # fold trivial tags
     html = re.sub(r'([^<\s]*)\s*<br\s*/?>\s*(<[a-zA-Z0-9][^/>]*>)', strip_whitespace_around_br, html)  # text<br><tag[stuff]>
     html = re.sub(r'(</[a-zA-Z0-9]*>)\s*<br\s*/?>\s*([^<\s]*)', strip_whitespace_around_br, html)  # </tag><br>text
-    html = re.sub(r'( *)((<[a-zA-Z0-9]+ )[a-zA-Z][^/>]*(data-[a-zA-Z][^/>]*)+>)([^<]*)(</[a-zA-Z0-9]+>)', data_on_new_lines,
-                  html)
+    html = re.sub(r'( *)((<[a-zA-Z0-9]+ )[a-zA-Z][^/>]*(data-[a-zA-Z][^/>]*)+>)([^<]*)(</[a-zA-Z0-9]+>)', data_linebreaks, html)
     html = re.sub(r'(<td[^>]*>)([\s\S]*?)(?=</td>)', fold_table_cell, html)
+    html = re.sub(r'\n\s*\n', '\n', html)  # clear empty lines
     return html
 
 

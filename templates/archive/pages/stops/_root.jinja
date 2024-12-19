@@ -1,0 +1,8 @@
+<div class='content-container selected' id='container-stops'>
+    <div class='content-section' id='stops-index'>
+        {% for group, stops in db.stop_groups.items() | lexicographic_sort(attribute=0) %}
+            {% include 'archive.pages.stops.tile' %}
+        {% endfor %}
+    </div>
+    {% include 'archive.pages.stops.view_panel' %}
+</div>

@@ -1,0 +1,19 @@
+{% set region = db.region_of(stops | first) %}
+<div class='stop-group-view'>
+    <div class='stop-header'>
+        <div class='roman-numeral'>{{ util.roman_numeral(region.number) }}</div>
+        <div class='name-and-stars'>
+            <div class='stop-group-name'>{{ group }}</div>
+            <div class='stars'>{{ '★' * db.get_stars_for_group(stops | length) }}</div>
+        </div>
+        <div class='expand-icon material-symbols-outlined'>add</div>
+    </div>
+    <div class='group-stops'>
+        {% for stop in stops %}
+            <div class='stop-preview' data-stop-id='{{ stop.short_name }}'>
+                <div class='marker'>{{ stop.marker() }}</div>
+                <span class='stop-id'>{{ stop.short_name }}</span>
+            </div>
+        {% endfor %}
+    </div>
+</div>

@@ -1,0 +1,8 @@
+<div class='content-container' id='container-vehicles'>
+    <div class='content-section' id='vehicles-index'>
+        {% for vehicle in db.vehicles.values() | sort %}
+            {% include 'archive.pages.vehicles.tile' %}
+        {% endfor %}
+    </div>
+    {% include 'archive.pages.vehicles.view_panel' %}
+</div>

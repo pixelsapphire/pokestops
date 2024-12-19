@@ -1,0 +1,16 @@
+<div class='sidebar' id='achievements'>
+    {% for player in db.players %}
+        <div class='progress-list' data-player='{{ player.nickname.lower() }}'
+             {%- if player.nickname != db.players[0].nickname %}style='display:none;' {% endif %}>
+            <p class='center'>Achievements completed: {{ player.logbook.get_n_achievements(db) }}</p>
+            <table>
+                <tbody>
+                {% for achievement in player.logbook.get_achievements(db) %}
+                    {% include 'map.sidebars.achievements.row' %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endfor %}
+</div>
+{% include 'map.sidebars.achievements.button' %}

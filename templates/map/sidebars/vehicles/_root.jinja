@@ -1,0 +1,16 @@
+<div class='sidebar' id='vehicles'>
+    {% for player in db.players %}
+        <div class='progress-list' data-player='{{ player.nickname.lower() }}'
+             {%- if loop.index0 %}style='display:none;'{% endif %}>
+            <p class='center'>Vehicles discovered: {{ player.logbook.get_n_vehicles() }}</p>
+            <table>
+                <tbody>
+                {% for discovery in player.logbook.get_vehicles() %}
+                    {% include 'map.sidebars.vehicles.row' %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endfor %}
+</div>
+{% include 'map.sidebars.vehicles.button' %}

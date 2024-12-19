@@ -1,0 +1,25 @@
+<p id='exploration' class='hud'>
+    <label id='region-selection'>
+        <select class='dropdown hud' onchange='selectRegion()'>
+            {% for region in db.regions.values() | sort %}
+                <option value='{{ region.short_name }}'>{{ region.full_name }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <br>
+    <span id='exploration-progress'>
+        Exploration progress:
+        <span id='exploration-percentage'
+                {%- for player in db.players -%}
+                    data-lines-{{ player.nickname.lower() }}='{{ db.progress['LN'][player.nickname] }}'
+                    data-sv-{{ player.nickname.lower() }}='{{ db.progress['SV'][player.nickname] }}'
+                    {%- for region in db.regions.values() -%}
+                      data-{{ region.short_name.lower() }}-{{ player.nickname.lower() }}='{{ db.progress[region.short_name][player.nickname] }}'
+                      data-{{ region.short_name.lower() }}-ev-{{ player.nickname.lower() }}='{{ db.progress[region.short_name]['ev-' + player.nickname] }}'
+                    {%- endfor -%}
+                {%- endfor -%}>
+            {{ db.progress[db.district.short_name][db.players[0].nickname] }}
+        </span>
+    </span>
+</p>
+<img id='compass' src='{{ ref.asset_img_compass }}'>

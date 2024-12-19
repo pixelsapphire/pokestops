@@ -1,0 +1,12 @@
+{% if vehicle.model %}
+    {% set model = vehicle.model %}
+{% else %}
+    {% set model = {'kind': 'bus', 'brand': '?'} %}
+{% endif %}
+<div class='vehicle-preview' data-vehicle-id='{{ vehicle.vehicle_id }}'>
+    <img class='vehicle-icon' src='{{ ref.asset_path_vehicles }}/{{ model.kind }}.webp'>
+    {% if model.brand != '?' %}
+        <img class='vehicle-brand' src='{{ ref.asset_path_brands }}/{{ model.brand.lower() }}.webp'>
+    {% endif %}
+    <div class='vehicle-id'>#{{ vehicle.vehicle_id }}</div>
+</div>

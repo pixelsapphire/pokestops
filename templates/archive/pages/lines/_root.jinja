@@ -1,0 +1,8 @@
+<div class='content-container' id='container-lines'>
+    <div class='content-section' id='lines-index'>
+        {% for line in db.lines.values() | sort %}
+            {% include 'archive.pages.lines.tile' %}
+        {% endfor %}
+    </div>
+    {% include 'archive.pages.lines.view_panel' %}
+</div>

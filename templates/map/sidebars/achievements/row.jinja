@@ -1,0 +1,22 @@
+<tr>
+    <td class='achievement-stars'>{{ db.get_stars_for_group(achievement.total) * '★' }}</td>
+    <td>
+        {{ achievement.name }}
+        <br>
+        <p class='achievement-description'>
+            Collect all of the following: {{ ', '.join(achievement.stops_list | sort) }}
+        </p>
+    </td>
+    <td class='achievement-progress'>
+        {% if achievement.is_completed() %}
+            <span class='smaller'>Completed</span><br>
+            {% if achievement.completion_date %}
+                {{ achievement.completion_date.to_string(number=False) }}
+            {% else %}
+                <span class='smaller'>a long time ago</span>
+            {% endif %}
+        {% else %}
+            {{ achievement.visited }}/{{ achievement.total }}
+        {% endif %}
+    </td>
+</tr>
