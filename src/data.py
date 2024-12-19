@@ -4,7 +4,6 @@ import ref
 import re
 from abc import ABC
 from collections import defaultdict
-from sortedcontainers import SortedSet
 from typing import Literal, TYPE_CHECKING
 from util import *
 
@@ -355,6 +354,8 @@ class Line(JsonSerializable):
         self.routes: list[str] = routes
         self.stops: list[list[str]] = stops
         self.discoveries: list[Discovery] = []
+        if self.background_color == self.text_color:
+            self.text_color = invert_hex_color(self.text_color)
 
     def __eq__(self, other):
         return self.number == other.number if isinstance(other, type(self)) else False

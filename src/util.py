@@ -53,6 +53,13 @@ def to_css(stylesheet: dict[str, dict[str, str]]) -> str:
     )
 
 
+def invert_hex_color(color: str) -> str:
+    hashtag: bool = color.startswith('#')
+    color: str = color.lstrip('#')
+    inverted_color = ''.join(f'{255 - int(color[i:i + 2], 16):02x}' for i in range(0, 6, 2))
+    return f'{'#' if hashtag else ''}{inverted_color}{color[-2:] if len(color) > 6 else ''}'
+
+
 __error_log__: list[str] = []
 
 

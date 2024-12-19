@@ -85,7 +85,8 @@ function selectLine(linePreview, ctrl) {
                 const stopCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
                 Object.entries({
                     'cx': `${stopRadius}`, 'cy': `${y += stopSpacing}`, 'r': `${stopRadius - strokeWidth / 2}`,
-                    'fill': 'white', 'stroke': `#${lines[lineNumber].bc}`, 'stroke-width': `${strokeWidth}`
+                    'fill': 'white', 'stroke-width': `${strokeWidth}`,
+                    'stroke': lines[lineNumber].bc.toLowerCase() === 'ffffff' ? '#888' : `#${lines[lineNumber].bc}`
                 }).forEach(([key, value]) => stopCircle.setAttribute(key, value));
                 routeImage.appendChild(stopCircle);
                 const stopLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
