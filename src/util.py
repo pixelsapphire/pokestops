@@ -1,5 +1,6 @@
 from __future__ import annotations
 import csv
+import datetime
 import os
 import platform
 import subprocess
@@ -44,6 +45,10 @@ def sign(n: int | float) -> int:
 
 def count(iterable: Iterable[Any]) -> int:
     return sum(1 for _ in iterable)
+
+
+def find_first[T](predicate: Callable[[T], bool], iterable: Iterable[T]) -> T | None:
+    return next(filter(predicate, iterable), None)
 
 
 def to_css(stylesheet: dict[str, dict[str, str]]) -> str:
@@ -308,8 +313,14 @@ class DateAndOrder:
     def __lt__(self, other):
         return self.__cmp_key__() < other.__cmp_key__() if isinstance(other, DateAndOrder) else False
 
+    def __le__(self, other):
+        return self.__cmp_key__() <= other.__cmp_key__() if isinstance(other, DateAndOrder) else False
+
     def __gt__(self, other):
         return self.__cmp_key__() > other.__cmp_key__() if isinstance(other, DateAndOrder) else False
+
+    def __ge__(self, other):
+        return self.__cmp_key__() >= other.__cmp_key__() if isinstance(other, DateAndOrder) else False
 
     def __hash__(self):
         return hash((self._year, self._month, self._day, self._number_in_day))
@@ -369,6 +380,11 @@ class DateAndOrder:
 
     def to_string(self, number: bool = True) -> str:
         return self.__str__() if number else self.__str__().split(':')[0]
+
+    @staticmethod
+    def today() -> DateAndOrder:
+        today_date: datetime.date = datetime.date.today()
+        return DateAndOrder(year=today_date.year, month=today_date.month, day=today_date.day)
 
 
 DateAndOrder.long_time_ago = DateAndOrder(year=0, month=0, day=0, number_in_day=0)  # type: ignore

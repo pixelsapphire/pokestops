@@ -118,6 +118,10 @@ class Stop(JsonSerializable):
             return 'E'
 
     @staticmethod
+    def dummy(short_name: str, full_name: str) -> Stop:
+        return Stop(short_name, full_name, '0', '0', '', '')
+
+    @staticmethod
     def read_stops(source: str, db: Database) -> tuple[dict[str, Stop], dict[str, SortedSet[Stop]]]:
         print(f'  Reading stops data from {source}... ', end='')
         stops: dict[str, Stop] = {}
@@ -218,6 +222,46 @@ class Terminal(JsonSerializable):
                 f'lt:{self.latitude},'
                 f'ln:{self.longitude}'
                 f'}},')
+
+
+class StopChange:
+    def __init__(self, date: DateAndOrder, old_stop: Stop = None, new_stop: Stop | None = None):
+        self.date: DateAndOrder = date
+        self.old_stop: Stop | None = old_stop
+        self.new_stop: Stop | None = new_stop
+        if old_stop is None and new_stop is None:
+            raise ValueError('Empty change')
+
+    def affects(self, stop: Stop) -> bool:
+        return stop == self.old_stop or stop == self.new_stop
+
+    def is_effective(self) -> bool:
+        return DateAndOrder.today() >= self.date
+
+    def is_additional(self) -> bool:
+        return self.old_stop is None
+
+    def is_removal(self) -> bool:
+        return self.new_stop is None
+
+    def is_modification(self) -> bool:
+        return self.old_stop is not None and self.new_stop is not None
+
+    def is_id_change(self) -> bool:
+        return self.is_modification() and self.old_stop.short_name != self.new_stop.short_name
+
+    def is_name_change(self) -> bool:
+        return self.is_modification() and self.old_stop.full_name != self.new_stop.full_name
+
+    @staticmethod
+    def read_list(source: str) -> list[StopChange]:
+        print(f'  Reading scheduled stop changes data from {source}... ', end='')
+        constructor = lambda *row: StopChange(DateAndOrder(date_string=row[0]),
+                                              Stop.dummy(row[1], row[2]) if row[1] and row[2] else None,
+                                              Stop.dummy(row[3], row[4]) if row[3] and row[4] else None)
+        # warning caused by Pycharm issue PY-70668
+        # noinspection PyTypeChecker
+        return __read_collection__(source, [], constructor, list.append)
 
 
 class Carrier(JsonSerializable):
@@ -481,7 +525,7 @@ class Region:
             regions = [Region(region['number'], region['short_name'], region['full_name'],
                               Region.__resolve_predicate__(region['predicate']))
                        for region in index['regions']]
-            district: Region = next(filter(lambda r: r.short_name == index['district'], regions))
+            district: Region = find_first(lambda r: r.short_name == index['district'], regions)
             print('Done!')
             return district, {
                 district.short_name: district,
@@ -499,7 +543,7 @@ class Database:
                  stops: dict[str, Stop], stop_groups: dict[str, SortedSet[Stop]], terminals: list[Terminal],
                  carriers: dict[str, Carrier], regions: dict[str, Region], district: Region,
                  vehicles: dict[str, Vehicle], models: dict[str, VehicleModel],
-                 lines: dict[str, Line], routes: dict[str, Route]):
+                 lines: dict[str, Line], routes: dict[str, Route], scheduled_changes: list[StopChange]):
         self.players: list[Player] = players
         self.progress: dict[str, dict[str, float]] = progress
         self.stops: dict[str, Stop] = stops
@@ -512,6 +556,7 @@ class Database:
         self.models: dict[str, VehicleModel] = models
         self.routes: dict[str, Route] = routes
         self.lines: dict[str, Line] = lines
+        self.scheduled_changes: list[StopChange] = scheduled_changes
 
     def __contains__(self, name: CollectionName) -> bool:
         return bool(getattr(self, name))
@@ -522,10 +567,11 @@ class Database:
                 terminals: list[Terminal] | None = None, carriers: dict[str, Carrier] | None = None,
                 regions: dict[str, Region] | None = None, district: Region | None = None,
                 vehicles: dict[str, Vehicle] | None = None, models: dict[str, VehicleModel] | None = None,
-                lines: dict[str, Line] | None = None, routes: dict[str, Route] | None = None) -> Database:
+                lines: dict[str, Line] | None = None, routes: dict[str, Route] | None = None,
+                scheduled_changes: list[StopChange] | None = None) -> Database:
         return Database(players or [], progress or {}, stops or {}, stop_groups or {}, terminals or [],
                         carriers or {}, regions or {}, district or Region(0, '', '', lambda _: False),
-                        vehicles or {}, models or {}, lines or {}, routes or {})
+                        vehicles or {}, models or {}, lines or {}, routes or {}, scheduled_changes or [])
 
     @staticmethod
     def get_stars_for_group(size: int):
@@ -542,15 +588,26 @@ class Database:
         return geopoint(sum(s.location.latitude for s in stops) / len(stops),
                         sum(s.location.longitude for s in stops) / len(stops))
 
+    def get_effective_changes(self):
+        return [change for change in self.scheduled_changes if change.is_effective()]
+
     @staticmethod
     def make_update_report(old_data: Database, new_data: Database) -> None:
         added_stops: set[Stop] = {s for s in new_data.stops.values() if s not in old_data.stops.values()}
         removed_stops: set[Stop] = {s for s in old_data.stops.values() if s not in new_data.stops.values()}
+        changed_stops: set[tuple[Stop, Stop]] = set()
         added_lines: set[str] = {r for r in new_data.lines.keys() if r not in old_data.lines.keys()}
         removed_lines: set[str] = {r for r in old_data.lines.keys() if r not in new_data.lines.keys()}
         changed_lines: set[str] = {r for r in new_data.lines.keys()
                                    if r in old_data.lines.keys() and new_data.lines[r].stops != old_data.lines[r].stops}
-        if not added_stops and not removed_stops and not added_lines and not removed_lines and not changed_lines:
+        effective_modifications: list[StopChange] = [c for c in new_data.get_effective_changes() if c.is_modification()]
+        if effective_modifications:
+            for change in effective_modifications:
+                removed_stops.discard(change.old_stop)
+                added_stops.discard(change.new_stop)
+                changed_stops.add((change.old_stop, change.new_stop))
+        if (not added_stops and not removed_stops and not changed_stops and
+                not added_lines and not removed_lines and not changed_lines):
             print(' No changes, no report created.')
         else:
             print(' Data has changed, creating report... ', end='')
@@ -566,6 +623,10 @@ class Database:
                 if removed_stops:
                     file.write(f'Removed stops:\n- {'\n- '.join(f'{s.full_name} [{s.short_name}]'
                                                                 for s in sorted(removed_stops, key=stop_key))}\n')
+                if changed_stops:
+                    file.write(f'Changed stops:\n- {'\n- '
+                               .join(f'{old.full_name} [{old.short_name}] -> {new.full_name} [{new.short_name}]'
+                                     for old, new in sorted(changed_stops, key=lambda p: stop_key(p[0])))}\n')
                 if added_lines:
                     file.write(f'Added lines:\n- {"\n- ".join(sorted(added_lines, key=line_key))}\n')
                 if removed_lines:

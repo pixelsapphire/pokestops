@@ -53,8 +53,8 @@ def load_data(initial_db: Database) -> Database:
         }
     }
 
-    return Database(players, progress, stops, initial_db.stop_groups, terminals,
-                    carriers, regions, initial_db.district, vehicles, models, initial_db.lines, initial_db.routes)
+    return Database(players, progress, stops, initial_db.stop_groups, terminals, carriers, regions, initial_db.district,
+                    vehicles, models, initial_db.lines, initial_db.routes, initial_db.scheduled_changes)
 
 
 def next_midpoint(previous_dir: vector2f, current_point: vector2f, next_point: vector2f,
@@ -306,7 +306,9 @@ def main() -> None:
     print('Building initial database...')
     district, regions = Region.read_regions(ref.rawdata_regions)
     players: list[Player] = Player.read_list(ref.rawdata_players)
-    initial_db: Database = Database.partial(regions=regions, district=district, players=players)
+    scheduled_changes: list[StopChange] = StopChange.read_list(ref.rawdata_scheduled_changes)
+    initial_db: Database = Database.partial(regions=regions, district=district, players=players,
+                                            scheduled_changes=scheduled_changes)
 
     if update_ztm_stops:
         print('Updating GTFS data...')
@@ -326,14 +328,13 @@ def main() -> None:
     db: Database = load_data(initial_db)
     del initial_db
 
-    print('Generating map data...')
-    if update_ztm_stops:
-        print('Drawing line route diagrams... ', end='')
-        for line in db.lines.values():
-            create_route_map(line, db, False)
-        print('Done!')
-
     if update_map:
+        print('Generating map data...')
+        if update_ztm_stops:
+            print('Drawing line route diagrams... ', end='')
+            for line in db.lines.values():
+                create_route_map(line, db, False)
+            print('Done!')
         fmap: folium.Map = generate_map(db)
         print('Compiling application...')
         build_app(fmap, db)

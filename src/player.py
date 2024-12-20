@@ -149,8 +149,13 @@ class Player(JsonSerializable):
                 stop.add_visit(self, date)
                 self.logbook.add_stop(stop, date)
             else:
-                error(f'{self.nickname} has visited stop {row[0]}, which is currently not in the database, '
-                      f'comment or remove the {row[1]} entry from her stops file')
+                change: StopChange | None = find_first(lambda c: row[0] == c.old_stop.short_name, db.get_effective_changes())
+                if change:
+                    error(f'{self.nickname} has visited stop {row[0]}, which is now {change.new_stop.short_name}, '
+                          f'change the {row[1]} entry in her stops file')
+                else:
+                    error(f'{self.nickname} has visited stop {row[0]}, which is currently not in the database, '
+                          f'comment or remove the {row[1]} entry from her stops file')
         for row in stop_comments:
             if db.stops.get(row[0]):
                 error(f'{self.nickname} has visited stop {row[0]}, which is now in the database, '
@@ -164,8 +169,13 @@ class Player(JsonSerializable):
                 stop.add_visit(self)
                 self.logbook.add_stop(stop)
             else:
-                error(f'{self.nickname} has visited stop {row[0]}, which is currently not in the database, '
-                      f'comment or remove the entry from her EV stops file')
+                change = find_first(lambda c: row[0] == c.old_stop.short_name, db.get_effective_changes())
+                if change:
+                    error(f'{self.nickname} has visited stop {row[0]}, which is now {change.new_stop.short_name}, '
+                          f'change the entry in her EV stops file')
+                else:
+                    error(f'{self.nickname} has visited stop {row[0]}, which is currently not in the database, '
+                          f'comment or remove the entry from her EV stops file')
         for row in ev_stop_comments:
             if db.stops.get(row[0]):
                 error(f'{self.nickname} has visited stop {row[0]}, which is now in the database, '
