@@ -116,8 +116,8 @@ def create_route_map(line: Line, db: Database, all_variants: bool) -> None:
         variant += 1
         stops: list[Stop] = []
         for stop_id in line_variant:
-            stop: Stop = db.stops[stop_id]
-            if not any(stop.full_name == s.full_name for s in stops):
+            stop: Stop = db.stops.get(stop_id)
+            if stop and not any(stop.full_name == s.full_name for s in stops):
                 stops.append(stop)
         stops_locations: list[geopoint] = list(map(db.group_location, stops))
         lat_min: float = min(s.latitude for s in stops_locations)

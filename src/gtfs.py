@@ -69,14 +69,16 @@ def attach_stop_lines(gtfs_db: sqlite3.Connection) -> None:
 def attach_line_routes(gtfs_db: sqlite3.Connection) -> None:
     print('    Attaching route ids to lines... ', end='')
     cursor: sqlite3.Cursor = gtfs_db.cursor()
-    cursor.execute('SELECT route_id, shape_id '
-                   'FROM trips '
-                   'WHERE trip_id LIKE \'%+\''
-                   'GROUP BY shape_id, route_id;')
-
+    cursor.execute('WITH Filtered AS (SELECT route_id, shape_id FROM trips WHERE trip_id LIKE \'%+\'),'
+                   '     Fallback AS (SELECT route_id, shape_id FROM trips) '
+                   'SELECT * FROM Filtered '
+                   'WHERE route_id IN (SELECT DISTINCT route_id FROM Filtered) GROUP BY shape_id, route_id '
+                   'UNION ALL '
+                   'SELECT * FROM Fallback '
+                   'WHERE route_id NOT IN (SELECT DISTINCT route_id FROM Filtered) GROUP BY shape_id, route_id ;')
     line_routes: dict[str, list[str]] = defaultdict(list)
-    for route_id, shape_id in cursor.fetchall():
-        line_routes[route_id].append(shape_id)
+    for line_id, shape_id in cursor.fetchall():
+        line_routes[line_id].append(shape_id)
     cursor.close()
 
     lines_header_row: list[str]
@@ -88,26 +90,32 @@ def attach_line_routes(gtfs_db: sqlite3.Connection) -> None:
 
     with open(prepare_path(ref.rawdata_lines), 'w') as file:
         writer = csv.writer(file)
-        writer.writerow([*lines_header_row, 'stops'])
+        writer.writerow([*lines_header_row, 'routes'])
         for line in lines_data:
             writer.writerow([*line, '&'.join(line_routes[line[0]])])
 
     print('Done!')
 
 
-# noinspection SqlNoDataSourceInspection
 def attach_line_stops(gtfs_db: sqlite3.Connection) -> None:
     print('    Attaching stop codes to lines... ', end='')
     cursor: sqlite3.Cursor = gtfs_db.cursor()
-    cursor.execute('SELECT route_id, trip_id, stop_code '
-                   'FROM trips JOIN stop_times USING (trip_id) JOIN stops USING (stop_id)'
-                   'WHERE trip_id LIKE \'%+\''
+    cursor.execute('WITH Filtered AS (SELECT route_id, trip_id, shape_id, stop_code, stop_sequence '
+                   '                  FROM trips JOIN stop_times USING (trip_id) JOIN stops USING (stop_id) '
+                   '                  WHERE trip_id LIKE \'%+\'),'
+                   '     Fallback AS (SELECT route_id, trip_id, shape_id, stop_code, stop_sequence '
+                   '                  FROM trips JOIN stop_times USING (trip_id) JOIN stops USING (stop_id)) '
+                   'SELECT * FROM (SELECT route_id, trip_id, stop_code, stop_sequence FROM Filtered '
+                   'WHERE route_id IN (SELECT DISTINCT route_id FROM Filtered) '
                    'GROUP BY route_id, trip_id, shape_id, stop_sequence '
+                   'UNION ALL '
+                   'SELECT route_id, trip_id, stop_code, stop_sequence FROM Fallback '
+                   'WHERE route_id NOT IN (SELECT DISTINCT route_id FROM Filtered) '
+                   'GROUP BY route_id, trip_id, shape_id, stop_sequence) '
                    'ORDER BY CAST(route_id AS INTEGER), trip_id, CAST(stop_sequence AS INTEGER)')
-
     line_stops: dict[str, dict[str, list[str]]] = defaultdict(lambda: defaultdict(list))
     for record in cursor.fetchall():
-        line_id, trip_id, stop_code = record
+        line_id, trip_id, stop_code, _ = record
         line_stops[line_id][trip_id].append(stop_code)
     cursor.close()
 
