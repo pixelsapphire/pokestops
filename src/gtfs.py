@@ -1,4 +1,3 @@
-import requests
 import sqlite3
 from data import *
 from util import *
@@ -150,20 +149,10 @@ def update_gtfs_data(first_update: bool, initial_db: Database) -> None:
         if os.path.exists(ref.rawdata_lines):
             old_db.lines = Line.read_dict(ref.rawdata_lines)
     print(f'  Downloading latest GTFS data from {ref.url_ztm_gtfs}... ', end='')
-    try:
-        response: requests.Response = requests.get(ref.url_ztm_gtfs)
-    except requests.RequestException as e:
-        print(f'Failed due to a connection error!')
-        error(f'Connection error while downloading GTFS data: {e}')
-        return
-    if response.status_code != 200:
-        print(f'Failed due to a request error!')
-        error(f'Request error while downloading GTFS data: {response.reason}')
-        return
+    os.system(f'curl -H "Accept: application/octet-stream" -H "Content-Type: application/x-www-form-urlencoded" '
+              f'-X GET "{ref.url_ztm_gtfs}" -o "{ref.tmpdata_gtfs}" > /dev/null 2>&1')
     print('Done!')
     print('  Extracting GTFS data... ', end='')
-    with open(prepare_path(ref.tmpdata_gtfs), 'wb') as file:
-        file.write(response.content)
     with zip_file(ref.tmpdata_gtfs, 'r') as gtfs_zip:
         gtfs_zip.extract_as('stops.txt', ref.rawdata_stops)
         gtfs_zip.extract_as('stop_times.txt', ref.rawdata_stop_times)
