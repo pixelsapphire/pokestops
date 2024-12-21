@@ -32,5 +32,10 @@ class UIBuilder(Environment):
 
     def create_archive(self, db: Database) -> Template:
         archive_template: Template = self.get_template('archive')
-        archive_template.globals.update(util=util, ref=ref, db=db)
+        archive_template.globals.update(ref=ref, db=db, util=util)
         return archive_template
+
+    def create_announcements(self, db: Database) -> Template:
+        announcements_template: Template = self.get_template('announcements')
+        announcements_template.globals.update(ref=ref, db=db)
+        return announcements_template

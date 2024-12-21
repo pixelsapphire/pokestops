@@ -8,10 +8,123 @@
     src: url('../fonts/markers.ttf');
 }
 
+@font-face {
+    font-family: 'Arklatrs';
+    src: url('../fonts/arklatrs.ttf');
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #222;
+    color: #d8d8d8;
+    font-family: Genshin, sans-serif;
+}
+
+body.default-light {
+    color: #333333;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
 .hidden {
     display: none !important;
 }
 
 .nowrap {
     white-space: nowrap;
+}
+
+#title-container {
+    background: url('../images/banner.png') center;
+    background-size: cover;
+    text-align: center;
+    padding: min(4vh, 4dvw);
+}
+
+#back-icon {
+    font-size: min(6vh, 6dvw);
+    cursor: pointer;
+    position: absolute;
+    left: min(3vh, 3dvw);
+    top: min(3vh, 3dvw);
+}
+
+#title-icon {
+    font-size: min(16vh, 16dvw);
+}
+
+#title {
+    font-size: min(6vh, 6dvw);
+}
+
+#container {
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+}
+
+.content-container {
+    display: none;
+    padding: min(2vh, 2dvw);
+    flex: 1;
+    overflow-y: hidden
+}
+
+.content-container.selected {
+    display: flex;
+}
+
+.content-section {
+    background-color: #181818;
+    overflow-y: auto;
+}
+
+.content-section::-webkit-scrollbar {
+    display: none;
+}
+
+.object-view {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: min(2vh, 2dvw);
+}
+
+.line-view {
+    display: inline-flex;
+    align-items: center;
+    margin: min(0.5vh, 0.5dvw);
+    border-radius: 100vmax;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.line-view.small {
+    margin: min(0.25vh, 0.25dvw);
+}
+
+.line-number {
+    padding: min(0.5vh, 0.5dvw) min(1.5vh, 1.5dvw);
+    border-radius: 100vmax;
+    font-size: min(3vh, 3dvw);
+    display: inline-block;
+}
+
+.small .line-number {
+    padding: min(0.25vh, 0.25dvw) min(0.75vh, 0.75dvw);
+    font-size: min(1.5vh, 1.5dvw);
+}
+
+.line-destination {
+    padding-left: min(1vh, 1dvw);
+    padding-right: min(1.5vh, 1.5dvw);
+    font-size: min(1.75vh, 1.75dvw);
 }

@@ -1,0 +1,32 @@
+<div class='announcement-preview' data-article-id='{{ announcement.announcement_id }}'>
+    <img class='source-icon' src='{{ ref.asset_path_agencies }}/{{ announcement.announcement_id.split('-')[0] }}.svg'>
+    <div class='preview-elements'>
+        <div class='announcement-title'>{{ announcement.title }}</div>
+        {% if announcement.date_published is not none %}
+            <div class='announcement-date'>
+                published on {{ announcement.date_published.to_string(number=False) }}
+            </div>
+        {% elif announcement.date_from is not none and announcement.date_to is not none %}
+            <div class='announcement-date'>
+                applies
+                {% if announcement.date_to.is_known() is false %} from {% endif %}
+                {{ announcement.date_from.to_string(number=False) }}
+                {% if announcement.date_to.is_known() %} ~
+                    {{ announcement.date_to.to_string(number=False) }}
+                {% endif %}
+            </div>
+        {% endif %}
+        {% if announcement.lines | length > 0 %}
+            <div class='announcement-lines'>
+                {% for line in announcement.lines %}
+                    <div class='line-view small'>
+                        <div class='line-number'
+                             style='background-color: #{{ line.background_color }}; color: #{{ line.text_color }}'>
+                            {{ line.number }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</div>

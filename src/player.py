@@ -124,19 +124,12 @@ class Player(JsonSerializable):
     def __repr__(self):
         return f'Player {self.nickname}'
 
-    @staticmethod
-    def __init_file__(path: str, header: str = '') -> None:
-        if not os.path.exists(path):
-            os.makedirs(os.path.dirname(path), exist_ok=True)
-            with open(path, 'x') as new_file:
-                new_file.write(f'{header}\n')
-
     def __init_files__(self) -> None:
-        self.__init_file__(self.__stops_file__, 'stop_id,date_visited')
-        self.__init_file__(self.__ev_file__, 'stop_id')
-        self.__init_file__(self.__terminals_file__, 'terminal_id,closest_arrival,closest_departure')
-        self.__init_file__(self.__lines_file__, 'line_number,date_discovered')
-        self.__init_file__(self.__vehicles_file__, 'vehicle_id,date_discovered')
+        prepare_file(self.__stops_file__, 'stop_id,date_visited\n')
+        prepare_file(self.__ev_file__, 'stop_id\n')
+        prepare_file(self.__terminals_file__, 'terminal_id,closest_arrival,closest_departure\n')
+        prepare_file(self.__lines_file__, 'line_number,date_discovered\n')
+        prepare_file(self.__vehicles_file__, 'vehicle_id,date_discovered\n')
 
     def __load_stops__(self, db: Database) -> None:
         loader: ChronoLoader = ChronoLoader(lambda r: f'{self.nickname}\'s stop visits are not in chronological order, '

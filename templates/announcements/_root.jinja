@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <title>The Steambird</title>
+    <link rel='icon' href='{{ ref.asset_img_compass }}'>
+    <link rel='stylesheet' type='text/css' href='{{ ref.url_material_icons }}'>
+    <link rel='stylesheet' type='text/css' href='{{ ref.stylesheet_common }}'>
+    <link rel='stylesheet' type='text/css' href='{{ ref.stylesheet_announcements }}'>
+    <script src='{{ ref.controller_announcements }}'></script>
+</head>
+<body>
+{% include 'announcements.header' %}
+<div id='container'>
+    <div class='content-container selected' id='container-announcements'>
+        <div class='content-section' id='announcements-index'>
+            {% for announcement in db.announcements %}
+                {% include 'announcements.tile' %}
+            {% endfor %}
+        </div>
+        <div class='content-section object-view' id='announcement-view'>
+            {% for announcement in db.announcements %}
+                <div class='announcement-article' id='{{ announcement.announcement_id }}'>
+                    <p class='announcement-article-title'>{{ announcement.title }}</p>
+                    {% include 'announcements._articles.' + announcement.announcement_id %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+</body>
+</html>

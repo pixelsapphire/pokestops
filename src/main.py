@@ -1,5 +1,6 @@
 import folium
 import gtfs
+from announcements import *
 from branca.element import Element
 from postprocess import *
 from uibuilder import *
@@ -19,6 +20,7 @@ def load_data(initial_db: Database) -> Database:
     carriers: dict[str, Carrier] = Carrier.read_dict(ref.rawdata_carriers)
     models: dict[str, VehicleModel] = VehicleModel.read_dict(ref.rawdata_vehicle_models)
     vehicles: dict[str, Vehicle] = Vehicle.read_dict(ref.rawdata_vehicles, carriers, models)
+    announcements: list[Announcement] = Announcement.read_list(ref.rawdata_announcements, initial_db.lines)
 
     initial_db.terminals = terminals
     initial_db.vehicles = vehicles
@@ -54,7 +56,7 @@ def load_data(initial_db: Database) -> Database:
     }
 
     return Database(players, progress, stops, initial_db.stop_groups, terminals, carriers, regions, initial_db.district,
-                    vehicles, models, initial_db.lines, initial_db.routes, initial_db.scheduled_changes)
+                    vehicles, models, initial_db.lines, initial_db.routes, initial_db.scheduled_changes, announcements)
 
 
 def next_midpoint(previous_dir: vector2f, current_point: vector2f, next_point: vector2f,
@@ -294,9 +296,13 @@ def build_app(fmap: folium.Map, db: Database) -> None:
     with open(prepare_path(ref.document_map), 'w') as file:
         file.write(map_html)
 
-    rendered_archive: str = clean_html(builder.create_archive(db).render())
+    archive_html: str = clean_html(builder.create_archive(db).render())
     with open(prepare_path(ref.document_archive), 'w') as file:
-        file.write(rendered_archive)
+        file.write(archive_html)
+
+    announcements_html: str = clean_html(builder.create_announcements(db).render())
+    with open(prepare_path(ref.document_announcements), 'w') as file:
+        file.write(announcements_html)
 
     print('Done!')
 
@@ -324,6 +330,9 @@ def main() -> None:
             raise FileNotFoundError(f'{ref.rawdata_lines} not found. '
                                     f'Run the script with the --update flag to download the latest data.')
 
+    if update_announcements:
+        fetch_announcements()
+
     print('Building full database...')
     db: Database = load_data(initial_db)
     del initial_db
@@ -342,6 +351,7 @@ def main() -> None:
 
 update_ztm_stops: bool = '--update' in sys.argv or '-u' in sys.argv
 update_map: bool = '--map' in sys.argv or '-m' in sys.argv
+update_announcements: bool = '--announcements' in sys.argv or '-a' in sys.argv
 if __name__ == '__main__':
     os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     main()

@@ -1,13 +1,13 @@
 from __future__ import annotations
 import json
 import ref
-import re
 from abc import ABC
 from collections import defaultdict
 from typing import Literal, TYPE_CHECKING
 from util import *
 
 if TYPE_CHECKING:
+    from announcements import Announcement
     from player import Player
 
 T = TypeVar('T')
@@ -458,6 +458,10 @@ class Line(JsonSerializable):
         return 'suburban bus'
 
     @staticmethod
+    def dummy(number: str) -> Line:
+        return Line(number, '', '', '525252', 'ffffff', [], [])
+
+    @staticmethod
     def read_dict(source: str) -> dict[str, Line]:  # TODO attach actual routes and stops instead of ids
         print(f'  Reading routes data from {source}... ', end='')
         constructor = lambda *row: Line(row[2], row[3].split('|')[0], row[4].split('|')[0].split('^')[0], row[6], row[7],
@@ -535,15 +539,16 @@ class Region:
 
 class Database:
     type CollectionName = Literal[
-        'players', 'progress', 'stops', 'stop_groups', 'terminals',
-        'carriers', 'regions', 'vehicles', 'models', 'lines', 'routes']
+        'players', 'progress', 'stops', 'stop_groups', 'terminals', 'carriers', 'regions',
+        'vehicles', 'models', 'lines', 'routes', 'scheduled_changes', 'announcements']
     __stars__: dict[tuple[int, int], int] = {(1, 1): 1, (2, 2): 2, (3, 4): 3, (5, 7): 4, (8, 100): 5}
 
     def __init__(self, players: list[Player], progress: dict[str, dict[str, float]],
                  stops: dict[str, Stop], stop_groups: dict[str, SortedSet[Stop]], terminals: list[Terminal],
                  carriers: dict[str, Carrier], regions: dict[str, Region], district: Region,
                  vehicles: dict[str, Vehicle], models: dict[str, VehicleModel],
-                 lines: dict[str, Line], routes: dict[str, Route], scheduled_changes: list[StopChange]):
+                 lines: dict[str, Line], routes: dict[str, Route],
+                 scheduled_changes: list[StopChange], announcements: list[Announcement]):
         self.players: list[Player] = players
         self.progress: dict[str, dict[str, float]] = progress
         self.stops: dict[str, Stop] = stops
@@ -557,6 +562,7 @@ class Database:
         self.routes: dict[str, Route] = routes
         self.lines: dict[str, Line] = lines
         self.scheduled_changes: list[StopChange] = scheduled_changes
+        self.announcements: list[Announcement] = announcements
 
     def __contains__(self, name: CollectionName) -> bool:
         return bool(getattr(self, name))
@@ -568,10 +574,10 @@ class Database:
                 regions: dict[str, Region] | None = None, district: Region | None = None,
                 vehicles: dict[str, Vehicle] | None = None, models: dict[str, VehicleModel] | None = None,
                 lines: dict[str, Line] | None = None, routes: dict[str, Route] | None = None,
-                scheduled_changes: list[StopChange] | None = None) -> Database:
+                scheduled_changes: list[StopChange] | None = None, announcements: list[Announcement] | None = None) -> Database:
         return Database(players or [], progress or {}, stops or {}, stop_groups or {}, terminals or [],
                         carriers or {}, regions or {}, district or Region(0, '', '', lambda _: False),
-                        vehicles or {}, models or {}, lines or {}, routes or {}, scheduled_changes or [])
+                        vehicles or {}, models or {}, lines or {}, routes or {}, scheduled_changes or [], announcements or [])
 
     @staticmethod
     def get_stars_for_group(size: int):

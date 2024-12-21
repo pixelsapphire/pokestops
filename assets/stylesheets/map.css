@@ -331,7 +331,7 @@
     font-size: min(2dvh, 2dvw);
     font-family: Genshin, sans-serif;
     color: white;
-    transform: translateX(-50%) rotate(-90deg) translateY(min(1dvh, 1dvw));
+    transform: translateX(-50%) rotate(-90deg) translateY(50%);
     display: inline-block;
 }
 

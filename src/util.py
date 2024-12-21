@@ -3,6 +3,7 @@ import csv
 import datetime
 import os
 import platform
+import re
 import subprocess
 import sys
 import zipfile
@@ -80,8 +81,15 @@ def print_errors() -> None:
 def prepare_path(file_path: str | os.PathLike[str]) -> str | os.PathLike[str]:
     directory_path = os.path.dirname(os.path.abspath(file_path))
     if not os.path.exists(directory_path):
-        os.makedirs(directory_path)
+        os.makedirs(directory_path, exist_ok=True)
     return file_path
+
+
+def prepare_file(path: str | os.PathLike[str], initial_content: str = '', override: bool = False) -> str | os.PathLike[str]:
+    if not os.path.exists(path) or override:
+        with open(prepare_path(path), 'w' if override else 'x') as file:
+            file.write(f'{initial_content}')
+    return path
 
 
 def system_open(file_path: str | os.PathLike[str]) -> None:
@@ -279,25 +287,59 @@ class LineSegment[TFloatSeq](Sequence[TFloatSeq]):
 
 
 class DateAndOrder:
-    long_time_ago: Final[Self] = None
     never: Final[Self] = None
+    long_time_ago: Final[Self] = None
 
     def __init__(self, *, year: int | None = None, month: int | None = None, day: int | None = None,
-                 date_string: str | None = '', number_in_day: int | None = None):
+                 date_string: str | None = '', string_format: str | None = None, number_in_day: int | None = None):
         if date_string:
-            date_and_number: list[str] = date_string.split(':')
-            date_parts: list[int] = list(map(int, date_and_number[0].split('-')))
-            self._year: int = date_parts[0]
-            self._month: int = date_parts[1]
-            self._day: int = date_parts[2]
-            if len(date_and_number) > 1 and number_in_day is not None:
-                raise ValueError('Cannot pass argument number_in_day if the number is already present in date_string')
-            elif len(date_and_number) > 1:
-                self._number_in_day: int = int(date_and_number[1])
-            elif number_in_day is not None:
-                self._number_in_day: int = number_in_day
+            if string_format:
+                format_parts: list[str] = string_format.split('|')
+                if len(format_parts) > 1 and date_string == format_parts[1]:
+                    self._year: int = -1
+                    self._month: int = -1
+                    self._day: int = -1
+                    self._number_in_day: int = -1
+                elif len(format_parts) == 3 and date_string == format_parts[2]:
+                    self._year: int = 0
+                    self._month: int = 0
+                    self._day: int = 0
+                    self._number_in_day: int = 0
+                else:
+                    regex: str = (format_parts[0].replace('d', r'(\d{2})').replace('m', r'(\d{2})')
+                                  .replace('y', r'(\d{4})').replace('n', r'(\d+)'))
+                    match = re.match(regex, date_string)
+                    placeholders_order: list[str] = re.findall(r'[ymdn]', format_parts[0])
+                    if match:
+                        groups: tuple[str, ...] = match.groups()
+                        self._year: int = int(groups[placeholders_order.index('y')]) if 'y' in placeholders_order else 0
+                        self._month: int = int(groups[placeholders_order.index('m')]) if 'm' in placeholders_order else 0
+                        self._day: int = int(groups[placeholders_order.index('d')]) if 'd' in placeholders_order else 0
+                        if 'n' in placeholders_order and number_in_day is not None:
+                            raise ValueError(
+                                'Cannot pass argument number_in_day if the number is already present in date_string')
+                        elif 'n' in placeholders_order:
+                            self._number_in_day: int = int(groups[placeholders_order.index('n')])
+                        elif number_in_day is not None:
+                            self._number_in_day: int = number_in_day
+                        else:
+                            self._number_in_day: int = 0
+                    else:
+                        raise ValueError(f'Invalid date string \'{date_string}\' with format \'{string_format}\'')
             else:
-                self._number_in_day: int = 0
+                date_and_number: list[str] = date_string.split(':')
+                date_parts: list[int] = list(map(int, date_and_number[0].split('-')))
+                self._year: int = date_parts[0]
+                self._month: int = date_parts[1]
+                self._day: int = date_parts[2]
+                if len(date_and_number) > 1 and number_in_day is not None:
+                    raise ValueError('Cannot pass argument number_in_day if the number is already present in date_string')
+                elif len(date_and_number) > 1:
+                    self._number_in_day: int = int(date_and_number[1])
+                elif number_in_day is not None:
+                    self._number_in_day: int = number_in_day
+                else:
+                    self._number_in_day: int = 0
         elif year is not None and month is not None and day is not None:
             self._year = year
             self._month = month
@@ -340,10 +382,11 @@ class DateAndOrder:
         format_parts: list[str] = format_spec.split('|')
         if len(format_parts) > 3:
             raise ValueError(f'Invalid format specifier \'{format_spec}\' for object of type \'{type(self)}\'')
-        if self == DateAndOrder.long_time_ago and len(format_parts) > 1:
-            return format_parts[1]
-        elif self == DateAndOrder.never and len(format_parts) > 1:
-            return format_parts[2 if len(format_parts) == 2 else 1]
+        if not self.is_known():
+            if len(format_parts) == 2:
+                return format_parts[1]
+            elif len(format_parts) == 3:
+                return format_parts[1] if self == DateAndOrder.never else format_parts[2]
         else:
             formatted_string: str = format_parts[0]
             if 'y' in format_spec:
