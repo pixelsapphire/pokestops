@@ -267,7 +267,7 @@ def build_app(fmap: folium.Map, db: Database) -> None:
     print('  Compiling data to JavaScript... ', end='')
 
     with open(prepare_path(ref.compileddata_stops), 'w') as file:
-        file.write(f'const stops = {{\n{'\n'.join(map(Stop.json_entry, db.stops.values()))}\n}};')
+        file.write(f'const stops = {{\n{'\n'.join(map(Stop.json_entry, sorted(db.stops.values())))}\n}};')
         file.write(f'const terminals = {{\n{'\n'.join(map(Terminal.json_entry, db.terminals))}\n}};')
 
     with open(prepare_path(ref.compileddata_vehicles), 'w') as file:
@@ -290,17 +290,17 @@ def build_app(fmap: folium.Map, db: Database) -> None:
     print('Done!')
     print('  Building HTML documents... ', end='')
 
-    builder: UIBuilder = UIBuilder(lexmap_file=ref.lexmap_polish)
+    builder: UIBuilder = UIBuilder(database=db, lexmap_file=ref.lexmap_polish)
 
-    map_html: str = clean_html(builder.create_map(db, folium_html).render())
+    map_html: str = clean_html(builder.create_map(folium_html).render())
     with open(prepare_path(ref.document_map), 'w') as file:
         file.write(map_html)
 
-    archive_html: str = clean_html(builder.create_archive(db).render())
+    archive_html: str = clean_html(builder.create_archive().render())
     with open(prepare_path(ref.document_archive), 'w') as file:
         file.write(archive_html)
 
-    announcements_html: str = clean_html(builder.create_announcements(db).render())
+    announcements_html: str = clean_html(builder.create_announcements().render())
     with open(prepare_path(ref.document_announcements), 'w') as file:
         file.write(announcements_html)
 

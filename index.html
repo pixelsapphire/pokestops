@@ -51,6 +51,35 @@
     <link rel='stylesheet' type='text/css' href='assets/stylesheets/map.css'>
     <script src='data/js/players_data.min.js'></script>
     <script src='data/js/stops_data.min.js'></script>
+    <script src='data/js/vehicles_data.min.js'></script>
+    <script src='data/js/lines_data.min.js'></script>
+    <script src='https://mozilla.github.io/nunjucks/files/nunjucks.min.js'></script>
+    <script>let searchResultTemplate = `<div class='result-row{% if not result.unlocked %} undiscovered{% endif %}'>
+    <div class='result-icon material-symbols-outlined'>{% if result.type == 'stop' %}
+            pin_drop
+        {% elif result.type == 'line' %}
+            route
+        {% elif result.type == 'vehicle' %}
+            tram
+        {% endif %}</div>
+    <div class='result-body'>
+        {% if result.type == 'stop' %}
+            {{ result.object.n }} [{{ result.key }}]
+        {% elif result.type == 'line' %}
+            <div class='line-view'>
+                <div class='line-number' style='background-color: #{{ result.object.bc }}; color: #{{ result.object.tc }};'>{{ result.key }}</div>
+                <div class='line-destination'>{{ result.object.t }}</div>
+            </div>
+        {% elif result.type == 'vehicle' %}
+            {% if result.details | length > 0 %}{{ result.details }}{% else %}unknown vehicle{% endif %} #{{ result.key }}
+        {% endif %}
+    </div>
+    {% if result.unlocked %}
+        <div class='result-lock-icon material-symbols-outlined'>lock_open_right</div>
+    {% else %}
+        <div class='result-lock-icon material-symbols-outlined'>lock</div>
+    {% endif %}
+</div>`;</script>
     <script src='assets/scripts/map.js'></script>
 </head>
 <body class='default-light'>
@@ -58,7 +87,7 @@
 <div id='tab-buttons' class='hud'>
     <div class='tab-button' onclick='window.location.href = "announcements.html"'>
         <div class="material-icons">newspaper</div>
-        <div>The Steambird</div>
+        <div class='label-new-tab-button'>The Steambird</div>
     </div>
     <div class='tab-button' onclick='window.location.href = "archive.html"'>
         <div class="material-icons">auto_stories</div>
@@ -72,6 +101,11 @@
     <div class='tab-button' onclick='toggleSidebar("vehicles")'>
         <div class="material-icons">tram</div>
         <div>Vehicles</div>
+    </div>
+    <div class='tab-button-divider'></div>
+    <div class='tab-button' onclick='toggleSidebar("search")'>
+        <div class="material-icons">search</div>
+        <div class='label-new-tab-button'>Search anything</div>
     </div>
 </div>
 <div id='control' class='hud'>
@@ -6992,6 +7026,15 @@
             <tbody></tbody>
         </table>
     </div>
+</div>
+<div class='sidebar' id='search'>
+    <div class='sidebar-header'>
+        <div class='sidebar-icon material-icons'>search</div>
+        <div class='sidebar-title'>Search anything</div>
+        <div class='sidebar-close-icon material-symbols-outlined' onclick='toggleSidebar("search")'>close</div>
+    </div>
+    <input type='text' id='search-input' placeholder='Search for stops, vehicles or lines' oninput='searchObject()'>
+    <div id='search-results'></div>
 </div>
 <script src='data/js/map.min.js'></script>
 </body>

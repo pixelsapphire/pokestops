@@ -90,10 +90,6 @@
     transform: scale(1.2);
 }
 
-.undiscovered {
-    opacity: 0.4;
-}
-
 .name-label {
     font-size: min(3vh, 3dvw);
 }

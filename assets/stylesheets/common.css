@@ -38,6 +38,10 @@ a {
     display: none !important;
 }
 
+.undiscovered {
+    opacity: 0.4;
+}
+
 .nowrap {
     white-space: nowrap;
 }

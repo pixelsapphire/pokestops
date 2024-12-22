@@ -15,7 +15,21 @@
     pointer-events: auto;
 }
 
-.label-new::before {
+.label-new-tab-button::after {
+    content: "NEW";
+    padding: 0 min(0.5dvh, 0.5dvw);
+    border-radius: min(0.5dvh, 0.5dvw);
+    margin-right: min(0.5dvh, 0.5dvw);
+    font-size: min(1.5vh, 1.5dvw);
+    background-color: orangered;
+    -webkit-text-stroke: initial;
+    text-shadow: none;
+    position: absolute;
+    bottom: 2em;
+    transform: translateX(0.25em);
+}
+
+.label-new-switch::before {
     content: "NEW";
     padding: 0 min(0.5dvh, 0.5dvw);
     border-radius: min(0.5dvh, 0.5dvw);
@@ -93,6 +107,7 @@
     border-bottom-style: solid;
     border-width: min(0.25dvh, 0.25vw);
     border-image: linear-gradient(to right, transparent, black 10% 90%, transparent) 1;
+    position: relative;
     pointer-events: auto;
     cursor: pointer;
 }
@@ -315,6 +330,41 @@
 .vehicle-icon {
     height: min(4dvh, 4dvw);
     padding-bottom: min(0.75dvh, 0.75dvw);
+}
+
+#search {
+    width: min(75dvh, 75dvw);
+}
+
+#search-input {
+    width: 100%;
+    margin: min(1dvh, 1dvw) 0;
+    padding: min(0.5dvh, 0.5dvw);
+    font-size: min(2dvh, 2dvw);
+    border-radius: min(1dvh, 1dvw);
+}
+
+.result-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.result-row > div {
+    padding: min(0.5dvh, 0.5dvw);
+}
+
+.result-icon, .result-lock-icon {
+    font-size: min(4dvh, 4dvw);
+}
+
+.result-body {
+    flex: 1;
+    font-size: min(2dvh, 2dvw);
+}
+
+#search-results .line-number {
+    font-size: min(2dvh, 2dvw);
 }
 
 #theme-icon {

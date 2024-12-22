@@ -9,6 +9,9 @@ let darkMode = true;
 const lightModeIcon = 'assets/images/light_mode.png';
 const darkModeIcon = 'assets/images/dark_mode.png';
 
+const compiledRearchResultTemplate = nunjucks.compile(searchResultTemplate);
+let searchAbortController = null;
+
 function injectThemeSwitcher() {
     let zoomControl = document.querySelector('.leaflet-control-zoom');
     let icon = document.createElement('img');
@@ -167,6 +170,73 @@ function selectRegion() {
 
 function toggleSidebar(sidebar) {
     document.querySelector(`#${sidebar}`).classList.toggle('expanded');
+}
+
+Array.prototype.any = function (predicate) {
+    return this.filter(predicate).length > 0;
+};
+Array.prototype.all = function (predicate) {
+    return this.filter(predicate).length === this.length;
+}
+
+async function searchObject() {
+
+    if (searchAbortController) searchAbortController.abort();
+    searchAbortController = new AbortController();
+    const {signal} = searchAbortController;
+
+    let searchQuery = document.querySelector('#search-input').value.toLowerCase();
+    let resultsView = document.getElementById('search-results');
+    resultsView.innerHTML = '';
+    if (searchQuery.length === 0) return;
+
+    let resultsEqualTo = [];
+    let resultsStartingWith = [];
+    let resultsContaining = [];
+    let resultsContainingDetail = [];
+    const searchDictionary = (dictionary, type, unlockedGetter, searchKeyExtractor, searchDetailExtractor = null) => {
+        for (let key in dictionary) {
+            const searchKeys = searchKeyExtractor(key);
+            const details = searchDetailExtractor ? searchDetailExtractor(key) : '';
+            const unlocked = unlockedGetter(key) === true;
+            let resultsList = null;
+            if (searchKeys.any((k) => k.toLowerCase() === searchQuery)) resultsList = resultsEqualTo;
+            else if (searchKeys.any((k) => k.toLowerCase().startsWith(searchQuery))) resultsList = resultsStartingWith;
+            else if (searchKeys.any((k) => k.toLowerCase().includes(searchQuery))) resultsList = resultsContaining;
+            else if (searchDetailExtractor && details.toLowerCase().includes(searchQuery)) resultsList = resultsContainingDetail;
+            if (resultsList) resultsList.push({
+                type: type,
+                key: key,
+                object: dictionary[key],
+                details: details,
+                unlocked: unlocked
+            });
+        }
+    };
+    searchDictionary(stops, 'stop', (key) => stops[key].v && stops[key].v.any((v) => v[0] === activePlayer),
+        (key) => [key, stops[key].n]);
+    searchDictionary(lines, 'line', (key) => lines[key].d && lines[key].d.any((d) => d[0] === activePlayer),
+        (key) => [key], (key) => lines[key].t);
+    searchDictionary(vehicles, 'vehicle', (key) => vehicles[key].d && vehicles[key].d.any((d) => d[0] === activePlayer),
+        (key) => [key], (key) => {
+            if (!vehicles[key].m) return '';
+            const model = vehicle_models[vehicles[key].m];
+            return `${model.b} ${model.m}`;
+        });
+
+    if ([resultsEqualTo, resultsStartingWith, resultsContaining, resultsContainingDetail].all((r) => r.length === 0)) {
+        resultsView.innerHTML = '<div class="list-title center">No results found</div>';
+        return;
+    }
+    resultsView.innerHTML = '';
+
+    const postResult = (result) => resultsView.innerHTML += compiledRearchResultTemplate.render({result: result});
+    const allResults = [...resultsEqualTo, ...resultsStartingWith, ...resultsContaining, ...resultsContainingDetail];
+    for (let i = 0; i < allResults.length; i++) {
+        if (signal.aborted) return;
+        postResult(allResults[i]);
+        await new Promise(resolve => setTimeout(resolve, 0));
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {

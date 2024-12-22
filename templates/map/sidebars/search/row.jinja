@@ -1,0 +1,32 @@
+<div class='result-row{% if not result.unlocked %} undiscovered{% endif %}'>
+    <div class='result-icon material-symbols-outlined'>
+        {% if result.type == 'stop' %}
+            pin_drop
+        {% elif result.type == 'line' %}
+            route
+        {% elif result.type == 'vehicle' %}
+            tram
+        {% endif %}
+    </div>
+    <div class='result-body'>
+        {% if result.type == 'stop' %}
+            {{ result.object.n }} [{{ result.key }}]
+        {% elif result.type == 'line' %}
+            <div class='line-view'>
+                <div class='line-number' style='background-color: #{{ result.object.bc }}; color: #{{ result.object.tc }};'>
+                    {{ result.key }}
+                </div>
+                <div class='line-destination'>
+                    {{ result.object.t }}
+                </div>
+            </div>
+        {% elif result.type == 'vehicle' %}
+            {% if result.details | length > 0 %}{{ result.details }}{% else %}unknown vehicle{% endif %} #{{ result.key }}
+        {% endif %}
+    </div>
+    {% if result.unlocked %}
+        <div class='result-lock-icon material-symbols-outlined'>lock_open_right</div>
+    {% else %}
+        <div class='result-lock-icon material-symbols-outlined'>lock</div>
+    {% endif %}
+</div>
