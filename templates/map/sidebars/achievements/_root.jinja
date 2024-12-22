@@ -1,8 +1,13 @@
 <div class='sidebar' id='achievements'>
+    <div class='sidebar-header'>
+        <div class='sidebar-icon material-icons'>emoji_events</div>
+        <div class='sidebar-title'>Achievements</div>
+        <div class='sidebar-close-icon material-symbols-outlined' onclick='toggleSidebar("achievements")'>close</div>
+    </div>
     {% for player in db.players %}
         <div class='progress-list' data-player='{{ player.nickname.lower() }}'
              {%- if player.nickname != db.players[0].nickname %}style='display:none;' {% endif %}>
-            <p class='center'>Achievements completed: {{ player.logbook.get_n_achievements(db) }}</p>
+            <p class='list-title center'>Achievements completed: {{ player.logbook.get_n_achievements(db) }}</p>
             <table>
                 <tbody>
                 {% for achievement in player.logbook.get_achievements(db) %}
@@ -13,4 +18,3 @@
         </div>
     {% endfor %}
 </div>
-{% include 'map.sidebars.achievements.button' %}

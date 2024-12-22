@@ -9,9 +9,6 @@ let darkMode = true;
 const lightModeIcon = 'assets/images/light_mode.png';
 const darkModeIcon = 'assets/images/dark_mode.png';
 
-const primary = 0;
-const tint = 1;
-
 function injectThemeSwitcher() {
     let zoomControl = document.querySelector('.leaflet-control-zoom');
     let icon = document.createElement('img');
@@ -40,13 +37,13 @@ function preparePokestops() {
     });
 
     document.querySelectorAll(`.marker.v-${activePlayer.toLowerCase()}.r-${activeRegion}:not(.ev-${activePlayer.toLowerCase()})`).forEach(m => {
-        m.style.color = colors[activePlayer][primary];
+        m.style.color = players[activePlayer].pc;
         m.parentElement.style.display = null;
     });
     const everVisitedMarkers = document.querySelectorAll(`.marker.ev-${activePlayer.toLowerCase()}.r-${activeRegion}`);
     if (showEverVisitedStops)
         everVisitedMarkers.forEach(m => {
-            m.style.color = colors[activePlayer][tint];
+            m.style.color = players[activePlayer].tc;
             m.parentElement.style.display = null;
         });
     else
@@ -77,8 +74,8 @@ function preparePokelines() {
     });
     document.querySelectorAll('path.leaflet-interactive').forEach(l => {
         if (l.classList.contains('disc') || l.classList.contains('compl') || showUndiscoveredLines) l.style.display = null;
-        if (l.classList.contains(`d-${activePlayer.toLowerCase()}`)) l.setAttribute('stroke', colors[activePlayer][tint]);
-        else if (l.classList.contains(`c-${activePlayer.toLowerCase()}`)) l.setAttribute('stroke', colors[activePlayer][primary]);
+        if (l.classList.contains(`d-${activePlayer.toLowerCase()}`)) l.setAttribute('stroke', players[activePlayer].tc);
+        else if (l.classList.contains(`c-${activePlayer.toLowerCase()}`)) l.setAttribute('stroke', players[activePlayer].pc);
         else {
             if (showUndiscoveredLines) l.setAttribute('stroke', 'red');
             else l.style.display = 'none';
@@ -97,13 +94,13 @@ function prepareStellarVoyage() {
     });
 
     document.querySelectorAll(`.marker.terminal`).forEach(m => {
-        if (m.classList.contains(`reached-${activePlayer.toLowerCase()}`)) m.style.color = colors[activePlayer][primary];
+        if (m.classList.contains(`reached-${activePlayer.toLowerCase()}`)) m.style.color = players[activePlayer].pc;
         else m.style.color = 'red';
         m.parentElement.style.display = null;
     });
     document.querySelectorAll(`.marker.tp-${activePlayer.toLowerCase()}`).forEach(m => {
         m.parentElement.style.display = null;
-        if (m.classList.contains(`v-${activePlayer.toLowerCase()}`)) m.style.color = colors[activePlayer][tint];
+        if (m.classList.contains(`v-${activePlayer.toLowerCase()}`)) m.style.color = players[activePlayer].tc;
         else m.style.color = 'red';
     });
     document.querySelectorAll(`.marker:not(.terminal):not(.tp-${activePlayer.toLowerCase()})`).forEach(m => {
@@ -131,7 +128,8 @@ function refreshMap() {
 
     document.querySelectorAll('.leaflet-layer,.leaflet-control-zoom-in,.leaflet-control-zoom-out,.leaflet-control-attribution,.leaflet-control-theme')
         .forEach(e => e.style.filter = darkMode ? 'invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)' : null);
-    document.querySelectorAll('.folium-map,.marker,.sidebar,.toggle-sidebar').forEach(e => e.classList.toggle('dark', darkMode));
+    // document.querySelectorAll('.folium-map,.marker,.sidebar,.toggle-sidebar').forEach(e => e.classList.toggle('dark', darkMode));
+    document.body.classList.toggle('dark', darkMode);
 }
 
 function toggleUnvisited() {
@@ -169,7 +167,6 @@ function selectRegion() {
 
 function toggleSidebar(sidebar) {
     document.querySelector(`#${sidebar}`).classList.toggle('expanded');
-    document.querySelector(`#toggle-${sidebar}`).classList.toggle('expanded');
 }
 
 document.addEventListener('DOMContentLoaded', () => {

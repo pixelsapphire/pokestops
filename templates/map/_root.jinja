@@ -4,27 +4,21 @@
     {{ folium_head }}
     <title>Pokestops</title>
     <link rel='icon' href='{{ ref.asset_img_compass }}'>
-    <link rel='stylesheet' type='text/css' href='{{ ref.url_material_icons }}'>
+    <link rel='stylesheet' type='text/css' href='{{ ref.url_material_symbols }}'>
+    <link rel="stylesheet" type='text/css' href='{{ ref.url_material_icons }}'>
     <link rel='stylesheet' type='text/css' href='{{ ref.stylesheet_common }}'>
     <link rel='stylesheet' type='text/css' href='{{ ref.stylesheet_map }}'>
-    <script>
-        let colors = {
-            {% for player in db.players %}
-                '{{ player.nickname }}': ['{{ player.primary_color }}', '{{ player.tint_color }}'],
-            {% endfor %}
-        };
-    </script>
     <script src='{{ ref.compileddata_players }}'></script>
     <script src='{{ ref.compileddata_stops }}'></script>
     <script src='{{ ref.controller_map }}'></script>
 </head>
 <body class='default-light'>
 {{ folium_body }}
-{% include 'map.control.hud_top' %}
-{% include 'map.control.hud_bottom' %}
+{% include 'map.control.hud_left_top' %}
+{% include 'map.control.hud_right_top' %}
+{% include 'map.control.hud_right_bottom' %}
 {% include 'map.sidebars.achievements' %}
 {% include 'map.sidebars.vehicles' %}
-{% include 'map.sidebars.archive.button' %}
 <script src='{{ ref.compileddata_map }}'></script>
 </body>
 </html>

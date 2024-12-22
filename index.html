@@ -46,19 +46,34 @@
     <link rel='icon' href='assets/images/compass.png'>
     <link rel='stylesheet' type='text/css'
           href='https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0'>
+    <link rel="stylesheet" type='text/css' href='https://fonts.googleapis.com/icon?family=Material+Icons'>
     <link rel='stylesheet' type='text/css' href='assets/stylesheets/common.css'>
     <link rel='stylesheet' type='text/css' href='assets/stylesheets/map.css'>
-    <script>let colors = {
-        'Zorie': ['#4caf50', '#93cf96'],
-        'Sapphire': ['#8566d9', '#b5a3e8'],
-        'Camomile': ['#ff9800', '#ffc166'],
-    };</script>
     <script src='data/js/players_data.min.js'></script>
     <script src='data/js/stops_data.min.js'></script>
     <script src='assets/scripts/map.js'></script>
 </head>
 <body class='default-light'>
 <div class="folium-map" id="m"></div>
+<div id='tab-buttons' class='hud'>
+    <div class='tab-button' onclick='window.location.href = "announcements.html"'>
+        <div class="material-icons">newspaper</div>
+        <div>The Steambird</div>
+    </div>
+    <div class='tab-button' onclick='window.location.href = "archive.html"'>
+        <div class="material-icons">auto_stories</div>
+        <div>Pokestops Archive</div>
+    </div>
+    <div class='tab-button-divider'></div>
+    <div class='tab-button' onclick='toggleSidebar("achievements")'>
+        <div class="material-icons">emoji_events</div>
+        <div>Achievements</div>
+    </div>
+    <div class='tab-button' onclick='toggleSidebar("vehicles")'>
+        <div class="material-icons">tram</div>
+        <div>Vehicles</div>
+    </div>
+</div>
 <div id='control' class='hud'>
     <label id='player-selection'>
         <select class='dropdown hud' onchange='selectPlayer()'>
@@ -204,8 +219,13 @@
 </p>
 <img id='compass' src='assets/images/compass.png'>
 <div class='sidebar' id='achievements'>
+    <div class='sidebar-header'>
+        <div class='sidebar-icon material-icons'>emoji_events</div>
+        <div class='sidebar-title'>Achievements</div>
+        <div class='sidebar-close-icon material-symbols-outlined' onclick='toggleSidebar("achievements")'>close</div>
+    </div>
     <div class='progress-list' data-player='zorie'>
-        <p class='center'>Achievements completed: 150</p>
+        <p class='list-title center'>Achievements completed: 150</p>
         <table>
             <tbody>
             <tr>
@@ -1558,7 +1578,7 @@
         </table>
     </div>
     <div class='progress-list' data-player='sapphire' style='display:none;'>
-        <p class='center'>Achievements completed: 262</p>
+        <p class='list-title center'>Achievements completed: 262</p>
         <table>
             <tbody>
             <tr>
@@ -3751,7 +3771,7 @@
         </table>
     </div>
     <div class='progress-list' data-player='camomile' style='display:none;'>
-        <p class='center'>Achievements completed: 11</p>
+        <p class='list-title center'>Achievements completed: 11</p>
         <table>
             <tbody>
             <tr>
@@ -3896,12 +3916,14 @@
         </table>
     </div>
 </div>
-<button class='toggle-sidebar' id='toggle-achievements' onclick='toggleSidebar("achievements")'>
-    <span class='sidebar-button-label'>Achievements</span>
-</button>
 <div class='sidebar' id='vehicles'>
+    <div class='sidebar-header'>
+        <div class='sidebar-icon material-icons'>tram</div>
+        <div class='sidebar-title'>Vehicles</div>
+        <div class='sidebar-close-icon material-symbols-outlined' onclick='toggleSidebar("vehicles")'>close</div>
+    </div>
     <div class='progress-list' data-player='zorie'>
-        <p class='center'>Vehicles discovered: 73</p>
+        <p class='list-title center'>Vehicles discovered: 73</p>
         <table>
             <tbody>
             <tr>
@@ -4615,7 +4637,7 @@
         </table>
     </div>
     <div class='progress-list' data-player='sapphire' style='display:none;'>
-        <p class='center'>Vehicles discovered: 241</p>
+        <p class='list-title center'>Vehicles discovered: 241</p>
         <table>
             <tbody>
             <tr>
@@ -6965,18 +6987,12 @@
         </table>
     </div>
     <div class='progress-list' data-player='camomile' style='display:none;'>
-        <p class='center'>Vehicles discovered: 0</p>
+        <p class='list-title center'>Vehicles discovered: 0</p>
         <table>
             <tbody></tbody>
         </table>
     </div>
 </div>
-<button class='toggle-sidebar' id='toggle-vehicles' onclick='toggleSidebar("vehicles")'>
-    <span class='sidebar-button-label'>Vehicles</span>
-</button>
-<button class='toggle-sidebar' id='open-archive' onclick='window.location.href = "archive.html";'>
-    <span class='sidebar-button-label'>Archive</span>
-</button>
 <script src='data/js/map.min.js'></script>
 </body>
 </html>

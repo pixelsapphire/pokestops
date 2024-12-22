@@ -257,4 +257,6 @@ class Player(JsonSerializable):
                 f's:[{','.join(sorted(f'"{d.item.short_name}"' for d in self.logbook.get_stops()))}],\n'
                 f'l:[{','.join(sorted(f'"{d.item.number}"' for d in self.logbook.get_lines()))}],\n'
                 f'v:[{','.join(sorted(f'"{d.item.vehicle_id}"' for d in self.logbook.get_vehicles()))}],\n'
+                f'pc:"{self.primary_color}",\n'
+                f'tc:"{self.tint_color}",\n'
                 f'}},')

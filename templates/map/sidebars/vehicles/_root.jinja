@@ -1,8 +1,13 @@
 <div class='sidebar' id='vehicles'>
+    <div class='sidebar-header'>
+        <div class='sidebar-icon material-icons'>tram</div>
+        <div class='sidebar-title'>Vehicles</div>
+        <div class='sidebar-close-icon material-symbols-outlined' onclick='toggleSidebar("vehicles")'>close</div>
+    </div>
     {% for player in db.players %}
         <div class='progress-list' data-player='{{ player.nickname.lower() }}'
              {%- if loop.index0 %}style='display:none;'{% endif %}>
-            <p class='center'>Vehicles discovered: {{ player.logbook.get_n_vehicles() }}</p>
+            <p class='list-title center'>Vehicles discovered: {{ player.logbook.get_n_vehicles() }}</p>
             <table>
                 <tbody>
                 {% for discovery in player.logbook.get_vehicles() %}
@@ -13,4 +18,3 @@
         </div>
     {% endfor %}
 </div>
-{% include 'map.sidebars.vehicles.button' %}

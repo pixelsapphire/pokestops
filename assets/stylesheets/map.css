@@ -1,7 +1,3 @@
-.folium-map.dark {
-    background-color: #181818;
-}
-
 .hud {
     color: white;
     font-family: Genshin, sans-serif;
@@ -53,63 +49,60 @@
     }
 }
 
-.marker {
-    font-family: Markers, sans-serif;
+#tab-buttons {
+    position: absolute;
+    top: min(3dvh, 3dvw);
+    left: 0;
+    z-index: 1000;
+    text-align: left;
+    font-size: min(3dvh, 3vw);
 }
 
-@supports (-webkit-text-stroke: 4px white) {
-    .marker {
-        font-size: 28px;
-        -webkit-text-stroke: 4px white;
-    }
-
-    .marker.dark {
-        -webkit-text-stroke: 4px black;
-    }
+#tab-buttons .material-icons {
+    font-size: min(4dvh, 4vw);
+    margin-right: min(1dvh, 1vw);
 }
 
-@supports not (-webkit-text-stroke: 4px white) {
-    .marker {
-        font-size: 22px;
-        text-shadow: 3px 3px white, -3px 3px white, 3px -3px white, -3px -3px white, 0 4px white, 0 -4px white, 4px 0 white, -4px 0 white;
-    }
-
-    .marker.dark {
-        text-shadow: 3px 3px black, -3px 3px black, 3px -3px black, -3px -3px black, 0 4px black, 0 -4px black, 4px 0 black, -4px 0 black;
+@supports (-webkit-text-stroke: min(0.2dvh, 0.2dvw) black) {
+    #tab-buttons {
+        -webkit-text-stroke: min(0.15dvh, 0.15dvw) black
     }
 }
 
-.leaflet-popup {
-    white-space: nowrap;
-    font-family: Genshin, sans-serif;
+@supports not (-webkit-text-stroke: min(0.2dvh, 0.2dvw) black) {
+    #tab-buttons {
+        text-shadow: min(0.11dvh, 0.11dvw) min(0.11dvh, 0.11dvw) black,
+        max(-0.11dvh, -0.11dvw) min(0.11dvh, 0.11dvw) black,
+        min(0.11dvh, 0.11dvw) max(-0.11dvh, -0.11dvw) black,
+        max(-0.11dvh, -0.11dvw) max(-0.11dvh, -0.11dvw) black,
+        0 min(0.15dvh, 0.15dvw) black,
+        0 max(-0.15dvh, -0.15dvw) black,
+        min(0.15dvh, 0.15dvw) 0 black,
+        max(-0.15dvh, -0.15dvw) 0 black;
+    }
 }
 
-.folium-map.dark .leaflet-popup {
-    filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+.tab-button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: min(0.5dvh, 0.5dvw) 0;
+    padding: 0 min(2dvh, 2vw);
+    background: linear-gradient(to right, rgba(112, 112, 112, 0), rgba(112, 112, 112, 0.6667) 10% 90%, rgba(112, 112, 112, 0));
+    border-top-style: solid;
+    border-bottom-style: solid;
+    border-width: min(0.25dvh, 0.25vw);
+    border-image: linear-gradient(to right, transparent, black 10% 90%, transparent) 1;
+    pointer-events: auto;
+    cursor: pointer;
 }
 
-.folium-map.dark .leaflet-popup-content-wrapper {
-    box-shadow: 0 3px 14px rgba(255, 255, 255, 0.4); /* style copied from leaflet default, with white color to compensate for the invert filter */
+.dark .tab-button {
+    border-image: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.25) 10% 90%, rgba(255, 255, 255, 0)) 1;
 }
 
-.stop-name {
-    font-size: min(2dvh, 2dvw);
-}
-
-.stop-visitors, .stop-tp {
-    font-size: min(1.5dvh, 1.5dvw);
-}
-
-.stellar-voyage .stop-visitors {
-    display: none;
-}
-
-.stop-tp {
-    display: none;
-}
-
-.stellar-voyage .stop-tp {
-    display: initial;
+.tab-button-divider {
+    height: min(1dvh, 1vw);
 }
 
 #control {
@@ -228,21 +221,19 @@
 }
 
 .sidebar {
+    display: none;
+    height: 100vh;
+    width: min(60dvh, 60dvw);
     position: absolute;
     left: 0;
-    top: 2dvh;
-    height: 86dvh;
-    width: min(60dvh, 60dvw);
+    top: 0;
+    padding: min(1.25dvh, 1.25dvw);
     z-index: 1200;
     background-color: rgb(224, 223, 223);
-    border: min(0.5dvh, 0.5dvw) solid black;
-    border-left: none;
-    border-radius: 0 min(2dvh, 2dvw) min(2dvh, 2dvw) 0;
-    padding: min(1.25dvh, 1.25dvw);
-    overflow: scroll;
+    border-right: min(0.5dvh, 0.5dvw) solid black;
     font-family: Genshin, sans-serif;
     font-size: min(2dvh, 2dvw);
-    display: none;
+    overflow: scroll;
 }
 
 .sidebar::-webkit-scrollbar {
@@ -253,12 +244,36 @@
     display: block;
 }
 
-.sidebar.dark {
+.dark .sidebar {
     background-color: rgb(56, 56, 56);
 }
 
-.sidebar.dark > * {
+.dark .sidebar > * {
     filter: invert(1);
+}
+
+.sidebar-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: min(1dvh, 1dvw);
+}
+
+.sidebar-icon {
+    font-size: min(5dvh, 5dvw);
+    margin-right: min(1dvh, 1dvw);
+    cursor: default;
+}
+
+.sidebar-title {
+    flex: 1;
+    font-size: min(3dvh, 3dvw);
+}
+
+.sidebar-close-icon {
+    font-size: min(4dvh, 4dvw);
+    font-weight: 900;
+    cursor: pointer;
 }
 
 .progress-list table {
@@ -268,6 +283,10 @@
 
 .progress-list table td {
     padding-bottom: min(0.5dvh, 0.5dvw);
+}
+
+.list-title {
+    margin: min(1.5dvh, 1.5dvw) 0;
 }
 
 .achievement-stars {
@@ -298,75 +317,72 @@
     padding-bottom: min(0.75dvh, 0.75dvw);
 }
 
-.center {
-    text-align: center;
-}
-
-.smaller {
-    font-size: min(1.75dvh, 1.75dvw);
-}
-
-.larger {
-    font-size: min(2.5dvh, 2.5dvw);
-}
-
-.toggle-sidebar {
-    position: absolute;
-    left: 0;
-    transform: translateY(-50%);
-    z-index: 1100;
-    background-color: rgb(112, 112, 112);
-    border-radius: 0 min(2dvh, 2dvw) min(2dvh, 2dvw) 0;
-    border: min(0.5dvh, 0.5dvw) solid black;
-    border-left: none;
-    height: min(20dvh, 20dvw);
-    width: min(4dvh, 4dvw);
-}
-
-.toggle-sidebar.expanded {
-    left: min(60dvh, 60dvw);
-}
-
-.sidebar-button-label {
-    font-size: min(2dvh, 2dvw);
-    font-family: Genshin, sans-serif;
-    color: white;
-    transform: translateX(-50%) rotate(-90deg) translateY(50%);
-    display: inline-block;
-}
-
-@supports (-webkit-text-stroke: min(0.075dvh, 0.075dvw) black) {
-    .sidebar-button-label {
-        -webkit-text-stroke: min(0.075dvh, 0.075dvw) black;
-    }
-}
-
-@supports not (-webkit-text-stroke: min(0.075dvh, 0.075dvw) black) {
-    .sidebar-button-label {
-        text-shadow: min(0.05dvh, 0.05dvw) min(0.05dvh, 0.05dvw) black,
-        max(-0.05dvh, -0.05dvw) min(0.05dvh, 0.05dvw) black,
-        min(0.05dvh, 0.05dvw) max(-0.05dvh, -0.05dvw) black,
-        max(-0.05dvh, -0.05dvw) max(-0.05dvh, -0.05dvw) black,
-        0 min(0.075dvh, 0.075dvw) black,
-        0 max(-0.075dvh, -0.075dvw) black,
-        min(0.075dvh, 0.075dvw) 0 black,
-        max(-0.075dvh, -0.075dvw) 0 black;
-    }
-}
-
-#open-archive {
-    top: 21%;
-}
-
-#toggle-vehicles {
-    top: 45%;
-}
-
-#toggle-achievements {
-    top: 69%;
-}
-
 #theme-icon {
     width: 100%;
     padding: 4px;
+}
+
+/* map styles */
+
+.dark .folium-map {
+    background-color: #181818;
+}
+
+.marker {
+    font-family: Markers, sans-serif;
+}
+
+@supports (-webkit-text-stroke: 4px white) {
+    .marker {
+        font-size: 28px;
+        -webkit-text-stroke: 4px white;
+    }
+
+    .dark .marker {
+        -webkit-text-stroke: 4px black;
+    }
+}
+
+@supports not (-webkit-text-stroke: 4px white) {
+    .marker {
+        font-size: 22px;
+        text-shadow: 3px 3px white, -3px 3px white, 3px -3px white, -3px -3px white, 0 4px white, 0 -4px white, 4px 0 white, -4px 0 white;
+    }
+
+    .dark .marker {
+        text-shadow: 3px 3px black, -3px 3px black, 3px -3px black, -3px -3px black, 0 4px black, 0 -4px black, 4px 0 black, -4px 0 black;
+    }
+}
+
+.leaflet-popup {
+    white-space: nowrap;
+    font-family: Genshin, sans-serif;
+}
+
+.dark .folium-map .leaflet-popup {
+    filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
+
+.dark .folium-map .leaflet-popup-content-wrapper {
+    box-shadow: 0 3px 14px rgba(255, 255, 255, 0.4); /* style copied from leaflet default, with white color to compensate for the invert filter */
+}
+
+.stop-name {
+    font-size: min(2dvh, 2dvw);
+}
+
+.stop-visitors, .stop-tp {
+    font-size: min(1.5dvh, 1.5dvw);
+}
+
+.stellar-voyage .stop-visitors {
+    display: none;
+}
+
+.stop-tp {
+    display: none;
+}
+
+.stellar-voyage .stop-tp {
+    display: initial;
 }
