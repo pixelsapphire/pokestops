@@ -218,7 +218,7 @@ async function searchObject() {
     searchDictionary(lines, 'line', (key) => lines[key].d && lines[key].d.any((d) => d[0] === activePlayer),
         (key) => [key], (key) => lines[key].t);
     searchDictionary(vehicles, 'vehicle', (key) => vehicles[key].d && vehicles[key].d.any((d) => d[0] === activePlayer),
-        (key) => [key], (key) => {
+        (key) => [key].concat(key.includes('+') ? key.split('+') : []), (key) => {
             if (!vehicles[key].m) return '';
             const model = vehicle_models[vehicles[key].m];
             return `${model.b} ${model.m}`;
