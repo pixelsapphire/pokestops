@@ -149,8 +149,8 @@ def update_gtfs_data(first_update: bool, initial_db: Database) -> None:
         if os.path.exists(ref.rawdata_lines):
             old_db.lines = Line.read_dict(ref.rawdata_lines)
     print(f'  Downloading latest GTFS data from {ref.url_ztm_gtfs}... ', end='')
-    os.system(f'curl -H "Accept: application/octet-stream" -H "Content-Type: application/x-www-form-urlencoded" '
-              f'-X GET "{ref.url_ztm_gtfs}" -o "{ref.tmpdata_gtfs}" > /dev/null 2>&1')
+    os.system('wget --header="Accept: application/octet-stream" '
+              f'"{ref.url_ztm_gtfs}" -O "{ref.tmpdata_gtfs}" > /dev/null 2>&1')
     print('Done!')
     print('  Extracting GTFS data... ', end='')
     with zip_file(ref.tmpdata_gtfs, 'r') as gtfs_zip:

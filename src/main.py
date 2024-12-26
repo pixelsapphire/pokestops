@@ -263,6 +263,11 @@ def generate_map(db: Database) -> folium.Map:
 
 
 def build_app(fmap: folium.Map, db: Database) -> None:
+    print('  Compiling Folium map... ', end='')
+    map_element: Element = fmap.get_root()
+    folium_html: str = map_element.render()
+    print('Done!')
+
     from player import Player
     print('  Compiling data to JavaScript... ', end='')
 
@@ -281,8 +286,6 @@ def build_app(fmap: folium.Map, db: Database) -> None:
     with open(prepare_path(ref.compileddata_players), 'w') as file:
         file.write(f'const players = {{\n{'\n'.join(map(Player.json_entry, db.players))}\n}};')
 
-    map_element: Element = fmap.get_root()
-    folium_html: str = map_element.render()
     map_script: str = folium_html[folium_html.rfind('<script>') + 8:folium_html.rfind('</script>')]
     with open(prepare_path(ref.compileddata_map), 'w') as script_file:
         script_file.write(clean_js(map_script))

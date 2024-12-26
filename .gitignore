@@ -7,6 +7,7 @@ data/raw/announcements.csv
 data/raw/lines.csv
 data/raw/routes.csv
 data/raw/stops.csv
+templates/announcements/_articles/
 test.py
 reports/
 toolbox/

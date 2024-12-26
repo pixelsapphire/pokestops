@@ -52,6 +52,19 @@ def find_first[T](predicate: Callable[[T], bool], iterable: Iterable[T]) -> T | 
     return next(filter(predicate, iterable), None)
 
 
+def coalesce(*args: Any) -> Any:
+    for x in args:
+        if x is not None:
+            return x
+    return None
+
+
+def maybe(self: Any, method: str | Callable, *args: Any, **kwargs: Any) -> Any:
+    if self is None:
+        return None
+    return method(self, *args, **kwargs) if callable(method) else getattr(self, method)(*args, **kwargs)
+
+
 def to_css(stylesheet: dict[str, dict[str, str]]) -> str:
     return '\n'.join(
         f'{selector} {{\n{";\n".join(f"{prop}: {value}" for prop, value in properties.items())};\n}}'
@@ -341,10 +354,10 @@ class DateAndOrder:
                 else:
                     self._number_in_day: int = 0
         elif year is not None and month is not None and day is not None:
-            self._year = year
-            self._month = month
-            self._day = day
-            self._number_in_day = number_in_day if number_in_day is not None else 0
+            self._year: int = year
+            self._month: int = month
+            self._day: int = day
+            self._number_in_day: int = coalesce(number_in_day, 0)
         else:
             raise ValueError('Must pass either (date_string, [number_in_day]), (year, month, day, [number_in_day]), '
                              'or use DateAndOrder.long_time_ago or DateAndOrder.unknown')
@@ -420,6 +433,9 @@ class DateAndOrder:
 
     def is_known(self) -> bool:
         return self != DateAndOrder.never and self != DateAndOrder.long_time_ago
+
+    def format(self, format_spec: str) -> str:
+        return self.__format__(format_spec)
 
     def to_string(self, number: bool = True) -> str:
         return self.__str__() if number else self.__str__().split(':')[0]

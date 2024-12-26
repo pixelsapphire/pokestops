@@ -115,7 +115,6 @@ def fetch_ztm_article(url: str, announcements: list[Announcement], pbar: tqdm) -
                      [date for date in re.sub(r'Obowiązuje ?(od )?', lambda _: '', dates_str).split(' - ') if date]))
     published: DateAndOrder | None = None
     if len(dates) == 1:
-        # dates.append(DateAndOrder.never) if '-' in dates_str else dates.append(None)
         if '-' in dates_str:
             dates.append(DateAndOrder.never)
         else:
@@ -183,9 +182,9 @@ def fetch_announcements() -> None:
     with open(prepare_file(ref.rawdata_announcements, f'{header}\n', True), 'a') as file:
         for announcement in announcements:
             file.write(f'{announcement.announcement_id},"{announcement.title.replace('"', '\"')}",'
-                       f'{'' if announcement.date_from is None else f'{announcement.date_from:y-m-d}'},'
-                       f'{'' if announcement.date_to is None else f'{announcement.date_to:y-m-d|indefinite}'},'
-                       f'{'' if announcement.date_published is None else f'{announcement.date_published:y-m-d}'},'
+                       f'{coalesce(maybe(announcement.date_from, DateAndOrder.format, 'y-m-d'), '')},'
+                       f'{coalesce(maybe(announcement.date_to, DateAndOrder.format, 'y-m-d|indefinite'), '')},'
+                       f'{coalesce(maybe(announcement.date_published, DateAndOrder.format, 'y-m-d'), '')},'
                        f'{'&'.join(line.number for line in announcement.lines)}\n')
             with open(prepare_file(f'{ref.templates_path_announcements}/{announcement.announcement_id}.jinja'), 'w') as article:
                 article.write(announcement.content)

@@ -1,6 +1,7 @@
 from __future__ import annotations
 import json
 import ref
+import traceback
 from abc import ABC
 from collections import defaultdict
 from typing import Literal, TYPE_CHECKING
@@ -25,6 +26,7 @@ def __read_collection__(source: str, identity: C, mapper: Callable[..., T], comb
                     combiner(collection, mapper(*row))
                 except (IndexError, TypeError) as e:
                     error(f'Error while processing row {row}: {e}')
+                    error(traceback.format_exc())
         print('Done!')
         return collection
 
