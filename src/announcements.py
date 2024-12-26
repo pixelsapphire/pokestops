@@ -36,7 +36,7 @@ class Announcement(JsonSerializable):
         constructor = lambda *row: Announcement(
             row[0], row[1],
             DateAndOrder(date_string=row[2], string_format='y-m-d') if row[2] else None,
-            DateAndOrder(date_string=row[3], string_format='y-m-d|indefinite') if row[3] else None,
+            DateAndOrder(date_string=row[3], string_format='y-m-d|||indefinite') if row[3] else None,
             DateAndOrder(date_string=row[4], string_format='y-m-d') if row[4] else None,
             [lines.get(line, Line.dummy(line)) for line in row[5].split('&')] if row[5] else [])
         # warning caused by Pycharm issue PY-70668
@@ -82,7 +82,7 @@ def fetch_mpk_article(url: str, announcements: list[Announcement], pbar: tqdm) -
     dates = list(map(lambda date: DateAndOrder(date_string=date, string_format='d.m.y'),
                      [date for date in dates_str.replace('Obowiązuje: ', '').split(' - ') if date]))
     if len(dates) == 1:
-        dates.append(DateAndOrder.never) if '-' in dates_str else dates.append(None)
+        dates.append(DateAndOrder.distant_future) if '-' in dates_str else dates.append(None)
 
     try:
         lines_str: str = browser.find_element(By.CSS_SELECTOR, '.container-xxl .green-box.mb-3').text
@@ -116,7 +116,7 @@ def fetch_ztm_article(url: str, announcements: list[Announcement], pbar: tqdm) -
     published: DateAndOrder | None = None
     if len(dates) == 1:
         if '-' in dates_str:
-            dates.append(DateAndOrder.never)
+            dates.append(DateAndOrder.distant_future)
         else:
             published = dates[0]
             dates = [None, None]

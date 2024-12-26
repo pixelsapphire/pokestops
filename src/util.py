@@ -301,23 +301,26 @@ class LineSegment[TFloatSeq](Sequence[TFloatSeq]):
 
 class DateAndOrder:
     never: Final[Self] = None
-    long_time_ago: Final[Self] = None
+    distant_past: Final[Self] = None
+    distant_future: Final[Self] = None
 
     def __init__(self, *, year: int | None = None, month: int | None = None, day: int | None = None,
                  date_string: str | None = '', string_format: str | None = None, number_in_day: int | None = None):
         if date_string:
             if string_format:
                 format_parts: list[str] = string_format.split('|')
-                if len(format_parts) > 1 and date_string == format_parts[1]:
+                if len(string_format) == 0 or len(format_parts) not in (1, 2, 4):
+                    raise ValueError(f'Invalid format specifier \'{string_format}\' for object of type \'{type(self)}\'')
+                if len(format_parts) > 1 and date_string == format_parts[1]:  # never
                     self._year: int = -1
                     self._month: int = -1
                     self._day: int = -1
-                    self._number_in_day: int = -1
-                elif len(format_parts) == 3 and date_string == format_parts[2]:
-                    self._year: int = 0
-                    self._month: int = 0
-                    self._day: int = 0
                     self._number_in_day: int = 0
+                elif len(format_parts) == 4 and date_string in [format_parts[2], format_parts[3]]:  # distant past/future
+                    self._year: int = -1
+                    self._month: int = -1
+                    self._day: int = -1
+                    self._number_in_day: int = -1 if date_string == format_parts[2] else 1
                 else:
                     regex: str = (format_parts[0].replace('d', r'(\d{2})').replace('m', r'(\d{2})')
                                   .replace('y', r'(\d{4})').replace('n', r'(\d+)'))
@@ -365,17 +368,29 @@ class DateAndOrder:
     def __eq__(self, other):
         return self.__cmp_key__() == other.__cmp_key__() if isinstance(other, DateAndOrder) else False
 
-    def __lt__(self, other):
-        return self.__cmp_key__() < other.__cmp_key__() if isinstance(other, DateAndOrder) else False
-
     def __le__(self, other):
-        return self.__cmp_key__() <= other.__cmp_key__() if isinstance(other, DateAndOrder) else False
+        if DateAndOrder.never in (self, other):
+            return self == DateAndOrder.never
+        if DateAndOrder.distant_past in (self, other):
+            return self == DateAndOrder.distant_past
+        if DateAndOrder.distant_future in (self, other):
+            return other == DateAndOrder.distant_future
+        return self.__cmp_key__() < other.__cmp_key__() if isinstance(other, DateAndOrder) else bool(self) < bool(other)
 
-    def __gt__(self, other):
-        return self.__cmp_key__() > other.__cmp_key__() if isinstance(other, DateAndOrder) else False
+    def __lt__(self, other):
+        return self <= other and self != other
 
     def __ge__(self, other):
-        return self.__cmp_key__() >= other.__cmp_key__() if isinstance(other, DateAndOrder) else False
+        if DateAndOrder.never in (self, other):
+            return other == DateAndOrder.never
+        if DateAndOrder.distant_past in (self, other):
+            return other == DateAndOrder.distant_past
+        if DateAndOrder.distant_future in (self, other):
+            return self == DateAndOrder.distant_future
+        return self.__cmp_key__() > other.__cmp_key__() if isinstance(other, DateAndOrder) else bool(self) > bool(other)
+
+    def __gt__(self, other):
+        return self >= other and self != other
 
     def __hash__(self):
         return hash((self._year, self._month, self._day, self._number_in_day))
@@ -393,13 +408,12 @@ class DateAndOrder:
         if not format_spec:
             return self.__str__()
         format_parts: list[str] = format_spec.split('|')
-        if len(format_parts) > 3:
+        if len(format_spec) == 0 or len(format_parts) not in (1, 2, 4):
             raise ValueError(f'Invalid format specifier \'{format_spec}\' for object of type \'{type(self)}\'')
         if not self.is_known():
-            if len(format_parts) == 2:
+            if len(format_parts) == 2 or self == DateAndOrder.never:
                 return format_parts[1]
-            elif len(format_parts) == 3:
-                return format_parts[1] if self == DateAndOrder.never else format_parts[2]
+            return format_parts[2] if self == DateAndOrder.distant_past else format_parts[3]
         else:
             formatted_string: str = format_parts[0]
             if 'y' in format_spec:
@@ -432,7 +446,7 @@ class DateAndOrder:
         return self._number_in_day
 
     def is_known(self) -> bool:
-        return self != DateAndOrder.never and self != DateAndOrder.long_time_ago
+        return self != DateAndOrder.never and self != DateAndOrder.distant_past and self != DateAndOrder.distant_future
 
     def format(self, format_spec: str) -> str:
         return self.__format__(format_spec)
@@ -446,8 +460,9 @@ class DateAndOrder:
         return DateAndOrder(year=today_date.year, month=today_date.month, day=today_date.day)
 
 
-DateAndOrder.long_time_ago = DateAndOrder(year=0, month=0, day=0, number_in_day=0)  # type: ignore
-DateAndOrder.never = DateAndOrder(year=-1, month=-1, day=-1, number_in_day=-1)  # type: ignore
+DateAndOrder.never = DateAndOrder(year=-1, month=-1, day=-1, number_in_day=0)  # type: ignore
+DateAndOrder.distant_past = DateAndOrder(year=-1, month=-1, day=-1, number_in_day=-1)  # type: ignore
+DateAndOrder.distant_future = DateAndOrder(year=-1, month=-1, day=-1, number_in_day=1)  # type: ignore
 
 
 class CustomHtmlTagAttribute(HtmlTagAttribute):

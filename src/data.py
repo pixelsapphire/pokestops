@@ -40,7 +40,7 @@ class JsonSerializable(ABC):
 
 
 class Discovery[RichComparisonT]:
-    def __init__(self, item: RichComparisonT, date: DateAndOrder = DateAndOrder.long_time_ago):
+    def __init__(self, item: RichComparisonT, date: DateAndOrder = DateAndOrder.distant_past):
         self.item: RichComparisonT = item
         self.date: DateAndOrder = date
 
@@ -93,7 +93,7 @@ class Stop(JsonSerializable):
         return next((visit.date for visit in self.visits
                      if player.nickname == visit.item.nickname and (visit.date.is_known() or include_ev)))
 
-    def add_visit(self, player: Player, date: DateAndOrder = DateAndOrder.long_time_ago):
+    def add_visit(self, player: Player, date: DateAndOrder = DateAndOrder.distant_past):
         if self.is_visited_by(player):
             error(f'{player.nickname} has already visited stop {self.short_name}, '
                   f'remove the {f'{date.to_string(number=False)} ' if date else ''}'

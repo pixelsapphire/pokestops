@@ -30,7 +30,7 @@ class Logbook:
         self.lines: list[Discovery[Line]] = []
         self.vehicles: list[Discovery[Vehicle]] = []
 
-    def add_stop(self, stop: Stop, date: DateAndOrder = DateAndOrder.long_time_ago) -> None:
+    def add_stop(self, stop: Stop, date: DateAndOrder = DateAndOrder.distant_past) -> None:
         self.stops.append(Discovery(stop, date))
 
     def add_line(self, line: Line, date: DateAndOrder) -> None:
@@ -84,7 +84,7 @@ class Logbook:
 
 class ChronoLoader:
     def __init__(self, error_generator: Callable[[list[str]], str]):
-        self.current_day: DateAndOrder = DateAndOrder.long_time_ago
+        self.current_day: DateAndOrder = DateAndOrder.distant_past
         self.current_day_count: int = 0
         self.error_generator: Callable[[list[str]], str] = error_generator
 
