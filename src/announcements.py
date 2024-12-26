@@ -36,7 +36,7 @@ class Announcement(JsonSerializable):
         constructor = lambda *row: Announcement(
             row[0], row[1],
             DateAndOrder(date_string=row[2], string_format='y-m-d') if row[2] else None,
-            DateAndOrder(date_string=row[3], string_format='y-m-d|||indefinite') if row[3] else None,
+            DateAndOrder(date_string=row[3], string_format='y-m-d|indefinite') if row[3] else None,
             DateAndOrder(date_string=row[4], string_format='y-m-d') if row[4] else None,
             [lines.get(line, Line.dummy(line)) for line in row[5].split('&')] if row[5] else [])
         # warning caused by Pycharm issue PY-70668
@@ -56,8 +56,8 @@ def create_driver() -> WebDriver:
 
 def postprocess_html(html: str) -> str:
     current_stage: str = html
-    current_stage = re.sub(r'[^\-]color: ?#000000;?', lambda s: 'color:white;', current_stage)
-    current_stage = re.sub(r'</?strong>', lambda s: '', current_stage)
+    current_stage = re.sub(r'[^\-]color: ?#000000;?', 'color:white;', current_stage)
+    current_stage = re.sub(r'</?strong>', '', current_stage)
     current_stage = re.sub(r'<span class="fontstyle\d+">\s*([^<>]+?)\s*</span>', lambda s: f' {s.group(1)}', current_stage)
     current_stage = current_stage.replace('„', '"').replace('”', '"')
     current_stage = clean_html(BeautifulSoup(current_stage, features='html.parser').prettify())
@@ -112,19 +112,16 @@ def fetch_ztm_article(url: str, announcements: list[Announcement], pbar: tqdm) -
 
     dates_str: str = browser.find_element(By.CSS_SELECTOR, '.text--green.fw-medium').text
     dates = list(map(lambda date: DateAndOrder(date_string=date, string_format='d.m.y'),
-                     [date for date in re.sub(r'Obowiązuje ?(od )?', lambda _: '', dates_str).split(' - ') if date]))
+                     [date for date in re.sub(r'Obowiązuje ?(od )?', '', dates_str).split(' - ') if date]))
     published: DateAndOrder | None = None
     if len(dates) == 1:
-        if '-' in dates_str:
-            dates.append(DateAndOrder.distant_future)
-        else:
-            published = dates[0]
-            dates = [None, None]
+        dates.append(DateAndOrder.distant_future)
     elif len(dates) == 0:
         dates = [None, None]
         try:
-            modified_time_meta: WebElement = browser.find_element(By.XPATH, '//meta[@property="article:modified_time"]')
-            published = DateAndOrder(date_string=modified_time_meta.get_attribute('content')[:10], string_format='y-m-d')
+            seo: WebElement = browser.find_element(By.CSS_SELECTOR, 'script[type="application/ld+json"].yoast-schema-graph')
+            date_modified: str = json.loads(seo.get_attribute('innerHTML'))['@graph'][0]['dateModified'][:10]
+            published: DateAndOrder = DateAndOrder(date_string=date_modified, string_format='y-m-d')
         except NoSuchElementException:
             pass
 
@@ -176,7 +173,7 @@ def fetch_announcements() -> None:
                                         for url in ztm_article_urls]
         for future in as_completed(mpk_jobs + ztm_jobs):
             future.result()
-    announcements.sort(key=lambda a: (a.date_from if a.date_from is not None else a.date_published, a.date_to), reverse=True)
+    announcements.sort(key=lambda a: (coalesce(a.date_from, a.date_published), a.date_to, a.announcement_id), reverse=True)
 
     header: str = 'announcement_id,title,date_from,date_to,date_published,lines'
     with open(prepare_file(ref.rawdata_announcements, f'{header}\n', True), 'a') as file:

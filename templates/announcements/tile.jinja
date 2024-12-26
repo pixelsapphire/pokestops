@@ -6,13 +6,17 @@
             <div class='announcement-date'>
                 published on {{ announcement.date_published.to_string(number=False) }}
             </div>
-        {% elif announcement.date_from is not none and announcement.date_to is not none %}
+        {% elif announcement.date_from is not none %}
             <div class='announcement-date'>
-                applies
-                {% if announcement.date_to.is_known() is false %} from {% endif %}
-                {{ announcement.date_from.to_string(number=False) }}
-                {% if announcement.date_to.is_known() %} ~
-                    {{ announcement.date_to.to_string(number=False) }}
+                {{ 'applies ' }}
+                {%- if announcement.date_to is none -%}
+                    {{ ' on ' + announcement.date_from.to_string(number=False) }}
+                {%- else -%}
+                    {% if announcement.date_to.is_known() is false %} from {% endif %}
+                    {{- announcement.date_from.to_string(number=False) -}}
+                    {%- if announcement.date_to.is_known() -%}
+                        {{- ' ~ ' + announcement.date_to.to_string(number=False) -}}
+                    {% endif %}
                 {% endif %}
             </div>
         {% endif %}
