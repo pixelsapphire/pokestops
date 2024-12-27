@@ -1,3 +1,4 @@
+import args
 import folium
 import gtfs
 from announcements import *
@@ -262,11 +263,13 @@ def generate_map(db: Database) -> folium.Map:
     return fmap
 
 
-def build_app(fmap: folium.Map, db: Database) -> None:
-    print('  Compiling Folium map... ', end='')
-    map_element: Element = fmap.get_root()
-    folium_html: str = map_element.render()
-    print('Done!')
+def build_app(db: Database, fmap: folium.Map | None) -> None:
+    folium_html: str | None = None
+    if build_map:
+        print('  Compiling Folium map... ', end='')
+        map_element: Element = fmap.get_root()
+        folium_html = map_element.render()
+        print('Done!')
 
     from player import Player
     print('  Compiling data to JavaScript... ', end='')
@@ -286,26 +289,31 @@ def build_app(fmap: folium.Map, db: Database) -> None:
     with open(prepare_path(ref.compileddata_players), 'w') as file:
         file.write(f'const players = {{\n{'\n'.join(map(Player.json_entry, db.players))}\n}};')
 
-    map_script: str = folium_html[folium_html.rfind('<script>') + 8:folium_html.rfind('</script>')]
-    with open(prepare_path(ref.compileddata_map), 'w') as script_file:
-        script_file.write(clean_js(map_script))
+    if folium_html is not None:
+        map_script: str = folium_html[folium_html.rfind('<script>') + 8:folium_html.rfind('</script>')]
+        with open(prepare_path(ref.compileddata_map), 'w') as script_file:
+            script_file.write(clean_js(map_script))
 
     print('Done!')
+
     print('  Building HTML documents... ', end='')
 
     builder: UIBuilder = UIBuilder(database=db, lexmap_file=ref.lexmap_polish)
 
-    map_html: str = clean_html(builder.create_map(folium_html).render())
-    with open(prepare_path(ref.document_map), 'w') as file:
-        file.write(map_html)
+    if build_map:
+        map_html: str = clean_html(builder.create_map(folium_html).render())
+        with open(prepare_path(ref.document_map), 'w') as file:
+            file.write(map_html)
 
-    archive_html: str = clean_html(builder.create_archive().render())
-    with open(prepare_path(ref.document_archive), 'w') as file:
-        file.write(archive_html)
+    if build_archive:
+        archive_html: str = clean_html(builder.create_archive().render())
+        with open(prepare_path(ref.document_archive), 'w') as file:
+            file.write(archive_html)
 
-    announcements_html: str = clean_html(builder.create_announcements().render())
-    with open(prepare_path(ref.document_announcements), 'w') as file:
-        file.write(announcements_html)
+    if build_announcements:
+        announcements_html: str = clean_html(builder.create_announcements().render())
+        with open(prepare_path(ref.document_announcements), 'w') as file:
+            file.write(announcements_html)
 
     print('Done!')
 
@@ -319,42 +327,56 @@ def main() -> None:
     initial_db: Database = Database.partial(regions=regions, district=district, players=players,
                                             scheduled_changes=scheduled_changes)
 
-    if update_ztm_stops:
+    if update_gtfs:
         print('Updating GTFS data...')
         gtfs.update_gtfs_data(not os.path.exists(ref.rawdata_stops), initial_db)
     else:
         if not os.path.exists(ref.rawdata_stops):
             raise FileNotFoundError(f'{ref.rawdata_stops} not found. '
-                                    f'Run the script with the --update flag to download the latest data.')
+                                    f'Run the script with the --update-gtfs option to download the latest data.')
         if not os.path.exists(ref.rawdata_routes):
             raise FileNotFoundError(f'{ref.rawdata_routes} not found. '
-                                    f'Run the script with the --update flag to download the latest data.')
+                                    f'Run the script with the --update-gtfs option to download the latest data.')
         if not os.path.exists(ref.rawdata_lines):
             raise FileNotFoundError(f'{ref.rawdata_lines} not found. '
-                                    f'Run the script with the --update flag to download the latest data.')
+                                    f'Run the script with the --update-gtfs option to download the latest data.')
 
     if update_announcements:
         fetch_announcements()
+    elif not os.path.exists(ref.rawdata_announcements):
+        raise FileNotFoundError(f'{ref.rawdata_announcements} not found. '
+                                f'Run the script with the --update-announcements option to download the latest data.')
 
     print('Building full database...')
     db: Database = load_data(initial_db)
     del initial_db
 
-    if update_map:
+    if update_gtfs:
+        print('Drawing line route diagrams... ', end='')
+        for line in db.lines.values():
+            create_route_map(line, db, False)
+        print('Done!')
+
+    fmap: folium.Map | None = None
+    if build_map:
         print('Generating map data...')
-        if update_ztm_stops:
-            print('Drawing line route diagrams... ', end='')
-            for line in db.lines.values():
-                create_route_map(line, db, False)
-            print('Done!')
-        fmap: folium.Map = generate_map(db)
+        fmap = generate_map(db)
+    if build_map or build_archive or build_announcements:
         print('Compiling application...')
-        build_app(fmap, db)
+        build_app(db, fmap)
 
 
-update_ztm_stops: bool = '--update' in sys.argv or '-u' in sys.argv
-update_map: bool = '--map' in sys.argv or '-m' in sys.argv
-update_announcements: bool = '--announcements' in sys.argv or '-a' in sys.argv
+args.validate_flags('-A', '-a', '-b', '-G', '-m', '-N', '-n', '-U')
+args.validate_options('--all', '--update-all', '--build-all',
+                      '--update-gtfs', '--update-announcements',
+                      '--build-map', '--build-archive', '--build-announcements')
+
+update_gtfs: bool = args.one_of_present('--update-gtfs', '--update-all', '--all', '-G', '-U', '-A')
+update_announcements: bool = args.one_of_present('--update-announcements', '--update-all', '--all', '-N', '-U', '-A')
+build_map: bool = args.one_of_present('--build-map', '--build-all', '--all', '-m', '-b', '-A')
+build_archive: bool = args.one_of_present('--build-archive', '--build-all', '--all', '-a', '-b', '-A')
+build_announcements: bool = args.one_of_present('--build-announcements', '--build-all', '--all', '-n', '-b', '-A')
+
 if __name__ == '__main__':
     os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     main()
