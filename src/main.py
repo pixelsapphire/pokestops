@@ -342,6 +342,7 @@ def main() -> None:
                                     f'Run the script with the --update-gtfs option to download the latest data.')
 
     if update_announcements:
+        clear_directory(ref.templates_path_announcements)
         fetch_announcements()
     elif not os.path.exists(ref.rawdata_announcements):
         raise FileNotFoundError(f'{ref.rawdata_announcements} not found. '
@@ -353,6 +354,7 @@ def main() -> None:
 
     if update_gtfs:
         print('Drawing line route diagrams... ', end='')
+        clear_directory(ref.mapdata_path)
         for line in db.lines.values():
             create_route_map(line, db, False)
         print('Done!')

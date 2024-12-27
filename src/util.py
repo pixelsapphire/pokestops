@@ -105,6 +105,13 @@ def prepare_file(path: str | os.PathLike[str], initial_content: str = '', overri
     return path
 
 
+def clear_directory(directory: str | os.PathLike[str]) -> None:
+    for file in os.listdir(directory):
+        file_path: str = os.path.join(directory, file)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+
+
 def system_open(file_path: str | os.PathLike[str]) -> None:
     if platform.system() == 'Darwin':  # macOS
         subprocess.call(('open', file_path))
