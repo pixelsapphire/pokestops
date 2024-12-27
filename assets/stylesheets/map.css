@@ -306,10 +306,14 @@
 
 .achievement-stars {
     font-size: min(2dvh, 2dvw);
-    width: min(5dvh, 5dvw);
+    width: min(4.5dvh, 4.5dvw);
     text-align: center;
     word-break: break-all;
     line-height: 1;
+}
+
+.achievement-details {
+    padding: 0 min(1dvh, 1dvw);
 }
 
 .achievement-progress {
