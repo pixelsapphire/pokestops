@@ -7,7 +7,6 @@ import re
 import subprocess
 import sys
 import zipfile
-from htmlBuilder.attributes import HtmlTagAttribute
 from math import atan2, pi
 from sortedcontainers import SortedSet
 from typing import Any, Callable, Final, Iterable, Protocol, Self, Sequence, TypeVar, runtime_checkable
@@ -470,14 +469,6 @@ class DateAndOrder:
 DateAndOrder.never = DateAndOrder(year=-1, month=-1, day=-1, number_in_day=0)  # type: ignore
 DateAndOrder.distant_past = DateAndOrder(year=-1, month=-1, day=-1, number_in_day=-1)  # type: ignore
 DateAndOrder.distant_future = DateAndOrder(year=-1, month=-1, day=-1, number_in_day=1)  # type: ignore
-
-
-class CustomHtmlTagAttribute(HtmlTagAttribute):
-    def __init__(self, name: str, value: str | bool | None):
-        if isinstance(value, bool):
-            value = 'true' if value else 'false'
-        super().__init__(value)
-        self._name = name
 
 
 class Comparator[T]:
