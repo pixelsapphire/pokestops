@@ -130,8 +130,6 @@ def place_stop_markers(db: Database, fmap: folium.Map) -> None:
         popup: folium.Popup = folium.Popup(f'<span class="stop-name">{stop.full_name} [{stop.short_name}]</span>'
                                            f'<span class="stop-visitors"><br>{visited_label}</span>'
                                            f'<span class="stop-tp"><br>{terminal_progress_label}</span>')
-        # see: https://github.com/python-visualization/folium/pull/2056
-        # noinspection PyTypeChecker
         folium.Marker(location=stop.location, popup=popup, icon=marker).add_to(fmap)
     print('Done!')
 
