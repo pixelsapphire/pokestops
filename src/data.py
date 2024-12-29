@@ -556,7 +556,7 @@ class Database:
                  scheduled_changes: list[StopChange], announcements: list[Announcement],
                  *, is_old_data: bool = False):
         self.__old_data__: Database | None = Database.partial(is_old_data=True) if is_old_data else None
-        self.__changed_collections__: set[Database.CollectionName] = set()
+        self.__reported_collections__: set[Database.CollectionName] = set()
         self.players: list[Player] = players
         self.progress: dict[str, dict[str, float]] = progress
         self.stops: dict[str, Stop] = stops
@@ -633,8 +633,8 @@ class Database:
     def report_old_data(self, old_data: Database) -> None:
         self.__old_data__ = Database.merge(self.__old_data__, old_data)
         for collection in get_args(Database.CollectionName):
-            if getattr(old_data, collection):
-                self.__changed_collections__.add(collection)
+            if len(getattr(old_data, collection)) > 0:
+                self.__reported_collections__.add(collection)
 
     def make_update_report(self) -> None:
         added_stops: set[Stop] = {s for s in self.stops.values() if s not in self.__old_data__.stops.values()}
@@ -659,10 +659,11 @@ class Database:
             lexmap: dict[str, float] = create_lexicographic_mapping(file_to_string(ref.lexmap_polish))
             line_key = lambda line: int(line) if line.isdigit() else int(re.sub(r'\D', '', line)) - lines
             stop_key = lambda stop: lexicographic_sequence(f'{stop.full_name}{stop.short_name}', lexmap)
-            with open(prepare_path(ref.report_gtfs), 'w') as file:
-                if 'stops' in self.__changed_collections__ or 'lines' in self.__changed_collections__:
+            with (open(prepare_path(ref.report_gtfs), 'w') as file):
+                if (('stops' in self.__reported_collections__ and (added_stops or removed_stops or changed_stops)) or
+                        ('lines' in self.__reported_collections__ and (added_lines or removed_lines or changed_lines))):
                     file.write('GTFS database updated.\n')
-                if 'stops' in self.__changed_collections__:
+                if 'stops' in self.__reported_collections__:
                     if added_stops:
                         file.write(f'Added stops:\n- {'\n- '.join(f'{s.full_name} [{s.short_name}]'
                                                                   for s in sorted(added_stops, key=stop_key))}\n')
@@ -673,14 +674,14 @@ class Database:
                         file.write(f'Changed stops:\n- {'\n- '
                                    .join(f'{old.full_name} [{old.short_name}] -> {new.full_name} [{new.short_name}]'
                                          for old, new in sorted(changed_stops, key=lambda p: stop_key(p[0])))}\n')
-                if 'lines' in self.__changed_collections__:
+                if 'lines' in self.__reported_collections__:
                     if added_lines:
                         file.write(f'Added lines:\n- {"\n- ".join(sorted(added_lines, key=line_key))}\n')
                     if removed_lines:
                         file.write(f'Removed lines:\n- {"\n- ".join(sorted(removed_lines, key=line_key))}\n')
                     if changed_lines:
                         file.write(f'Changed lines:\n- {"\n- ".join(sorted(changed_lines, key=line_key))}\n')
-                if 'announcements' in self.__changed_collections__:
+                if 'announcements' in self.__reported_collections__ and (added_announcements or removed_announcements):
                     file.write('Announcements updated.\n')
                     if added_announcements:
                         file.write(f'New announcements:\n- {"\n- ".join(a.title for a in added_announcements)}\n')
