@@ -63,6 +63,7 @@ def postprocess_html(html: str) -> str:
     current_stage = clean_html(BeautifulSoup(current_stage, features='html.parser').prettify())
     current_stage = re.sub(r'"\n\s*(.+?)\n\s*"', lambda s: f'"{s.group(1)}"', current_stage)
     current_stage = re.sub(r'\(\n\s*(.+?)\n\s*\)', lambda s: f'({s.group(1)})', current_stage)
+    current_stage = re.sub(r'\s?\u00A0\s?', '\u00A0', current_stage)
     return current_stage
 
 
