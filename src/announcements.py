@@ -130,8 +130,17 @@ def fetch_ztm_article(url: str, announcements: list[Announcement], pbar: tqdm) -
     content: str = postprocess_html(content_container.get_attribute('innerHTML'))
     browser.quit()
 
+    pattern: re.Pattern[str] = re.compile(r'[Ll]ini[a-z:]+\s+([a-z:]+\s+)*(T?\d+(,\s+T?\d+)*(\s+(i|oraz)\s+T?\d+)?)')
+    line_mentions: list[re.Match] = pattern.findall(title) + pattern.findall(content)
+    line_numbers: set[str] = set()
+    for mention in line_mentions:
+        line_numbers.update(re.findall(r'T?\d+', mention[1]))
+    lines: list[Line] = sorted(map(Line.dummy, line_numbers))
+    if len(lines) > 30:
+        lines = lines[:20] + [Line.dummy(f'and {len(lines) - 20} more')]
+
     with __mutex__:
-        announcements.append(Announcement(announcement_id, title, dates[0], dates[1], published, [], content))
+        announcements.append(Announcement(announcement_id, title, dates[0], dates[1], published, lines, content))
         pbar.update(0.5)
 
 
