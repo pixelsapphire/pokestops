@@ -4,7 +4,7 @@ import ref
 import traceback
 from abc import ABC
 from collections import defaultdict
-from typing import Literal, TYPE_CHECKING
+from typing import get_args, Literal, TYPE_CHECKING
 from util import *
 
 if TYPE_CHECKING:
@@ -540,7 +540,7 @@ class Region:
 
 
 class Database:
-    type CollectionName = Literal[
+    CollectionName = Literal[
         'players', 'progress', 'stops', 'stop_groups', 'terminals', 'carriers', 'regions',
         'vehicles', 'models', 'lines', 'routes', 'scheduled_changes', 'announcements']
     __stars__: dict[tuple[int, int], int] = {(1, 1): 1, (2, 2): 2, (3, 4): 3, (5, 7): 4, (8, 100): 5}
@@ -550,7 +550,10 @@ class Database:
                  carriers: dict[str, Carrier], regions: dict[str, Region], district: Region,
                  vehicles: dict[str, Vehicle], models: dict[str, VehicleModel],
                  lines: dict[str, Line], routes: dict[str, Route],
-                 scheduled_changes: list[StopChange], announcements: list[Announcement]):
+                 scheduled_changes: list[StopChange], announcements: list[Announcement],
+                 *, is_old_data: bool = False):
+        self.__old_data__: Database | None = Database.partial(is_old_data=True) if is_old_data else None
+        self.__changed_collections__: set[Database.CollectionName] = set()
         self.players: list[Player] = players
         self.progress: dict[str, dict[str, float]] = progress
         self.stops: dict[str, Stop] = stops
@@ -576,10 +579,35 @@ class Database:
                 regions: dict[str, Region] | None = None, district: Region | None = None,
                 vehicles: dict[str, Vehicle] | None = None, models: dict[str, VehicleModel] | None = None,
                 lines: dict[str, Line] | None = None, routes: dict[str, Route] | None = None,
-                scheduled_changes: list[StopChange] | None = None, announcements: list[Announcement] | None = None) -> Database:
+                scheduled_changes: list[StopChange] | None = None, announcements: list[Announcement] | None = None,
+                *, is_old_data: bool = False) -> Database:
         return Database(players or [], progress or {}, stops or {}, stop_groups or {}, terminals or [],
                         carriers or {}, regions or {}, district or Region(0, '', '', lambda _: False),
-                        vehicles or {}, models or {}, lines or {}, routes or {}, scheduled_changes or [], announcements or [])
+                        vehicles or {}, models or {}, lines or {}, routes or {}, scheduled_changes or [], announcements or [],
+                        is_old_data=is_old_data)
+
+    @staticmethod
+    def merge(db1: Database, db2: Database) -> Database:
+        if db1 and db2 is None:
+            return Database.partial()
+        elif (db1 is None) != (db2 is None):
+            return coalesce(db1, db2)
+        return Database(
+            db1.players + db2.players,
+            {**db1.progress, **db2.progress},
+            {**db1.stops, **db2.stops},
+            {**db1.stop_groups, **db2.stop_groups},
+            db1.terminals + db2.terminals,
+            {**db1.carriers, **db2.carriers},
+            {**db1.regions, **db2.regions},
+            db1.district,
+            {**db1.vehicles, **db2.vehicles},
+            {**db1.models, **db2.models},
+            {**db1.lines, **db2.lines},
+            {**db1.routes, **db2.routes},
+            db1.scheduled_changes + db2.scheduled_changes,
+            db1.announcements + db2.announcements
+        )
 
     @staticmethod
     def get_stars_for_group(size: int):
@@ -599,50 +627,66 @@ class Database:
     def get_effective_changes(self):
         return [change for change in self.scheduled_changes if change.is_effective()]
 
-    @staticmethod
-    def make_update_report(old_data: Database, new_data: Database) -> None:
-        added_stops: set[Stop] = {s for s in new_data.stops.values() if s not in old_data.stops.values()}
-        removed_stops: set[Stop] = {s for s in old_data.stops.values() if s not in new_data.stops.values()}
+    def report_old_data(self, old_data: Database) -> None:
+        self.__old_data__ = Database.merge(self.__old_data__, old_data)
+        for collection in get_args(Database.CollectionName):
+            if getattr(old_data, collection):
+                self.__changed_collections__.add(collection)
+
+    def make_update_report(self) -> None:
+        added_stops: set[Stop] = {s for s in self.stops.values() if s not in self.__old_data__.stops.values()}
+        removed_stops: set[Stop] = {s for s in self.__old_data__.stops.values() if s not in self.stops.values()}
         changed_stops: set[tuple[Stop, Stop]] = set()
-        added_lines: set[str] = {r for r in new_data.lines.keys() if r not in old_data.lines.keys()}
-        removed_lines: set[str] = {r for r in old_data.lines.keys() if r not in new_data.lines.keys()}
-        changed_lines: set[str] = {r for r in new_data.lines.keys()
-                                   if r in old_data.lines.keys() and new_data.lines[r].stops != old_data.lines[r].stops}
-        effective_modifications: list[StopChange] = [c for c in new_data.get_effective_changes() if c.is_modification()]
+        added_lines: set[str] = {r for r in self.lines.keys() if r not in self.__old_data__.lines.keys()}
+        removed_lines: set[str] = {r for r in self.__old_data__.lines.keys() if r not in self.lines.keys()}
+        changed_lines: set[str] = {r for r in self.lines.keys() if r in self.__old_data__.lines.keys() and
+                                   self.lines[r].stops != self.__old_data__.lines[r].stops}
+        added_announcements: set[Announcement] = {a for a in self.announcements if a not in self.__old_data__.announcements}
+        removed_announcements: set[Announcement] = {a for a in self.__old_data__.announcements if a not in self.announcements}
+        effective_modifications: list[StopChange] = [c for c in self.get_effective_changes() if c.is_modification()]
         if effective_modifications:
             for change in effective_modifications:
                 removed_stops.discard(change.old_stop)
                 added_stops.discard(change.new_stop)
                 changed_stops.add((change.old_stop, change.new_stop))
-        if (not added_stops and not removed_stops and not changed_stops and
-                not added_lines and not removed_lines and not changed_lines):
-            print(' No changes, no report created.')
-        else:
-            print(' Data has changed, creating report... ', end='')
+        if (added_stops or removed_stops or changed_stops or
+                added_lines or removed_lines or changed_lines or added_announcements):
+            print('Data has changed, creating report... ', end='')
             lines: int = max(len(added_lines), len(removed_lines), len(changed_lines))
             lexmap: dict[str, float] = create_lexicographic_mapping(file_to_string(ref.lexmap_polish))
             line_key = lambda line: int(line) if line.isdigit() else int(re.sub(r'\D', '', line)) - lines
             stop_key = lambda stop: lexicographic_sequence(f'{stop.full_name}{stop.short_name}', lexmap)
             with open(prepare_path(ref.report_gtfs), 'w') as file:
-                file.write('GTFS database updated.\n')
-                if added_stops:
-                    file.write(f'Added stops:\n- {'\n- '.join(f'{s.full_name} [{s.short_name}]'
-                                                              for s in sorted(added_stops, key=stop_key))}\n')
-                if removed_stops:
-                    file.write(f'Removed stops:\n- {'\n- '.join(f'{s.full_name} [{s.short_name}]'
-                                                                for s in sorted(removed_stops, key=stop_key))}\n')
-                if changed_stops:
-                    file.write(f'Changed stops:\n- {'\n- '
-                               .join(f'{old.full_name} [{old.short_name}] -> {new.full_name} [{new.short_name}]'
-                                     for old, new in sorted(changed_stops, key=lambda p: stop_key(p[0])))}\n')
-                if added_lines:
-                    file.write(f'Added lines:\n- {"\n- ".join(sorted(added_lines, key=line_key))}\n')
-                if removed_lines:
-                    file.write(f'Removed lines:\n- {"\n- ".join(sorted(removed_lines, key=line_key))}\n')
-                if changed_lines:
-                    file.write(f'Changed lines:\n- {"\n- ".join(sorted(changed_lines, key=line_key))}\n')
+                if 'stops' in self.__changed_collections__ or 'lines' in self.__changed_collections__:
+                    file.write('GTFS database updated.\n')
+                if 'stops' in self.__changed_collections__:
+                    if added_stops:
+                        file.write(f'Added stops:\n- {'\n- '.join(f'{s.full_name} [{s.short_name}]'
+                                                                  for s in sorted(added_stops, key=stop_key))}\n')
+                    if removed_stops:
+                        file.write(f'Removed stops:\n- {'\n- '.join(f'{s.full_name} [{s.short_name}]'
+                                                                    for s in sorted(removed_stops, key=stop_key))}\n')
+                    if changed_stops:
+                        file.write(f'Changed stops:\n- {'\n- '
+                                   .join(f'{old.full_name} [{old.short_name}] -> {new.full_name} [{new.short_name}]'
+                                         for old, new in sorted(changed_stops, key=lambda p: stop_key(p[0])))}\n')
+                if 'lines' in self.__changed_collections__:
+                    if added_lines:
+                        file.write(f'Added lines:\n- {"\n- ".join(sorted(added_lines, key=line_key))}\n')
+                    if removed_lines:
+                        file.write(f'Removed lines:\n- {"\n- ".join(sorted(removed_lines, key=line_key))}\n')
+                    if changed_lines:
+                        file.write(f'Changed lines:\n- {"\n- ".join(sorted(changed_lines, key=line_key))}\n')
+                if 'announcements' in self.__changed_collections__:
+                    file.write('Announcements updated.\n')
+                    if added_announcements:
+                        file.write(f'New announcements:\n- {"\n- ".join(a.title for a in added_announcements)}\n')
+                    if removed_announcements:
+                        file.write(f'Expired announcements:\n- {"\n- ".join(a.title for a in removed_announcements)}\n')
             print(f'Report stored in {ref.report_gtfs}!')
             system_open(ref.report_gtfs)
+        else:
+            print('No changes, no report created.')
 
     @staticmethod
     def get_game_modes() -> list[str]:

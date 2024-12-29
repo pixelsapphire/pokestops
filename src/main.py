@@ -1,8 +1,8 @@
 import args
 import folium
-import gtfs
 from announcements import *
 from branca.element import Element
+from gtfs import update_gtfs_data
 from postprocess import *
 from uibuilder import *
 from util import *
@@ -329,7 +329,7 @@ def main() -> None:
 
     if update_gtfs:
         print('Updating GTFS data...')
-        gtfs.update_gtfs_data(not os.path.exists(ref.rawdata_stops), initial_db)
+        update_gtfs_data(not os.path.exists(ref.rawdata_stops), initial_db)
     else:
         if not os.path.exists(ref.rawdata_stops):
             raise FileNotFoundError(f'{ref.rawdata_stops} not found. '
@@ -342,11 +342,13 @@ def main() -> None:
                                     f'Run the script with the --update-gtfs option to download the latest data.')
 
     if update_announcements:
-        clear_directory(ref.templates_path_announcements)
-        fetch_announcements()
+        fetch_announcements(not os.path.exists(ref.rawdata_announcements), initial_db)
     elif not os.path.exists(ref.rawdata_announcements):
         raise FileNotFoundError(f'{ref.rawdata_announcements} not found. '
                                 f'Run the script with the --update-announcements option to download the latest data.')
+
+    if update_gtfs or update_announcements:
+        initial_db.make_update_report()
 
     print('Building full database...')
     db: Database = load_data(initial_db)

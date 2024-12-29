@@ -30,6 +30,12 @@ class Announcement(JsonSerializable):
         self.lines: list[Line] = lines
         self.content: str | None = content
 
+    def __eq__(self, other):
+        return self.announcement_id == other.announcement_id
+
+    def __hash__(self):
+        return hash(self.announcement_id)
+
     @staticmethod
     def read_list(source: str, lines: dict[str, Line]) -> list[Announcement]:
         print(f'  Reading announcements data from {source}... ', end='')
@@ -158,7 +164,11 @@ def get_articles_ztm(browser: WebDriver, url: str) -> list[str]:
                     container.find_elements(By.CLASS_NAME, 'col-lg-6')))
 
 
-def fetch_announcements() -> None:
+def fetch_announcements(first_update: bool, initial_db: Database) -> None:
+    if not first_update:
+        initial_db.report_old_data(Database.partial(announcements=Announcement.read_list(ref.rawdata_announcements, {})))
+    clear_directory(ref.templates_path_announcements)
+
     pbar: tqdm = tqdm(total=70, desc='Fetching announcements...', unit='article', dynamic_ncols=True, file=sys.stdout)
 
     browser: WebDriver = create_driver()
@@ -195,3 +205,5 @@ def fetch_announcements() -> None:
                        f'{'&'.join(line.number for line in announcement.lines)}\n')
             with open(prepare_file(f'{ref.templates_path_announcements}/{announcement.announcement_id}.jinja'), 'w') as article:
                 article.write(announcement.content)
+
+    initial_db.announcements = announcements

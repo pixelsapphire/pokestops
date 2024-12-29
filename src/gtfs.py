@@ -173,8 +173,5 @@ def update_gtfs_data(first_update: bool, initial_db: Database) -> None:
     initial_db.routes = Route.read_dict(ref.rawdata_routes)
     initial_db.lines = Line.read_dict(ref.rawdata_lines)
 
-    if first_update:
-        print('  GTFS database created.', end='')
-    else:
-        print('  GTFS database updated.', end='')
-        Database.make_update_report(old_db, initial_db)
+    if not first_update:
+        initial_db.report_old_data(old_db)
