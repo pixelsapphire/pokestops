@@ -2,6 +2,7 @@ import args
 import folium
 from announcements import *
 from branca.element import Element
+from geo import *
 from gtfs import update_gtfs_data
 from postprocess import *
 from uibuilder import *
@@ -58,59 +59,6 @@ def load_data(initial_db: Database) -> Database:
 
     return Database(players, progress, stops, initial_db.stop_groups, terminals, carriers, regions, initial_db.district,
                     vehicles, models, initial_db.lines, initial_db.routes, initial_db.scheduled_changes, announcements)
-
-
-def next_midpoint(previous_dir: vector2f, current_point: vector2f, next_point: vector2f,
-                  alternative_direction: bool) -> tuple[vector2f, vector2f, vector2f]:
-    delta: vector2f = next_point - current_point
-    distance: vector2f = vector2f(abs(delta.x), abs(delta.y))
-    current_dir_1: vector2f = vector2f(sign(delta.x), sign(delta.y))
-    current_dir_2: vector2f = vector2f(sign(delta.x), 0) if distance.x > distance.y \
-        else vector2f(0, sign(delta.y)) if distance.y > distance.x else current_dir_1
-    midpoint_offset_1: float = min(distance.x, distance.y)
-    midpoint_offset_2: float = max(distance.x, distance.y) - midpoint_offset_1
-    if not previous_dir:
-        if midpoint_offset_1 > midpoint_offset_2:
-            dir_before_midpoint: vector2f = current_dir_1 if not alternative_direction else current_dir_2
-        else:
-            dir_before_midpoint: vector2f = current_dir_2 if not alternative_direction else current_dir_1
-    else:
-        if previous_dir == current_dir_1 or previous_dir == current_dir_2:
-            dir_before_midpoint: vector2f = previous_dir
-        elif vector2f.angle_offset(previous_dir, current_dir_1) < vector2f.angle_offset(previous_dir, current_dir_2):
-            dir_before_midpoint: vector2f = current_dir_1 if not alternative_direction else current_dir_2
-        else:
-            dir_before_midpoint: vector2f = current_dir_2 if not alternative_direction else current_dir_1
-    if dir_before_midpoint == current_dir_1:
-        midpoint_offset: float = midpoint_offset_1
-        dir_after_midpoint: vector2f = current_dir_2
-    else:
-        midpoint_offset: float = midpoint_offset_2
-        dir_after_midpoint: vector2f = current_dir_1
-    midpoint: vector2f = current_point + dir_before_midpoint * midpoint_offset
-    return dir_before_midpoint, midpoint, dir_after_midpoint
-
-
-def midpoints(sequence: list[vector2f]) -> list[vector2f]:
-    if not sequence:
-        return []
-    new_sequence: list[vector2f] = []
-    previous_dir: vector2f = vector2f(0, 0)
-    current_point: vector2f = sequence[0]
-    new_sequence.append(current_point)
-
-    for i in range(1, len(sequence)):
-        next_point: vector2f = sequence[i]
-        dir_before_midpoint1, midpoint1, dir_after_midpoint1 = next_midpoint(previous_dir, current_point, next_point, False)
-        dir_before_midpoint2, midpoint2, dir_after_midpoint2 = next_midpoint(previous_dir, current_point, next_point, True)
-        diff1: float = vector2f.angle_offset(previous_dir, dir_before_midpoint1)
-        diff2: float = vector2f.angle_offset(previous_dir, dir_before_midpoint2)
-        midpoint, dir_after_midpoint = (midpoint1, dir_after_midpoint1) if diff1 >= diff2 else (midpoint2, dir_after_midpoint2)
-        new_sequence.append(midpoint)
-        new_sequence.append(next_point)
-        previous_dir = dir_after_midpoint
-        current_point = next_point
-    return new_sequence
 
 
 def create_route_map(line: Line, db: Database, all_variants: bool) -> None:

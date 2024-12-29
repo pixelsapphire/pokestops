@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from concurrent.futures import as_completed, Future, ThreadPoolExecutor
 from data import __read_collection__
 from data import *
+from date import DateAndOrder
 from multiprocessing import cpu_count
 from postprocess import clean_html
 from selenium import webdriver
