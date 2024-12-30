@@ -11,6 +11,7 @@
     <script src='data/js/vehicles_data.min.js'></script>
     <script src='data/js/lines_data.min.js'></script>
     <script src='data/js/players_data.min.js'></script>
+    <script src='assets/scripts/common.js'></script>
     <script src='assets/scripts/archive.js'></script>
 </head>
 <body>
@@ -23,15 +24,15 @@
 </div>
 <div id='container'>
     <div id='navigation'>
-        <div class='navigation-tile selected' onclick='openTab(this, "stops")'>
+        <div class='navigation-tile selected' data-tab='stops' onclick='openTab(this, "stops")'>
             <span class='material-icon material-symbols-outlined'>pin_drop</span>
             <span>Stops</span>
         </div>
-        <div class='navigation-tile' onclick='openTab(this, "lines")'>
+        <div class='navigation-tile' data-tab='lines' onclick='openTab(this, "lines")'>
             <span class='material-icon material-symbols-outlined'>route</span>
             <span>Lines</span>
         </div>
-        <div class='navigation-tile' onclick='openTab(this, "vehicles")'>
+        <div class='navigation-tile' data-tab='vehicles' onclick='openTab(this, "vehicles")'>
             <span class='material-icon material-symbols-outlined'>tram</span>
             <span>Vehicles</span>
         </div>

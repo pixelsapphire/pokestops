@@ -13,6 +13,7 @@ compileddata_vehicles: str = 'data/js/vehicles_data.min.js'
 
 controller_announcements: str = 'assets/scripts/announcements.js'
 controller_archive: str = 'assets/scripts/archive.js'
+controller_common: str = 'assets/scripts/common.js'
 controller_map: str = 'assets/scripts/map.js'
 
 document_announcements: str = 'announcements.html'

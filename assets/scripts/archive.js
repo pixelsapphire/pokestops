@@ -14,6 +14,7 @@ function openTab(tile, tab) {
     document.querySelectorAll('.navigation-tile, .content-container').forEach(e => e.classList.remove('selected'));
     tile.classList.add('selected');
     document.querySelector(`#container-${tab}`).classList.add('selected');
+    window.location.hash = tab;
 }
 
 function makeAddress(address) {
@@ -52,6 +53,7 @@ function selectStop(stopPreview, ctrl) {
     ctrl.stopCoordinatesLabel.innerHTML = `(${coordinates})`;
     ctrl.stopLocationViewButton.href = streetViewLink;
     ctrl.stopDiscoveriesLabel.innerHTML = stop.v ? stop.v.map((v) => `visited by ${v[0]} ${v[1] ? `on ${v[1]}` : 'a long time ago'}`).join('<br>') : 'not yet visited';
+    window.location.hash = `stops.${stopId}`;
 }
 
 function selectLine(linePreview, ctrl) {
@@ -101,6 +103,7 @@ function selectLine(linePreview, ctrl) {
         }
     }
     ctrl.lineDiscoveriesLabel.innerHTML = line.d ? line.d.map((d) => `discovered by ${d[0]} on ${d[1]}`).join('<br>') : 'not yet discovered';
+    window.location.hash = `lines.${lineNumber}`;
 }
 
 function selectVehicle(vehiclePreview, ctrl) {
@@ -135,6 +138,7 @@ function selectVehicle(vehiclePreview, ctrl) {
         ctrl.vehicleImage.firstChild.addEventListener('click', () => window.open(vehicle.i, '_blank'));
     } else ctrl.vehicleImage.innerHTML = '';
     ctrl.vehicleDiscoveriesLabel.innerHTML = vehicle.d ? vehicle.d.map((d) => `discovered by ${d[0]} on ${d[1]}`).join('<br>') : 'not yet discovered';
+    window.location.hash = `vehicles.${vehicleId}`;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -204,4 +208,26 @@ document.addEventListener('DOMContentLoaded', () => {
         const id = preview.getAttribute('data-line-number');
         if (!activePlayer.l.containsBS(id)) preview.classList.add('undiscovered');
     });
+
+    const hash = window.location.hash;
+    if (hash) {
+        const [tab, id] = hash.substring(1).split('.');
+        const navigation = document.getElementById('navigation');
+        const tabButton = Array.from(navigation.children).filter(p => p.getAttribute('data-tab') === tab);
+        if (tabButton.length > 0) {
+            openTab(tabButton[0], tab);
+            if (id) {
+                if (tab === 'stops') {
+                    const stopPreview = document.querySelector(`#stops-index>div>.group-stops>.stop-preview[data-stop-id="${id}"]`);
+                    if (stopPreview) selectStop(stopPreview, stopViewControls) && scrollToPreview(stopPreview);
+                } else if (tab === 'lines') {
+                    const linePreview = document.querySelector(`#lines-index>.line-preview[data-line-number="${id}"]`);
+                    if (linePreview) selectLine(linePreview, lineViewControls) && scrollToPreview(linePreview);
+                } else if (tab === 'vehicles') {
+                    const vehiclePreview = document.querySelector(`#vehicles-index>.vehicle-preview[data-vehicle-id="${id}"]`);
+                    if (vehiclePreview) selectVehicle(vehiclePreview, vehicleViewControls) && scrollToPreview(vehiclePreview);
+                }
+            }
+        }
+    }
 });
