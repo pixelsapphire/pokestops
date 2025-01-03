@@ -1,4 +1,5 @@
 id,kind,kind_detailed,brand,model,seats,lore
+WFTH,tram,high-floor tram,Waggonfabrik Fuchs, Typ H,20,"A 1944 motor car manufactured in Heidelberg. The KSW (Kriegsstrassenbahnwagen - War Tram Wagon) was characterized by a simple design, simple electrical apparatus and wide doors. All 10 units came from a shipment for Vienna and were the only new streetcars delivered to Poznan during World War II."
 MTMA04,tram,high-floor tram,Modertrans,Moderus Alfa HF04 AC,32,"Moderus Alfa trams were rebuilt in 2008-2010 from former Konstal 105Na trams."
 MTMA07,tram,high-floor tram,Modertrans,Moderus Alfa 105N HF07,32,"Moderus Alfa trams were rebuilt in 2008-2010 from former Konstal 105Na trams."
 MTMB02,tram,low-entry tram,Modertrans,Moderus Beta MF02 AC,39,"Moderus Beta are the first trams built from scratch by Modertrans. This is a three-part, low-entry model, in production since 2011. The design is based on the previous generation, Moderus Alfa."
@@ -37,4 +38,4 @@ MBS515,minibus,diesel minibus,Mercedes-Benz,Sprinter Mk II 515 CDI,15,"Sprinter 
 MNNG36,bus,diesel bus,MAN,Lion's City G NG363,43,"NG363 is a german 18-meter bus produced since 2004."
 MNNL24,bus,diesel bus,MAN,Lion's City NL243F,37,"NL243F is a german 12-meter bus produced since 1998."
 MNNL28,bus,hybrid bus,MAN,Lion's City 12 EfficientHybrid NL280,37,"NL280 is a german 12-meter hybrid bus produced since 2019."
-MNNG73,bus,electric bus,MAN,Lion's City 18E NG734,40,NG734 is a german 18-meter electric bus produced since 2020.
+MNNG73,bus,electric bus,MAN,Lion's City 18E NG734,40,"NG734 is a german 18-meter electric bus produced since 2020."
