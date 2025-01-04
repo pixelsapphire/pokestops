@@ -24,12 +24,12 @@
 <style>
 circle {
 fill: white;
-stroke: black;
+stroke: #525252;
 stroke-width: 4;
 }
 path {
 fill: none;
-stroke: #FFFFFF;
+stroke: #525252;
 stroke-width: 8;
 }</style>
 </svg>

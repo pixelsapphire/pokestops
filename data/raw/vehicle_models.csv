@@ -1,4 +1,5 @@
 id,kind,kind_detailed,brand,model,seats,lore
+WFTH,tram,high-floor tram,Waggonfabrik Fuchs, Typ H,20,"A 1944 motor car manufactured in Heidelberg. The KSW (Kriegsstrassenbahnwagen - War Tram Wagon) was characterized by a simple design, simple electrical apparatus and wide doors. All 10 units came from a shipment for Vienna and were the only new streetcars delivered to Poznan during World War II."
 MTMA04,tram,high-floor tram,Modertrans,Moderus Alfa HF04 AC,32,"Moderus Alfa trams were rebuilt in 2008-2010 from former Konstal 105Na trams."
 MTMA07,tram,high-floor tram,Modertrans,Moderus Alfa 105N HF07,32,"Moderus Alfa trams were rebuilt in 2008-2010 from former Konstal 105Na trams."
 MTMB02,tram,low-entry tram,Modertrans,Moderus Beta MF02 AC,39,"Moderus Beta are the first trams built from scratch by Modertrans. This is a three-part, low-entry model, in production since 2011. The design is based on the previous generation, Moderus Alfa."
@@ -33,8 +34,11 @@ MBC530,bus,diesel bus,Mercedes-Benz,Citaro G C2 O530,30,"A german 12-meter bus f
 MBC53L,bus,diesel bus,Mercedes-Benz,Citaro G C2 O530L,30,"A german 15-meter bus from the second generation of Citaro, produced since 2012."
 MBC53G,bus,diesel bus,Mercedes-Benz,Citaro G C2 O530G,30,"A german 18-meter bus from the second generation of Citaro, produced since 2012."
 MBC53H,bus,diesel bus,Mercedes-Benz,Citaro G C2 BlueTec-Hybrid O530GDH,30,"A german 18-meter hybrid bus from the second generation of Citaro, produced since 2017."
-MBS515,minibus,diesel minibus,Mercedes-Benz,Sprinter Mk II 515 CDI,15,"Sprinter is a german light commercial vehicle produced since 1995. A versatile model that can be built as a van, a chassis cab, a minibus, or a pickup truck. The ones equpped with the 515 CDI engine are in production since 2006."
+MBS515,minibus,diesel minibus,Mercedes-Benz,Sprinter Mk II 515 CDI,15,"The Sprinter series is a german light commercial vehicle produced since 1995. A versatile model that can be built as a van, a chassis cab, a minibus, or a pickup truck. This model was in production between 2006 and 2009."
+MBS516,minibus,diesel minibus,Mercedes-Benz,Sprinter Mk III 516 CDI,15,"The Sprinter series is a german light commercial vehicle produced since 1995. A versatile model that can be built as a van, a chassis cab, a minibus, or a pickup truck. This model was in production between 2019 and 2022."
 MNNG36,bus,diesel bus,MAN,Lion's City G NG363,43,"NG363 is a german 18-meter bus produced since 2004."
 MNNL24,bus,diesel bus,MAN,Lion's City NL243F,37,"NL243F is a german 12-meter bus produced since 1998."
+MNNL29,bus,diesel bus,MAN,Lion's City NL293,37,"NL293 is a german 12-meter bus produced since 2009."
+MNNL31,bus,diesel bus,MAN,Lion's City NL313,37,"NL313 is a german 12-meter bus produced since 1999."
 MNNL28,bus,hybrid bus,MAN,Lion's City 12 EfficientHybrid NL280,37,"NL280 is a german 12-meter hybrid bus produced since 2019."
-MNNG73,bus,electric bus,MAN,Lion's City 18E NG734,40,NG734 is a german 18-meter electric bus produced since 2020.
+MNNG73,bus,electric bus,MAN,Lion's City 18E NG734,40,"NG734 is a german 18-meter electric bus produced since 2020."
