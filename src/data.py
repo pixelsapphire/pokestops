@@ -342,8 +342,15 @@ class Vehicle(JsonSerializable):
     def __lt__(self, other):
         return self.__cmp_key__() < other.__cmp_key__() if isinstance(other, type(self)) else False
 
-    def __cmp_key__(self):
-        return int(self.vehicle_id) if self.vehicle_id.isdigit() else int(self.vehicle_id[:self.vehicle_id.index('+')])
+    def __cmp_key__(self) -> RichComparisonT:
+        if self.vehicle_id.isdigit():
+            return int(self.vehicle_id), ''
+        elif '+' in self.vehicle_id:
+            return int(self.vehicle_id[:self.vehicle_id.index('+')]), ''
+        elif re.search(r'\d', self.vehicle_id):
+            return int(re.sub(r'\D', '', self.vehicle_id)), re.sub(r'\d', '_', self.vehicle_id)
+        else:
+            return 0, self.vehicle_id
 
     def is_discovered(self) -> bool:
         return len(self.discoveries) > 0
@@ -421,8 +428,11 @@ class Line(JsonSerializable):
     def __lt__(self, other):
         return self.__cmp_key__() < other.__cmp_key__() if isinstance(other, type(self)) else False
 
-    def __cmp_key__(self):
-        return int(self.number) if self.number.isdigit() else int(re.sub(r'\D', '', self.number)) - 1000
+    def __cmp_key__(self) -> RichComparisonT:
+        if self.number.isdigit():
+            return int(self.number), ''
+        else:
+            return int(re.sub(r'\D', '', self.number)) - 1000, re.sub(r'\d', '_', self.number)
 
     def is_discovered(self) -> bool:
         return len(self.discoveries) > 0
