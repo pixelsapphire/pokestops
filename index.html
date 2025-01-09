@@ -67,7 +67,8 @@
             {{ result.object.n }} [{{ result.key }}]
         {% elif result.type == 'line' %}
             <div class='line-view'>
-                <div class='line-number' style='background-color: #{{ result.object.bc }}; color: #{{ result.object.tc }};'>{{ result.key }}</div>
+                <div class='line-number' style='background-color: #{{ result.object.bc }}; color: #{{ result.object.tc }};'>
+        {{ result.key }}</div>
                 <div class='line-destination'>{{ result.object.t }}</div>
             </div>
         {% elif result.type == 'vehicle' %}
@@ -121,6 +122,7 @@
             <option value='pokestops'>Pokestops</option>
             <option value='pokelines'>Pokelines</option>
             <option value='stellar-voyage'>Stellar Voyage</option>
+            <option value='city-raiders'>City Raiders</option>
         </select>
     </label>
     <table id='controls-pokestops' class='hud-controls'>
@@ -153,7 +155,7 @@
         </tr>
         </tbody>
     </table>
-    <table id='controls-pokelines' class='hud-controls' style='display:none;'>
+    <table id='controls-pokelines' class='hud-controls hidden'>
         <tbody>
         <tr>
             <td>
@@ -170,6 +172,11 @@
         </tr>
         </tbody>
     </table>
+    <label id='controls-city-raiders' class='hud-controls hidden'>
+        <select class='dropdown hud' onchange='selectRaid()'>
+            <option value='202501'>January 2025</option>
+        </select>
+    </label>
 </div>
 <p id='exploration' class='hud'>
     <label id='region-selection'>
@@ -184,7 +191,7 @@
             <option value='HAR'>Hachi Region</option>
             <option value='KYR'>Kyuu Region</option>
         </select>
-    </label><br><span id='exploration-progress'>
+    </label><br><span id='exploration-progress' class='mode-info-label'>
         Exploration progress:
         <span id='exploration-percentage'
               data-lines-zorie='23.9'
@@ -248,6 +255,13 @@
               data-kyr-camomile='0.0'
               data-kyr-ev-camomile='0.0'>
         15.8
+        </span>
+    </span>
+    <span id='raid-info' class='mode-info-label hidden'>
+        Total length:
+        <span id='raid-length'
+              data-length-202501='63.8km'>
+        63.8km
         </span>
     </span>
 </p>

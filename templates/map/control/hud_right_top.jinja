@@ -20,9 +20,16 @@
         {{ switch_row('Show ever visited', 'ev-switch', 'toggleEV()') }}
         </tbody>
     </table>
-    <table id='controls-pokelines' class='hud-controls' style='display:none;'>
+    <table id='controls-pokelines' class='hud-controls hidden'>
         <tbody>
         {{ switch_row('Show undiscovered', 'discovered-switch', 'toggleUndiscovered()') }}
         </tbody>
     </table>
+    <label id='controls-city-raiders' class='hud-controls hidden'>
+        <select class='dropdown hud' onchange='selectRaid()'>
+            {% for raid in db.raids %}
+                <option value='{{ raid.raid_id }}'>{{ raid.date.format('M y') }}</option>
+            {% endfor %}
+        </select>
+    </label>
 </div>

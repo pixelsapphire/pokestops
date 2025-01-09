@@ -144,18 +144,18 @@
     line-height: 85%;
 }
 
-#exploration-progress {
+.mode-info-label {
     font-size: min(4dvh, 4dvw);
 }
 
 @supports (-webkit-text-stroke: min(0.2dvh, 0.2dvw) black) {
-    #exploration-progress {
+    .mode-info-label {
         -webkit-text-stroke: min(0.2dvh, 0.2dvw) black
     }
 }
 
 @supports not (-webkit-text-stroke: min(0.2dvh, 0.2dvw) black) {
-    #exploration-progress {
+    .mode-info-label {
         text-shadow: min(0.14dvh, 0.14dvw) min(0.14dvh, 0.14dvw) black,
         max(-0.14dvh, -0.14dvw) min(0.14dvh, 0.14dvw) black,
         min(0.14dvh, 0.14dvw) max(-0.14dvh, -0.14dvw) black,
@@ -393,7 +393,11 @@
     }
 
     .dark .marker {
-        -webkit-text-stroke: 4px black;
+        -webkit-text-stroke-color: black;
+    }
+
+    .marker.raid {
+        -webkit-text-stroke-width: 2px;
     }
 }
 
@@ -405,6 +409,14 @@
 
     .dark .marker {
         text-shadow: 3px 3px black, -3px 3px black, 3px -3px black, -3px -3px black, 0 4px black, 0 -4px black, 4px 0 black, -4px 0 black;
+    }
+
+    .marker.raid {
+         text-shadow: 1px 1px white, -1px 1px white, 1px -1px white, -1px -1px white, 0 2px white, 0 -2px white, 2px 0 white, -2px 0 white;
+    }
+
+    .dark .marker.raid {
+         text-shadow: 1px 1px black, -1px 1px black, 1px -1px black, -1px -1px black, 0 2px black, 0 -2px black, 2px 0 black, -2px 0 black;
     }
 }
 

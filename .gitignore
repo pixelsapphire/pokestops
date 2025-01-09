@@ -8,6 +8,7 @@ data/raw/lines.csv
 data/raw/routes.csv
 data/raw/stops.csv
 templates/announcements/_articles/
-test.py
 reports/
+src/raid_helper.py
+src/test.py
 toolbox/

@@ -7,7 +7,7 @@
         </select>
     </label>
     <br>
-    <span id='exploration-progress'>
+    <span id='exploration-progress' class='mode-info-label'>
         Exploration progress:
         <span id='exploration-percentage'
                 {%- for player in db.players -%}
@@ -19,6 +19,15 @@
                     {%- endfor -%}
                 {%- endfor -%}>
             {{ db.progress[db.district.short_name][db.players[0].nickname] }}
+        </span>
+    </span>
+    <span id='raid-info' class='mode-info-label hidden'>
+        Total length:
+        <span id='raid-length'
+                {%- for raid in db.raids -%}
+                    data-length-{{ raid.raid_id }}='{{ raid.get_total_length().format(precision=1) }}'
+                {%- endfor -%}>
+            {{ db.raids[0].get_total_length().format(precision=1) }}
         </span>
     </span>
 </p>

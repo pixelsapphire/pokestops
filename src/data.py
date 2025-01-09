@@ -1,14 +1,18 @@
 from __future__ import annotations
+import folium
 import json
 import re
 import ref
 import traceback
-from abc import ABC
+from abc import ABC, abstractmethod
 from collections import defaultdict
 from date import DateAndOrder
 from geo import geopoint
 from log import log
+from quantity import kilo
 from typing import get_args, Literal, Self, TYPE_CHECKING
+
+from src.quantity import Quantity
 from util import *
 
 if TYPE_CHECKING:
@@ -553,18 +557,112 @@ class Region:
             }
 
 
+class RaidElement(ABC):
+    @abstractmethod
+    def __draw__(self, fmap: folium.Map, raid_id: str) -> None:
+        ...
+
+    @staticmethod
+    def from_dict(data: dict[str, Any]) -> RaidElement:
+        clas: Any = globals().get(f'{data['type'][0].upper()}{data['type'][1:]}RaidElement')
+        if clas is None or not issubclass(clas, RaidElement) or clas.from_dict == RaidElement.from_dict:
+            raise ValueError(f'Unknown raid element type: {data['type']}')
+        return clas.from_dict(data)
+
+
+class PointRaidElement(RaidElement):
+    def __init__(self, phase: str, location: geopoint, stop: str):
+        self.phase: str = phase
+        self.location: geopoint = location
+        self.stop = stop
+
+    def marker(self) -> str:
+        if self.phase == 'start' or self.phase == 'finish':
+            return 'F'
+        elif self.phase == 'departure':
+            return 'D'
+        elif self.phase == 'arrival':
+            return 'A'
+        elif self.phase == 'transfer':
+            return 'M'
+        else:
+            return 'B'
+
+    def __draw__(self, fmap: folium.Map, raid_id: str) -> None:
+        popup: folium.Popup = folium.Popup(f'<span class="stop-name">{self.stop}</span>'
+                                           f'<span class="stop-visitors"><br>{self.phase} point</span>')
+        marker: folium.DivIcon = folium.DivIcon(
+            html=f'<div class="raid marker r-{raid_id}">{self.marker()}</div>',
+            icon_anchor=(12, 16)
+        )
+        folium.Marker(location=self.location, popup=popup, icon=marker).add_to(fmap)
+
+    @staticmethod
+    def from_dict(data: dict[str, Any]) -> PointRaidElement:
+        return PointRaidElement(data['phase'], geopoint.parse(data['location']), data['stop'])
+
+
+class RouteRaidElement(RaidElement):
+    def __init__(self, trasport_method: str, shape: list[geopoint]):
+        self.trasport_method: str = trasport_method
+        self.shape: list[geopoint] = shape
+
+    def __draw__(self, fmap: folium.Map, raid_id: str) -> None:
+        folium.PolyLine(fill_color=f'raid r-{raid_id}',  # see: https://github.com/python-visualization/folium/issues/2055
+                        locations=[self.shape], fill_opacity=0, weight=3, bubbling_mouse_events=False).add_to(fmap)
+
+    def get_total_length(self) -> Quantity:
+        return sum((geopoint.distance(self.shape[i], self.shape[i + 1]) for i in range(len(self.shape) - 1)), Quantity(0, 'm'))
+
+    @staticmethod
+    def from_dict(data: dict[str, Any]) -> RouteRaidElement:
+        return RouteRaidElement(data['transport_method'], [geopoint.parse(point) for point in data['shape'].split('&')])
+
+
+class Raid:
+    def __init__(self, raid_id: str, date: DateAndOrder, participants: list[Player], elements: list[RaidElement]):
+        self.raid_id: str = raid_id
+        self.date: DateAndOrder = date
+        self.participants: list[Player] = participants
+        self.elements: list[RaidElement] = elements
+
+    def draw(self, fmap: folium.Map) -> None:
+        for element in self.elements:
+            element.__draw__(fmap, self.raid_id)
+
+    @staticmethod
+    def load(raid_id: str, players: list[Player]):
+        with open(f'{ref.raiddata_path}/{raid_id}.json', 'r') as file:
+            raid_data = json.load(file)
+            return Raid(raid_id, DateAndOrder(date_string=raid_data['date']),
+                        [find_first(lambda p: p.nickname == nickname, players) for nickname in raid_data['participants']],
+                        [RaidElement.from_dict(element) for element in raid_data['elements']])
+
+    @staticmethod
+    def read_list(source: str, players: list[Player]) -> list[Raid]:
+        log(f'  Reading raids index from {source} and data from their respective files... ', end='')
+        # warning caused by Pycharm issue PY-70668
+        # noinspection PyTypeChecker
+        return __read_collection__(source, [], lambda i: Raid.load(i, players), list.append)
+
+    def get_total_length(self) -> Quantity:
+        return sum((element.get_total_length() for element in self.elements if isinstance(element, RouteRaidElement)),
+                   Quantity(0, 'm')).convert(multiplier=kilo)
+
+
 class Database:
     CollectionName = Literal[
         'players', 'progress', 'stops', 'stop_groups', 'terminals', 'carriers', 'regions',
-        'vehicles', 'models', 'lines', 'routes', 'scheduled_changes', 'announcements']
+        'vehicles', 'models', 'lines', 'routes', 'raids', 'scheduled_changes', 'announcements']
     __stars__: dict[tuple[int, int], int] = {(1, 1): 1, (2, 2): 2, (3, 4): 3, (5, 7): 4, (8, 100): 5}
 
     def __init__(self, players: list[Player], progress: dict[str, dict[str, float]],
                  stops: dict[str, Stop], stop_groups: dict[str, SortedSet[Stop]], terminals: list[Terminal],
                  carriers: dict[str, Carrier], regions: dict[str, Region], district: Region,
                  vehicles: dict[str, Vehicle], models: dict[str, VehicleModel],
-                 lines: dict[str, Line], routes: dict[str, Route],
+                 routes: dict[str, Route], lines: dict[str, Line], raids: list[Raid],
                  scheduled_changes: list[StopChange], announcements: list[Announcement],
+
                  *, is_old_data: bool = False):
         self.__old_data__: Database | None = Database.partial(is_old_data=True) if is_old_data else None
         self.__reported_collections__: set[Database.CollectionName] = set()
@@ -580,6 +678,7 @@ class Database:
         self.models: dict[str, VehicleModel] = models
         self.routes: dict[str, Route] = routes
         self.lines: dict[str, Line] = lines
+        self.raids: list[Raid] = raids
         self.scheduled_changes: list[StopChange] = scheduled_changes
         self.announcements: list[Announcement] = announcements
 
@@ -592,12 +691,13 @@ class Database:
                 terminals: list[Terminal] | None = None, carriers: dict[str, Carrier] | None = None,
                 regions: dict[str, Region] | None = None, district: Region | None = None,
                 vehicles: dict[str, Vehicle] | None = None, models: dict[str, VehicleModel] | None = None,
-                lines: dict[str, Line] | None = None, routes: dict[str, Route] | None = None,
+                routes: dict[str, Route] | None = None, lines: dict[str, Line] | None = None, raids: list[Raid] | None = None,
                 scheduled_changes: list[StopChange] | None = None, announcements: list[Announcement] | None = None,
                 *, is_old_data: bool = False) -> Database:
         return Database(players or [], progress or {}, stops or {}, stop_groups or {}, terminals or [],
                         carriers or {}, regions or {}, district or Region(0, '', '', lambda _: False),
-                        vehicles or {}, models or {}, lines or {}, routes or {}, scheduled_changes or [], announcements or [],
+                        vehicles or {}, models or {}, routes or {}, lines or {}, raids or [],
+                        scheduled_changes or [], announcements or [],
                         is_old_data=is_old_data)
 
     @staticmethod
@@ -617,8 +717,9 @@ class Database:
             db1.district,
             {**db1.vehicles, **db2.vehicles},
             {**db1.models, **db2.models},
-            {**db1.lines, **db2.lines},
             {**db1.routes, **db2.routes},
+            {**db1.lines, **db2.lines},
+            db1.raids + db2.raids,
             db1.scheduled_changes + db2.scheduled_changes,
             db1.announcements + db2.announcements
         )
@@ -705,4 +806,4 @@ class Database:
 
     @staticmethod
     def get_game_modes() -> list[str]:
-        return ['Pokestops', 'Pokelines', 'Stellar Voyage']
+        return ['Pokestops', 'Pokelines', 'Stellar Voyage', 'City Raiders']

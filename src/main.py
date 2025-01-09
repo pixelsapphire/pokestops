@@ -1,5 +1,4 @@
 import args
-import folium
 from announcements import *
 from branca.element import Element
 from geo import *
@@ -23,6 +22,7 @@ def load_data(initial_db: Database) -> Database:
     carriers: dict[str, Carrier] = Carrier.read_dict(ref.rawdata_carriers)
     models: dict[str, VehicleModel] = VehicleModel.read_dict(ref.rawdata_vehicle_models)
     vehicles: dict[str, Vehicle] = Vehicle.read_dict(ref.rawdata_vehicles, carriers, models)
+    raids: list[Raid] = Raid.read_list(ref.rawdata_raids, players)
     announcements: list[Announcement] = Announcement.read_list(ref.rawdata_announcements, initial_db.lines)
 
     initial_db.terminals = terminals
@@ -59,7 +59,7 @@ def load_data(initial_db: Database) -> Database:
     }
 
     return Database(players, progress, stops, initial_db.stop_groups, terminals, carriers, regions, initial_db.district,
-                    vehicles, models, initial_db.lines, initial_db.routes, initial_db.scheduled_changes, announcements)
+                    vehicles, models, initial_db.routes, initial_db.lines, raids, initial_db.scheduled_changes, announcements)
 
 
 def create_route_map(line: Line, db: Database, all_variants: bool) -> None:
@@ -126,7 +126,7 @@ def place_stop_markers(db: Database, fmap: folium.Map) -> None:
                                                     for kind, player, terminal in stop.terminals_progress])
         marker: folium.DivIcon = folium.DivIcon(
             html=f'<div class="marker {classes}">{stop.marker()}</div>',
-            icon_anchor=(10, 10)
+            icon_anchor=(12, 16)
         )
         popup: folium.Popup = folium.Popup(f'<span class="stop-name">{stop.full_name} [{stop.short_name}]</span>'
                                            f'<span class="stop-visitors"><br>{visited_label}</span>'
@@ -187,12 +187,19 @@ def place_terminal_markers(db: Database, fmap: folium.Map) -> None:
                                          ) if terminal.anybody_reached() else 'not yet reached'
         marker: folium.DivIcon = folium.DivIcon(
             html=f'<div class="marker terminal {' '.join(classes)}">T</div>',
-            icon_anchor=(10, 10)
+            icon_anchor=(12, 16)
         )
         popup: folium.Popup = folium.Popup(f'<span class="stop-name">{terminal.name}</span>'
                                            f'<br><span class="stop-tp">{visited_label}</span>')
         # noinspection PyTypeChecker
         folium.Marker(location=(terminal.latitude, terminal.longitude), popup=popup, icon=marker).add_to(fmap)
+    log('Done!')
+
+
+def place_raid_markers(db: Database, fmap: folium.Map) -> None:
+    log('  Placing City Raiders markers... ', end='')
+    for raid in db.raids:
+        raid.draw(fmap)
     log('Done!')
 
 
@@ -206,6 +213,7 @@ def generate_map(db: Database) -> folium.Map:
     place_stop_markers(db, fmap)
     place_line_markers(db, fmap)
     place_terminal_markers(db, fmap)
+    place_raid_markers(db, fmap)
 
     return fmap
 

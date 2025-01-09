@@ -1,9 +1,12 @@
 from __future__ import annotations
 from math import atan2, pi
+from pyproj import Geod
+from quantity import *
 from typing import Any, Protocol, Sequence, TypeVar
 from util import sign
 
 TFloatSeq = TypeVar("TFloatSeq", bound=Sequence[float])
+__geod__ = Geod(ellps='WGS84')
 
 
 class FloatVectorLike(Protocol):
@@ -35,6 +38,14 @@ class geopoint(Sequence[float]):
 
     def __getitem__(self, index: int):
         return self.latitude if index == 0 else self.longitude if index == 1 else None
+
+    @staticmethod
+    def parse(string: str) -> geopoint:
+        return geopoint(*map(float, string.split(',')))
+
+    @staticmethod
+    def distance(a: geopoint, b: geopoint) -> Quantity:
+        return Quantity(__geod__.inv(a.longitude, a.latitude, b.longitude, b.latitude)[2], 'm')
 
 
 class vector2f(Sequence[float]):

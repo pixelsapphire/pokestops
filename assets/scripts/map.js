@@ -4,7 +4,10 @@ let showUndiscoveredLines = false;
 let activePlayer = 'Zorie';
 let activeMode = 'pokestops';
 let activeRegion = 'POZ';
+let activeRaid = '202501';
 let darkMode = true;
+let raidRouteColor = '#ff61b1';
+let raidMarkerColor = '#ba56f6';
 
 const lightModeIcon = 'assets/images/light_mode.png';
 const darkModeIcon = 'assets/images/dark_mode.png';
@@ -34,7 +37,6 @@ function injectThemeSwitcher() {
 
 function preparePokestops() {
 
-    document.getElementById('region-selection').style.display = null;
     document.querySelectorAll('path.leaflet-interactive').forEach(l => {
         l.style.display = 'none';
     });
@@ -65,17 +67,17 @@ function preparePokestops() {
         m.parentElement.style.display = 'none';
     });
 
+    document.getElementById('exploration-progress').classList.remove('hidden');
+    document.getElementById('raid-info').classList.add('hidden');
     const percentage = document.querySelector('#exploration-percentage');
     percentage.innerHTML = `${percentage.getAttribute(`data-${activeRegion.toLowerCase()}-${showEverVisitedStops ? 'ev-' : ''}${activePlayer.toLowerCase()}`)} %`;
 }
 
 function preparePokelines() {
 
-    document.getElementById('region-selection').style.display = 'none';
-    document.querySelectorAll('.marker').forEach(m => {
-        m.parentElement.style.display = 'none';
-    });
-    document.querySelectorAll('path.leaflet-interactive').forEach(l => {
+    document.querySelectorAll('.marker').forEach(m => m.parentElement.style.display = 'none');
+    document.querySelectorAll('path.leaflet-interactive').forEach(l => l.style.display = 'none');
+    Array.from(document.querySelectorAll('path.leaflet-interactive')).filter(l => !l.classList.contains('raid')).forEach(l => {
         if (l.classList.contains('disc') || l.classList.contains('compl') || showUndiscoveredLines) l.style.display = null;
         if (l.classList.contains(`d-${activePlayer.toLowerCase()}`)) l.setAttribute('stroke', players[activePlayer].tc);
         else if (l.classList.contains(`c-${activePlayer.toLowerCase()}`)) l.setAttribute('stroke', players[activePlayer].pc);
@@ -85,16 +87,15 @@ function preparePokelines() {
         }
     });
 
+    document.getElementById('exploration-progress').classList.remove('hidden');
+    document.getElementById('raid-info').classList.add('hidden');
     const percentage = document.querySelector('#exploration-percentage');
     percentage.innerHTML = `${percentage.getAttribute(`data-lines-${activePlayer.toLowerCase()}`)} %`;
 }
 
 function prepareStellarVoyage() {
 
-    document.getElementById('region-selection').style.display = 'none';
-    document.querySelectorAll('path.leaflet-interactive').forEach(l => {
-        l.style.display = 'none';
-    });
+    document.querySelectorAll('path.leaflet-interactive').forEach(l => l.style.display = 'none');
 
     document.querySelectorAll(`.marker.terminal`).forEach(m => {
         if (m.classList.contains(`reached-${activePlayer.toLowerCase()}`)) m.style.color = players[activePlayer].pc;
@@ -110,8 +111,31 @@ function prepareStellarVoyage() {
         m.parentElement.style.display = 'none';
     });
 
+    document.getElementById('exploration-progress').classList.remove('hidden');
+    document.getElementById('raid-info').classList.add('hidden');
     const percentage = document.querySelector('#exploration-percentage');
     percentage.innerHTML = `${percentage.getAttribute(`data-sv-${activePlayer.toLowerCase()}`)} %`;
+}
+
+function prepareCityRaiders() {
+
+    document.querySelectorAll('path.leaflet-interactive').forEach(l => {
+        if (l.classList.contains('raid') && l.classList.contains(`r-${activeRaid}`)) {
+            l.style.display = null;
+            l.setAttribute('stroke', raidRouteColor);
+        } else l.style.display = 'none';
+    });
+    document.querySelectorAll('.marker').forEach(m => {
+        if (m.classList.contains('raid') && m.classList.contains(`r-${activeRaid}`)) {
+            m.parentElement.style.display = null;
+            m.style.color = raidMarkerColor;
+        } else m.parentElement.style.display = 'none';
+    });
+
+    document.getElementById('exploration-progress').classList.add('hidden');
+    document.getElementById('raid-info').classList.remove('hidden');
+    const length = document.getElementById('raid-length');
+    length.innerHTML = `${length.getAttribute(`data-length-${activeRaid}`)}`;
 }
 
 function refreshMap() {
@@ -119,12 +143,14 @@ function refreshMap() {
     document.body.classList.toggle('stellar-voyage', activeMode === 'stellar-voyage');
 
     document.querySelectorAll('.hud-controls').forEach(hud => {
-        if (hud.id === `controls-${activeMode}`) hud.style.display = null;
-        else hud.style.display = 'none';
+        if (hud.id === `controls-${activeMode}`) hud.classList.remove('hidden');
+        else hud.classList.add('hidden');
     });
+    document.getElementById('region-selection').classList.toggle('hidden', activeMode !== 'pokestops');
     if (activeMode === 'pokestops') preparePokestops();
     else if (activeMode === 'pokelines') preparePokelines();
     else if (activeMode === 'stellar-voyage') prepareStellarVoyage();
+    else if (activeMode === 'city-raiders') prepareCityRaiders();
 
     document.querySelectorAll('.progress-list')
         .forEach(list => list.style.display = list.getAttribute('data-player') === activePlayer.toLowerCase() ? null : 'none');
@@ -159,6 +185,12 @@ function selectPlayer() {
 function selectMode() {
     activeMode = document.querySelector("#mode-selection select").value;
     localStorage.setItem('activeMode', activeMode);
+    refreshMap();
+}
+
+function selectRaid() {
+    activeRaid = document.querySelector("#raid-selection select").value;
+    localStorage.setItem('activeRaid', activeRaid);
     refreshMap();
 }
 

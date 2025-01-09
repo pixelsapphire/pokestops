@@ -31,6 +31,8 @@ playerdata_file_terminals: str = 'terminals.csv'
 playerdata_file_vehicles: str = 'vehicles.csv'
 playerdata_path: str = 'playerdata'
 
+raiddata_path: str = 'raiddata'
+
 report_gtfs: str = 'reports/gtfs_update.txt'
 
 stylesheet_announcements: str = 'assets/stylesheets/announcements.css'
@@ -42,6 +44,7 @@ rawdata_announcements: str = 'data/raw/announcements.csv'
 rawdata_carriers: str = 'data/raw/carriers.csv'
 rawdata_lines: str = 'data/raw/lines.csv'
 rawdata_players: str = 'data/raw/players.csv'
+rawdata_raids: str = 'data/raw/raids.csv'
 rawdata_regions: str = 'data/raw/regions.json'
 rawdata_routes: str = 'data/raw/routes.csv'
 rawdata_scheduled_changes: str = 'data/raw/scheduled_changes.csv'

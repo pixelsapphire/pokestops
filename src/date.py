@@ -10,6 +10,9 @@ class DateAndOrder:
     distant_past: Final[Self] = None
     distant_future: Final[Self] = None
 
+    __months__: Final[list[str]] = ['January', 'February', 'March', 'April', 'May', 'June',
+                                    'July', 'August', 'September', 'October', 'November', 'December']
+
     def __init__(self, *, year: int | None = None, month: int | None = None, day: int | None = None,
                  date_string: str | None = '', string_format: str | None = None, number_in_day: int | None = None):
         if date_string:
@@ -126,6 +129,8 @@ class DateAndOrder:
                 formatted_string = formatted_string.replace('y', f'{self._year:04}')
             if 'm' in format_spec:
                 formatted_string = formatted_string.replace('m', f'{self._month:02}')
+            if 'M' in format_spec:
+                formatted_string = formatted_string.replace('M', f'{self.__months__[self._month - 1]}')
             if 'd' in format_spec:
                 formatted_string = formatted_string.replace('d', f'{self._day:02}')
             if 'n' in format_spec:
