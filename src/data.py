@@ -7,6 +7,7 @@ from abc import ABC
 from collections import defaultdict
 from date import DateAndOrder
 from geo import geopoint
+from log import log
 from typing import get_args, Literal, Self, TYPE_CHECKING
 from util import *
 
@@ -30,7 +31,7 @@ def __read_collection__(source: str, identity: C, mapper: Callable[..., T], comb
                 except (IndexError, TypeError) as e:
                     error(f'Error while processing row {row}: {e}')
                     error(traceback.format_exc())
-        print('Done!')
+        log('Done!')
         return collection
 
 
@@ -128,7 +129,7 @@ class Stop(JsonSerializable):
 
     @staticmethod
     def read_stops(source: str, db: Database) -> tuple[dict[str, Stop], dict[str, SortedSet[Stop]]]:
-        print(f'  Reading stops data from {source}... ', end='')
+        log(f'  Reading stops data from {source}... ', end='')
         stops: dict[str, Stop] = {}
         stop_groups: dict[str, SortedSet[Stop]] = {}
         with open(source, 'r', encoding='utf-8') as file:
@@ -145,7 +146,7 @@ class Stop(JsonSerializable):
                 if stop.full_name not in stop_groups:
                     stop_groups[stop.full_name] = SortedSet()
                 stop_groups[stop.full_name].add(stop)
-        print('Done!')
+        log('Done!')
         return stops, stop_groups
 
     def __json_entry__(self) -> str:
@@ -215,7 +216,7 @@ class Terminal(JsonSerializable):
 
     @staticmethod
     def read_list(source: str, stops: dict[str, Stop]) -> list[Terminal]:
-        print(f'  Reading terminals data from {source}... ', end='')
+        log(f'  Reading terminals data from {source}... ', end='')
         constructor = lambda *row: Terminal(row[0], row[1], row[2], row[3], stops.get(row[4]), stops.get(row[5]))
         # warning caused by Pycharm issue PY-70668
         # noinspection PyTypeChecker
@@ -260,7 +261,7 @@ class StopChange:
 
     @staticmethod
     def read_list(source: str) -> list[StopChange]:
-        print(f'  Reading scheduled stop changes data from {source}... ', end='')
+        log(f'  Reading scheduled stop changes data from {source}... ', end='')
         constructor = lambda *row: StopChange(DateAndOrder(date_string=row[0]),
                                               Stop.dummy(row[1], row[2]) if row[1] and row[2] else None,
                                               Stop.dummy(row[3], row[4]) if row[3] and row[4] else None)
@@ -283,7 +284,7 @@ class Carrier(JsonSerializable):
 
     @staticmethod
     def read_dict(source: str) -> dict[str, Carrier]:
-        print(f'  Reading carriers data from {source}... ', end='')
+        log(f'  Reading carriers data from {source}... ', end='')
         return __read_collection__(source, {}, Carrier, lambda c, v: c.update({v.symbol: v}))
 
     def __json_entry__(self) -> str:
@@ -310,7 +311,7 @@ class VehicleModel(JsonSerializable):
 
     @staticmethod
     def read_dict(source: str) -> dict[str, 'VehicleModel']:
-        print(f'  Reading vehicle models data from {source}... ', end='')
+        log(f'  Reading vehicle models data from {source}... ', end='')
         return __read_collection__(source, {}, VehicleModel, lambda c, v: c.update({v.model_id: v}))
 
     def __json_entry__(self) -> str:
@@ -368,7 +369,7 @@ class Vehicle(JsonSerializable):
 
     @staticmethod
     def read_dict(source: str, carriers: dict[str, Carrier], models: dict[str, VehicleModel]) -> dict[str, Vehicle]:
-        print(f'  Reading vehicles data from {source}... ', end='')
+        log(f'  Reading vehicles data from {source}... ', end='')
         constructor = lambda *row: Vehicle(row[0], row[1], carriers.get(row[2]), models.get(row[3]), row[4], row[5])
         return __read_collection__(source, {}, constructor, lambda c, v: c.update({v.vehicle_id: v}))
 
@@ -391,7 +392,7 @@ class Route:
 
     @staticmethod
     def read_dict(source: str) -> dict[str, Route]:
-        print(f'  Reading routes data from {source}... ', end='')
+        log(f'  Reading routes data from {source}... ', end='')
         # warning caused by Pycharm issue PY-70668
         # noinspection PyTypeChecker
         points: dict[str, list[tuple[geopoint, int]]] = __read_collection__(
@@ -478,7 +479,7 @@ class Line(JsonSerializable):
 
     @staticmethod
     def read_dict(source: str) -> dict[str, Line]:  # TODO attach actual routes and stops instead of ids
-        print(f'  Reading routes data from {source}... ', end='')
+        log(f'  Reading routes data from {source}... ', end='')
         constructor = lambda *row: Line(row[2], row[3].split('|')[0], row[4].split('|')[0].split('^')[0], row[6], row[7],
                                         row[8].split('&'), list(map(lambda seq: seq.split('&'), row[9].split('|'))))
         return __read_collection__(source, {}, constructor, lambda c, v: c.update({v.number: v}))
@@ -538,14 +539,14 @@ class Region:
 
     @staticmethod
     def read_regions(source: str) -> tuple[Region, dict[str, Region]]:
-        print(f'  Reading regions data from {source}... ', end='')
+        log(f'  Reading regions data from {source}... ', end='')
         with (open(source, 'r') as file):
             index = json.load(file)
             regions = [Region(region['number'], region['short_name'], region['full_name'],
                               Region.__resolve_predicate__(region['predicate']))
                        for region in index['regions']]
             district: Region = find_first(lambda r: r.short_name == index['district'], regions)
-            print('Done!')
+            log('Done!')
             return district, {
                 district.short_name: district,
                 **{region.short_name: region for region in regions if region != district},
@@ -664,7 +665,7 @@ class Database:
                 changed_stops.add((change.old_stop, change.new_stop))
         if (added_stops or removed_stops or changed_stops or
                 added_lines or removed_lines or changed_lines or added_announcements):
-            print('Data has changed, creating report... ', end='')
+            log('Data has changed, creating report... ', end='')
             lines: int = max(len(added_lines), len(removed_lines), len(changed_lines))
             lexmap: dict[str, float] = create_lexicographic_mapping(file_to_string(ref.lexmap_polish))
             line_key = lambda line: int(line) if line.isdigit() else int(re.sub(r'\D', '', line)) - lines
@@ -697,10 +698,10 @@ class Database:
                         file.write(f'New announcements:\n- {"\n- ".join(a.title for a in added_announcements)}\n')
                     if removed_announcements:
                         file.write(f'Expired announcements:\n- {"\n- ".join(a.title for a in removed_announcements)}\n')
-            print(f'Report stored in {ref.report_gtfs}!')
+            log(f'Report stored in {ref.report_gtfs}!')
             system_open(ref.report_gtfs)
         else:
-            print('No changes, no report created.')
+            log('No changes, no report created.')
 
     @staticmethod
     def get_game_modes() -> list[str]:

@@ -4,6 +4,7 @@ from announcements import *
 from branca.element import Element
 from geo import *
 from gtfs import update_gtfs_data
+from log import print_errors
 from postprocess import *
 from uibuilder import *
 from util import *
@@ -26,10 +27,10 @@ def load_data(initial_db: Database) -> Database:
 
     initial_db.terminals = terminals
     initial_db.vehicles = vehicles
-    print('  Reading players save data from their respective directories... ', end='')
+    log('  Reading players save data from their respective directories... ', end='')
     for player in initial_db.players:
         player.load_data(initial_db)
-    print('Done!')
+    log('Done!')
 
     for vehicle in vehicles.values():
         if vehicle.is_discovered() and vehicle.model is None:
@@ -109,7 +110,7 @@ def create_route_map(line: Line, db: Database, all_variants: bool) -> None:
 
 
 def place_stop_markers(db: Database, fmap: folium.Map) -> None:
-    print('  Placing Pokestops markers... ', end='')
+    log('  Placing Pokestops markers... ', end='')
     for stop in db.stops.values():
         stop_visits: list[Discovery] = sorted(stop.visits)
         classes: str = ' '.join(
@@ -131,11 +132,11 @@ def place_stop_markers(db: Database, fmap: folium.Map) -> None:
                                            f'<span class="stop-visitors"><br>{visited_label}</span>'
                                            f'<span class="stop-tp"><br>{terminal_progress_label}</span>')
         folium.Marker(location=stop.location, popup=popup, icon=marker).add_to(fmap)
-    print('Done!')
+    log('Done!')
 
 
 def place_line_markers(db: Database, fmap: folium.Map) -> None:
-    print('  Placing Pokelines markers... ', end='')
+    log('  Placing Pokelines markers... ', end='')
 
     already_drawn: set[tuple[LineSegment[geopoint], HashableSet[str]]] = set()
 
@@ -169,7 +170,7 @@ def place_line_markers(db: Database, fmap: folium.Map) -> None:
         if len(players_who_completed) > 0:
             draw_line(segment, HashableSet(['compl'] + [f'c-{player.nickname.lower()}' for player in players_who_completed]))
 
-    print('Done!')
+    log('Done!')
 
 
 def place_terminal_markers(db: Database, fmap: folium.Map) -> None:
@@ -179,7 +180,7 @@ def place_terminal_markers(db: Database, fmap: folium.Map) -> None:
         else:
             return f'{tp.player.nickname} has {'arrived at' if tp.arrived() else 'departed from'} this terminal'
 
-    print('  Placing Stellar Voyage markers... ', end='')
+    log('  Placing Stellar Voyage markers... ', end='')
     for terminal in db.terminals:
         classes: list[str] = [f'reached-{player.nickname.lower()}' for player in db.players if terminal.reached_by(player)]
         visited_label: str = '<br>'.join([tp_message(tp) for tp in terminal.progress if tp.reached()]
@@ -192,7 +193,7 @@ def place_terminal_markers(db: Database, fmap: folium.Map) -> None:
                                            f'<br><span class="stop-tp">{visited_label}</span>')
         # noinspection PyTypeChecker
         folium.Marker(location=(terminal.latitude, terminal.longitude), popup=popup, icon=marker).add_to(fmap)
-    print('Done!')
+    log('Done!')
 
 
 def generate_map(db: Database) -> folium.Map:
@@ -212,13 +213,13 @@ def generate_map(db: Database) -> folium.Map:
 def build_app(db: Database, fmap: folium.Map | None) -> None:
     folium_html: str | None = None
     if build_map:
-        print('  Compiling Folium map... ', end='')
+        log('  Compiling Folium map... ', end='')
         map_element: Element = fmap.get_root()
         folium_html = map_element.render()
-        print('Done!')
+        log('Done!')
 
     from player import Player
-    print('  Compiling data to JavaScript... ', end='')
+    log('  Compiling data to JavaScript... ', end='')
 
     with open(prepare_path(ref.compileddata_stops), 'w') as file:
         file.write(f'const stops = {{\n{'\n'.join(map(Stop.json_entry, sorted(db.stops.values())))}\n}};')
@@ -240,9 +241,9 @@ def build_app(db: Database, fmap: folium.Map | None) -> None:
         with open(prepare_path(ref.compileddata_map), 'w') as script_file:
             script_file.write(clean_js(map_script))
 
-    print('Done!')
+    log('Done!')
 
-    print('  Building HTML documents... ', end='')
+    log('  Building HTML documents... ', end='')
 
     builder: UIBuilder = UIBuilder(database=db, lexmap_file=ref.lexmap_polish)
 
@@ -261,12 +262,12 @@ def build_app(db: Database, fmap: folium.Map | None) -> None:
         with open(prepare_path(ref.document_announcements), 'w') as file:
             file.write(announcements_html)
 
-    print('Done!')
+    log('Done!')
 
 
 def main() -> None:
     from player import Player
-    print('Building initial database...')
+    log('Building initial database...')
     district, regions = Region.read_regions(ref.rawdata_regions)
     players: list[Player] = Player.read_list(ref.rawdata_players)
     scheduled_changes: list[StopChange] = StopChange.read_list(ref.rawdata_scheduled_changes)
@@ -274,7 +275,7 @@ def main() -> None:
                                             scheduled_changes=scheduled_changes)
 
     if update_gtfs:
-        print('Updating GTFS data...')
+        log('Updating GTFS data...')
         update_gtfs_data(not os.path.exists(ref.rawdata_stops), initial_db)
     else:
         if not os.path.exists(ref.rawdata_stops):
@@ -296,23 +297,23 @@ def main() -> None:
     if update_gtfs or update_announcements:
         initial_db.make_update_report()
 
-    print('Building full database...')
+    log('Building full database...')
     db: Database = load_data(initial_db)
     del initial_db
 
     if update_gtfs:
-        print('Drawing line route diagrams... ', end='')
+        log('Drawing line route diagrams... ', end='')
         clear_directory(ref.mapdata_path)
         for line in db.lines.values():
             create_route_map(line, db, False)
-        print('Done!')
+        log('Done!')
 
     fmap: folium.Map | None = None
     if build_map:
-        print('Generating map data...')
+        log('Generating map data...')
         fmap = generate_map(db)
     if build_map or build_archive or build_announcements:
-        print('Compiling application...')
+        log('Compiling application...')
         build_app(db, fmap)
 
 

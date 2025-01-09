@@ -5,39 +5,39 @@ from util import *
 
 # noinspection SqlNoDataSourceInspection,DuplicatedCode,SqlInsertValues
 def create_gtfs_database() -> sqlite3.Connection:
-    print('    Creating temporary SQL database... ')
+    log('    Creating temporary SQL database... ')
     db: sqlite3.Connection = sqlite3.connect(':memory:')
 
     with open(ref.rawdata_stops, 'r') as file:
-        print(f'      Reading stops data from {ref.rawdata_stops}... ', end='')
+        log(f'      Reading stops data from {ref.rawdata_stops}... ', end='')
         reader = csv.reader(file)
         header_row = next(reader)
         db.execute(f'CREATE TABLE stops ({", ".join(f'{col} TEXT' for col in header_row)})')
         db.executemany(f'INSERT INTO stops VALUES ({','.join('?' * len(header_row))})', reader)
-        print('Done!')
+        log('Done!')
 
     with open(ref.rawdata_stop_times, 'r') as file:
-        print(f'      Reading stop times data from {ref.rawdata_stop_times}... ', end='')
+        log(f'      Reading stop times data from {ref.rawdata_stop_times}... ', end='')
         reader = csv.reader(file)
         header_row = next(reader)
         db.execute(f'CREATE TABLE stop_times ({", ".join(f'{col} TEXT' for col in header_row)})')
         db.executemany(f'INSERT INTO stop_times VALUES ({','.join('?' * len(header_row))})', reader)
-        print('Done!')
+        log('Done!')
 
     with open(ref.rawdata_trips, 'r') as file:
-        print(f'      Reading trips data from {ref.rawdata_trips}... ', end='')
+        log(f'      Reading trips data from {ref.rawdata_trips}... ', end='')
         reader = csv.reader(file)
         header_row = next(reader)
         db.execute(f'CREATE TABLE trips ({", ".join(f'{col} TEXT' for col in header_row)})')
         db.executemany(f'INSERT INTO trips VALUES ({','.join('?' * len(header_row))})', reader)
-        print('Done!')
+        log('Done!')
 
     return db
 
 
 # noinspection SqlNoDataSourceInspection
 def attach_stop_lines(gtfs_db: sqlite3.Connection) -> None:
-    print('    Attaching line nubmers to stops... ', end='')
+    log('    Attaching line nubmers to stops... ', end='')
     cursor: sqlite3.Cursor = gtfs_db.cursor()
     cursor.execute('WITH stop_routes_groupped AS'
                    '(WITH stop_routes_ungroupped AS '
@@ -62,11 +62,11 @@ def attach_stop_lines(gtfs_db: sqlite3.Connection) -> None:
         writer.writerows(cursor.fetchall())
     cursor.close()
 
-    print('Done!')
+    log('Done!')
 
 
 def attach_line_routes(gtfs_db: sqlite3.Connection) -> None:
-    print('    Attaching route ids to lines... ', end='')
+    log('    Attaching route ids to lines... ', end='')
     cursor: sqlite3.Cursor = gtfs_db.cursor()
     cursor.execute('WITH Filtered AS (SELECT route_id, shape_id FROM trips WHERE trip_id LIKE \'%+\'),'
                    '     Fallback AS (SELECT route_id, shape_id FROM trips) '
@@ -93,11 +93,11 @@ def attach_line_routes(gtfs_db: sqlite3.Connection) -> None:
         for line in lines_data:
             writer.writerow([*line, '&'.join(line_routes[line[0]])])
 
-    print('Done!')
+    log('Done!')
 
 
 def attach_line_stops(gtfs_db: sqlite3.Connection) -> None:
-    print('    Attaching stop codes to lines... ', end='')
+    log('    Attaching stop codes to lines... ', end='')
     cursor: sqlite3.Cursor = gtfs_db.cursor()
     cursor.execute('WITH Filtered AS (SELECT route_id, trip_id, shape_id, stop_code, stop_sequence '
                    '                  FROM trips JOIN stop_times USING (trip_id) JOIN stops USING (stop_id) '
@@ -138,7 +138,7 @@ def attach_line_stops(gtfs_db: sqlite3.Connection) -> None:
         for line in lines_data:
             writer.writerow([*line, '|'.join(map(lambda stops: '&'.join(stops), line_stops_unique[line[0]]))])
 
-    print('Done!')
+    log('Done!')
 
 
 def update_gtfs_data(first_update: bool, initial_db: Database) -> None:
@@ -148,11 +148,11 @@ def update_gtfs_data(first_update: bool, initial_db: Database) -> None:
             old_db.stops = Stop.read_stops(ref.rawdata_stops, initial_db)[0]
         if os.path.exists(ref.rawdata_lines):
             old_db.lines = Line.read_dict(ref.rawdata_lines)
-    print(f'  Downloading latest GTFS data from {ref.url_ztm_gtfs}... ', end='')
+    log(f'  Downloading latest GTFS data from {ref.url_ztm_gtfs}... ', end='')
     os.system('wget --header="Accept: application/octet-stream" '
               f'"{ref.url_ztm_gtfs}" -O "{ref.tmpdata_gtfs}" > /dev/null 2>&1')
-    print('Done!')
-    print('  Extracting GTFS data... ', end='')
+    log('Done!')
+    log('  Extracting GTFS data... ', end='')
     with zip_file(ref.tmpdata_gtfs, 'r') as gtfs_zip:
         gtfs_zip.extract_as('stops.txt', ref.rawdata_stops)
         gtfs_zip.extract_as('stop_times.txt', ref.rawdata_stop_times)
@@ -160,8 +160,8 @@ def update_gtfs_data(first_update: bool, initial_db: Database) -> None:
         gtfs_zip.extract_as('shapes.txt', ref.rawdata_routes)
         gtfs_zip.extract_as('routes.txt', ref.rawdata_lines)
     os.remove(ref.tmpdata_gtfs)
-    print('Done!')
-    print('  Processing GTFS data... ')
+    log('Done!')
+    log('  Processing GTFS data... ')
     gtfs_db: sqlite3.Connection = create_gtfs_database()
     attach_stop_lines(gtfs_db)
     attach_line_routes(gtfs_db)

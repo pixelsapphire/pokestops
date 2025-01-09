@@ -247,7 +247,7 @@ class Player(JsonSerializable):
 
     @staticmethod
     def read_list(source: str) -> list[Player]:
-        print(f'  Reading players data from {source}... ', end='')
+        log(f'  Reading players data from {source}... ', end='')
         # warning caused by Pycharm issue PY-70668
         # noinspection PyTypeChecker
         return __read_collection__(source, [], Player, list.append)

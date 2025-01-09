@@ -3,8 +3,8 @@ import functools
 import os
 import platform
 import subprocess
-import sys
 import zipfile
+from log import error
 from sortedcontainers import SortedSet
 from typing import Any, Callable, Hashable, Iterable, Protocol, TypeVar, runtime_checkable
 
@@ -68,18 +68,6 @@ def invert_hex_color(color: str) -> str:
     color: str = color.lstrip('#')
     inverted_color = ''.join(f'{255 - int(color[i:i + 2], 16):02x}' for i in range(0, 6, 2))
     return f'{'#' if hashtag else ''}{inverted_color}{color[-2:] if len(color) > 6 else ''}'
-
-
-__error_log__: list[str] = []
-
-
-def error(*args: Any) -> None:
-    __error_log__.append(' '.join(map(str, args)))
-
-
-def print_errors() -> None:
-    for message in __error_log__:
-        print(message, file=sys.stderr)
 
 
 def prepare_path(file_path: str | os.PathLike[str]) -> str | os.PathLike[str]:

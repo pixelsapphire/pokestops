@@ -5,6 +5,7 @@ from concurrent.futures import as_completed, Future, ThreadPoolExecutor
 from data import __read_collection__
 from data import *
 from date import DateAndOrder
+from log import log
 from multiprocessing import cpu_count
 from postprocess import clean_html
 from selenium import webdriver
@@ -13,6 +14,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
+from sys import stdout
 from threading import Lock
 from tqdm import tqdm
 from typing import override
@@ -39,7 +41,7 @@ class Announcement(JsonSerializable):
 
     @staticmethod
     def read_list(source: str, lines: dict[str, Line]) -> list[Announcement]:
-        print(f'  Reading announcements data from {source}... ', end='')
+        log(f'  Reading announcements data from {source}... ', end='')
         constructor = lambda *row: Announcement(
             row[0], row[1],
             DateAndOrder(date_string=row[2], string_format='y-m-d') if row[2] else None,
@@ -238,7 +240,7 @@ def fetch_announcements(first_update: bool, initial_db: Database) -> None:
         initial_db.report_old_data(Database.partial(announcements=Announcement.read_list(ref.rawdata_announcements, {})))
     clear_directory(ref.templates_path_announcements)
 
-    pbar: tqdm = tqdm(total=70, desc='Fetching announcements...', unit='article', dynamic_ncols=True, file=sys.stdout)
+    pbar: tqdm = tqdm(total=70, desc='Fetching announcements...', unit='article', dynamic_ncols=True, file=stdout)
     mutex: Lock = Lock()
 
     browser: WebDriver = ArticleScraper.create_driver()
