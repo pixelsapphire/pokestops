@@ -135,7 +135,11 @@ function prepareCityRaiders() {
     document.getElementById('exploration-progress').classList.add('hidden');
     document.getElementById('raid-info').classList.remove('hidden');
     const length = document.getElementById('raid-length');
-    length.innerHTML = `${length.getAttribute(`data-length-${activeRaid}`)}`;
+    length.innerHTML = `${length.getAttribute(`data-${activeRaid}`)}`;
+    const time = document.getElementById('raid-time');
+    time.innerHTML = `${time.getAttribute(`data-${activeRaid}`)}`;
+    const rideTime = document.getElementById('raid-ride-time');
+    rideTime.innerHTML = `${rideTime.getAttribute(`data-${activeRaid}`)}`;
 }
 
 function refreshMap() {

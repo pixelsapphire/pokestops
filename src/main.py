@@ -1,6 +1,5 @@
 import args
 from announcements import *
-from branca.element import Element
 from geo import *
 from gtfs import update_gtfs_data
 from log import print_errors
@@ -109,121 +108,15 @@ def create_route_map(line: Line, db: Database, all_variants: bool) -> None:
             file.write('</svg>')
 
 
-def place_stop_markers(db: Database, fmap: folium.Map) -> None:
-    log('  Placing Pokestops markers... ', end='')
-    for stop in db.stops.values():
-        stop_visits: list[Discovery] = sorted(stop.visits)
-        classes: str = ' '.join(
-            [f'v-{visit.item.nickname.lower()}' for visit in stop_visits] +
-            [f'ev-{visit.item.nickname.lower()}' for visit in stop_visits if not visit.date.is_known()] +
-            [f'r-{region.short_name}' for region in stop.regions] +
-            [f'tp-{player.nickname.lower()}' for _, player, _ in stop.terminals_progress]
-        )
-        visited_label: str = '<br>'.join(
-            [f'visited by {visit.item.nickname} {f'on {visit.date:y-m-d}' if visit.date.is_known() else 'a long time ago'}'
-             for visit in sorted(stop.visits)]) if stop.visits else 'not yet visited'
-        terminal_progress_label: str = '<br>'.join([f'{player.nickname}\'s closest {kind} point to {terminal.name} '
-                                                    for kind, player, terminal in stop.terminals_progress])
-        marker: folium.DivIcon = folium.DivIcon(
-            html=f'<div class="marker {classes}">{stop.marker()}</div>',
-            icon_anchor=(12, 16)
-        )
-        popup: folium.Popup = folium.Popup(f'<span class="stop-name">{stop.full_name} [{stop.short_name}]</span>'
-                                           f'<span class="stop-visitors"><br>{visited_label}</span>'
-                                           f'<span class="stop-tp"><br>{terminal_progress_label}</span>')
-        folium.Marker(location=stop.location, popup=popup, icon=marker).add_to(fmap)
-    log('Done!')
+def build_app(db: Database) -> None:
+    builder: UIBuilder = UIBuilder(database=db, lexmap_file=ref.lexmap_polish)
 
-
-def place_line_markers(db: Database, fmap: folium.Map) -> None:
-    log('  Placing Pokelines markers... ', end='')
-
-    already_drawn: set[tuple[LineSegment[geopoint], HashableSet[str]]] = set()
-
-    def draw_line(pts: Sequence[geopoint], cls: HashableSet[str]) -> None:
-        if isinstance(pts, LineSegment) and (pts, cls) in already_drawn:
-            return
-        folium.PolyLine(locations=[pts], class_name=' '.join(cls),
-                        fill_opacity=0, weight=3, bubbling_mouse_events=False).add_to(fmap)
-
-    for line in [line for line in db.lines.values() if not line.is_discovered()]:
-        for route in line.routes:
-            draw_line(db.routes[route].points, HashableSet(('undiscovered',)))
-
-    segments_and_players: dict[LineSegment[geopoint], set[Player]] = defaultdict(set)
-    for line in [line for line in db.lines.values() if line.is_discovered()]:
-        for route in line.routes:
-            points: list[geopoint] = db.routes[route].points
-            for i in range(len(points) - 1):
-                segments_and_players[LineSegment(points[i], points[i + 1])] |= {p for p in db.players if line.discovered_by(p)}
-    for segment, players in segments_and_players.items():
-        draw_line(segment, HashableSet(['disc'] + [f'd-{player.nickname.lower()}' for player in players]))
-
-    segments_and_lines: dict[LineSegment[geopoint], set[Line]] = defaultdict(set)
-    for line in db.lines.values():
-        for route in line.routes:
-            points: list[geopoint] = db.routes[route].points
-            for i in range(len(points) - 1):
-                segments_and_lines[LineSegment(points[i], points[i + 1])].add(line)
-    for segment, lines in segments_and_lines.items():
-        players_who_completed: list[Player] = [p for p in db.players if all(ln.discovered_by(p) for ln in lines)]
-        if len(players_who_completed) > 0:
-            draw_line(segment, HashableSet(['compl'] + [f'c-{player.nickname.lower()}' for player in players_who_completed]))
-
-    log('Done!')
-
-
-def place_terminal_markers(db: Database, fmap: folium.Map) -> None:
-    def tp_message(tp: TerminalProgress) -> str:
-        if tp.completed():
-            return f'{tp.player.nickname} has completed this terminal'
-        else:
-            return f'{tp.player.nickname} has {'arrived at' if tp.arrived() else 'departed from'} this terminal'
-
-    log('  Placing Stellar Voyage markers... ', end='')
-    for terminal in db.terminals:
-        classes: list[str] = [f'reached-{player.nickname.lower()}' for player in db.players if terminal.reached_by(player)]
-        visited_label: str = '<br>'.join([tp_message(tp) for tp in terminal.progress if tp.reached()]
-                                         ) if terminal.anybody_reached() else 'not yet reached'
-        marker: folium.DivIcon = folium.DivIcon(
-            html=f'<div class="marker terminal {' '.join(classes)}">T</div>',
-            icon_anchor=(12, 16)
-        )
-        popup: folium.Popup = folium.Popup(f'<span class="stop-name">{terminal.name}</span>'
-                                           f'<br><span class="stop-tp">{visited_label}</span>')
-        # noinspection PyTypeChecker
-        folium.Marker(location=(terminal.latitude, terminal.longitude), popup=popup, icon=marker).add_to(fmap)
-    log('Done!')
-
-
-def place_raid_markers(db: Database, fmap: folium.Map) -> None:
-    log('  Placing City Raiders markers... ', end='')
-    for raid in db.raids:
-        raid.draw(fmap)
-    log('Done!')
-
-
-def generate_map(db: Database) -> folium.Map:
-    documented_visited_stops: list[Stop] = list(filter(lambda s: s.is_visited(include_ev=False), db.stops.values()))
-    visible_stops = documented_visited_stops if len(documented_visited_stops) > 0 else db.stops.values()
-    avg_lat = (min(s.location.latitude for s in visible_stops) + max(s.location.latitude for s in visible_stops)) / 2
-    avg_lon = (min(s.location.longitude for s in visible_stops) + max(s.location.longitude for s in visible_stops)) / 2
-    fmap: folium.Map = folium.Map(location=(avg_lat, avg_lon), zoom_start=12, prefer_canvas=False, zoom_control='bottomleft')
-
-    place_stop_markers(db, fmap)
-    place_line_markers(db, fmap)
-    place_terminal_markers(db, fmap)
-    place_raid_markers(db, fmap)
-
-    return fmap
-
-
-def build_app(db: Database, fmap: folium.Map | None) -> None:
     folium_html: str | None = None
     if build_map:
-        log('  Compiling Folium map... ', end='')
-        map_element: Element = fmap.get_root()
-        folium_html = map_element.render()
+        log('  Building Folium map...')
+        fmap: folium.Map = builder.build_fmap()
+        log('    Compiling... ', end='')
+        folium_html = fmap.get_root().render()
         log('Done!')
 
     from player import Player
@@ -249,11 +142,7 @@ def build_app(db: Database, fmap: folium.Map | None) -> None:
         with open(prepare_path(ref.compileddata_map), 'w') as script_file:
             script_file.write(clean_js(map_script))
 
-    log('Done!')
-
-    log('  Building HTML documents... ', end='')
-
-    builder: UIBuilder = UIBuilder(database=db, lexmap_file=ref.lexmap_polish)
+    log('Done!\n  Building HTML documents... ', end='')
 
     if build_map:
         map_html: str = clean_html(builder.create_map(folium_html).render())
@@ -316,13 +205,9 @@ def main() -> None:
             create_route_map(line, db, False)
         log('Done!')
 
-    fmap: folium.Map | None = None
-    if build_map:
-        log('Generating map data...')
-        fmap = generate_map(db)
     if build_map or build_archive or build_announcements:
         log('Compiling application...')
-        build_app(db, fmap)
+        build_app(db)
 
 
 args.validate_flags('-A', '-a', '-b', '-G', '-m', '-N', '-n', '-U')

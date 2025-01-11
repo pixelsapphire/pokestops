@@ -25,10 +25,25 @@
         Total length:
         <span id='raid-length'
                 {%- for raid in db.raids -%}
-                    data-length-{{ raid.raid_id }}='{{ raid.get_total_length().format(precision=1) }}'
+                    data-{{ raid.raid_id }}='{{ raid.total_length.format(precision=1) }}'
                 {%- endfor -%}>
-            {{ db.raids[0].get_total_length().format(precision=1) }}
+            {{ db.raids[0].total_length.format(precision=1) }}
         </span>
+        <br>
+        Total time:
+        <span id='raid-time'
+                {%- for raid in db.raids -%}
+                    data-{{ raid.raid_id }}='{{ raid.total_time.format_as_hms() }}'
+                {%- endfor -%}>
+            {{ db.raids[0].total_time.format_as_hms() }}
+        </span>
+        <br>
+        (ride time: <span id='raid-ride-time'
+                {%- for raid in db.raids -%}
+                    data-{{ raid.raid_id }}='{{ raid.total_ride_time.format_as_hms() }}'
+                {%- endfor -%}>
+            {{ db.raids[0].total_ride_time.format_as_hms() }}
+        </span>)
     </span>
 </p>
 <img id='compass' src='{{ ref.asset_img_compass }}'>

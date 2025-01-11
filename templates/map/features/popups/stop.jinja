@@ -1,0 +1,18 @@
+<span class="stop-name">{{ stop.full_name }} [{{ stop.short_name }}]</span>
+<span class="stop-visitors">
+    {%- if stop.visits -%}
+        {%- for visit in stop.visits | sort -%}
+            <br>visited by {{ visit.item.nickname -}}
+            {{- ' on ' + visit.date.format('y-m-d') if visit.date.is_known() else ' a long time ago' -}}
+        {%- endfor -%}
+    {%- else -%}
+        <br>not yet visited
+    {%- endif -%}
+</span>
+{%- if stop.terminals_progress | length > 0 -%}
+    <span class="stop-tp">
+        {%- for kind, player, terminal in stop.terminals_progress -%}
+            <br>{{ player.nickname }}'s closest {{ kind }} point to {{ terminal.name -}}
+        {%- endfor -%}
+    </span>
+{%- endif %}

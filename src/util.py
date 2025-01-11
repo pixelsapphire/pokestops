@@ -1,9 +1,9 @@
 import csv
-import functools
 import os
 import platform
 import subprocess
 import zipfile
+from functools import partial
 from log import error
 from sortedcontainers import SortedSet
 from typing import Any, Callable, Hashable, Iterable, Protocol, TypeVar, runtime_checkable
@@ -50,6 +50,10 @@ def coalesce(*args: Any) -> Any:
     return None
 
 
+def strif(s: str, condition: Any) -> str:
+    return s if condition else ''
+
+
 def maybe(self: Any, method: str | Callable, *args: Any, **kwargs: Any) -> Any:
     if self is None:
         return None
@@ -67,7 +71,7 @@ def invert_hex_color(color: str) -> str:
     hashtag: bool = color.startswith('#')
     color: str = color.lstrip('#')
     inverted_color = ''.join(f'{255 - int(color[i:i + 2], 16):02x}' for i in range(0, 6, 2))
-    return f'{'#' if hashtag else ''}{inverted_color}{color[-2:] if len(color) > 6 else ''}'
+    return f'{strif('#', hashtag)}{inverted_color}{strif(color[-2:], len(color) > 6)}'
 
 
 def prepare_path(file_path: str | os.PathLike[str]) -> str | os.PathLike[str]:
@@ -206,4 +210,4 @@ class memoized:
         return self.func.__doc__
 
     def __get__(self, obj, objtype):
-        return functools.partial(self.__call__, obj)
+        return partial(self.__call__, obj)

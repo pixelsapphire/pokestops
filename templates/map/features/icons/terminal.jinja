@@ -1,0 +1,7 @@
+<div class="marker terminal
+{%- for player in db.players -%}
+    {% if terminal.reached_by(player) %} reached-{{ player.nickname.lower() }}{% endif %}
+{%- endfor -%}
+">
+    {{- 'T' -}}
+</div>

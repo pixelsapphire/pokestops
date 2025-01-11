@@ -1,0 +1,10 @@
+<span class="stop-name">{{ point.stop }}</span>
+<span class="stop-visitors"><br>{{ point.phase }} point<br>
+    {%- if point.phase == 'transfer' -%}
+        arrival time: {{ point.arrival.strftime('%I:%M%p') if point.arrival else '?' }}<br>
+        departure time: {{ point.departure.strftime('%I:%M%p') if point.departure else '?' }}
+    {%- else -%}
+        time: {{ point.departure.strftime('%I:%M%p') if point.departure else
+                (point.arrival.strftime('%I:%M%p') if point.arrival else '?') }}
+    {%- endif -%}
+</span>

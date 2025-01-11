@@ -1,0 +1,16 @@
+<span class="stop-name">{{ terminal.name }}</span>
+<br>
+<span class="stop-tp">
+    {%- if terminal.anybody_reached() -%}
+        {%- for tp in terminal.progress if tp.reached() -%}
+            {%- if tp.completed() -%}
+                {{ tp.player.nickname }} has completed this terminal
+            {%- else -%}
+                {{ tp.player.nickname }} has {{ 'arrived at' if tp.arrived() else 'departed from' }} this terminal
+            {%- endif -%}
+            {% if not loop.last %}<br>{% endif %}
+        {%- endfor -%}
+    {%- else -%}
+        not yet reached
+    {%- endif -%}
+</span>

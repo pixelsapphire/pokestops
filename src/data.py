@@ -1,18 +1,18 @@
 from __future__ import annotations
-import folium
 import json
 import re
 import ref
 import traceback
-from abc import ABC, abstractmethod
+from abc import ABC
 from collections import defaultdict
 from date import DateAndOrder
+from datetime import datetime
 from geo import geopoint
 from log import log
 from quantity import kilo
-from typing import get_args, Literal, Self, TYPE_CHECKING
+from typing import Final, get_args, Literal, Self, TYPE_CHECKING
 
-from src.quantity import Quantity
+from src.quantity import Duration, Quantity
 from util import *
 
 if TYPE_CHECKING:
@@ -558,9 +558,9 @@ class Region:
 
 
 class RaidElement(ABC):
-    @abstractmethod
-    def __draw__(self, fmap: folium.Map, raid_id: str) -> None:
-        ...
+    def __init__(self, departure: datetime | None, arrival: datetime | None):
+        self.departure: datetime | None = departure
+        self.arrival: datetime | None = arrival
 
     @staticmethod
     def from_dict(data: dict[str, Any]) -> RaidElement:
@@ -572,6 +572,7 @@ class RaidElement(ABC):
 
 class PointRaidElement(RaidElement):
     def __init__(self, phase: str, location: geopoint, stop: str):
+        super().__init__(None, None)
         self.phase: str = phase
         self.location: geopoint = location
         self.stop = stop
@@ -588,55 +589,84 @@ class PointRaidElement(RaidElement):
         else:
             return 'B'
 
-    def __draw__(self, fmap: folium.Map, raid_id: str) -> None:
-        popup: folium.Popup = folium.Popup(f'<span class="stop-name">{self.stop}</span>'
-                                           f'<span class="stop-visitors"><br>{self.phase} point</span>')
-        marker: folium.DivIcon = folium.DivIcon(
-            html=f'<div class="raid marker r-{raid_id}">{self.marker()}</div>',
-            icon_anchor=(12, 16)
-        )
-        folium.Marker(location=self.location, popup=popup, icon=marker).add_to(fmap)
-
     @staticmethod
     def from_dict(data: dict[str, Any]) -> PointRaidElement:
         return PointRaidElement(data['phase'], geopoint.parse(data['location']), data['stop'])
 
 
 class RouteRaidElement(RaidElement):
-    def __init__(self, trasport_method: str, shape: list[geopoint]):
+    def __init__(self, trasport_method: str, shape: list[geopoint], departure: datetime | None, arrival: datetime | None):
+        super().__init__(departure, arrival)
         self.trasport_method: str = trasport_method
         self.shape: list[geopoint] = shape
-
-    def __draw__(self, fmap: folium.Map, raid_id: str) -> None:
-        folium.PolyLine(locations=[self.shape], class_name=f'raid r-{raid_id}',
-                        fill_opacity=0, weight=3, bubbling_mouse_events=False).add_to(fmap)
 
     def get_total_length(self) -> Quantity:
         return sum((geopoint.distance(self.shape[i], self.shape[i + 1]) for i in range(len(self.shape) - 1)), Quantity(0, 'm'))
 
+    def get_total_time(self) -> Duration:
+        return Duration.as_difference(self.departure, self.arrival) \
+            if self.departure is not None and self.arrival is not None else Duration(0)
+
     @staticmethod
     def from_dict(data: dict[str, Any]) -> RouteRaidElement:
-        return RouteRaidElement(data['transport_method'], [geopoint.parse(point) for point in data['shape'].split('&')])
+        return RouteRaidElement(data['transport_method'], [geopoint.parse(point) for point in data['shape'].split('&')],
+                                datetime.fromisoformat(data['departure']) if 'departure' in data else None,
+                                datetime.fromisoformat(data['arrival']) if 'arrival' in data else None)
 
 
 class Raid:
-    def __init__(self, raid_id: str, date: DateAndOrder, participants: list[Player], elements: list[RaidElement]):
-        self.raid_id: str = raid_id
-        self.date: DateAndOrder = date
-        self.participants: list[Player] = participants
-        self.elements: list[RaidElement] = elements
+    def __init__(self, raid_id: str, icon: str, date: DateAndOrder, participants: list[Player], elements: list[RaidElement]):
+        self.raid_id: Final[str] = raid_id
+        self.icon: Final[str] = icon
+        self.date: Final[DateAndOrder] = date
+        self._participants: list[Player] = participants
+        self._elements: list[RaidElement] = elements
 
-    def draw(self, fmap: folium.Map) -> None:
-        for element in self.elements:
-            element.__draw__(fmap, self.raid_id)
+    @property
+    def participants(self) -> list[Player]:
+        return self._participants
+
+    @property
+    def elements(self) -> list[RaidElement]:
+        return self._elements
+
+    @property
+    @memoized
+    def start_time(self) -> datetime:
+        return min(route.departure for route in self.__get_routes__() if route.departure is not None)
+
+    @property
+    @memoized
+    def finish_time(self) -> datetime:
+        return max(route.arrival for route in self.__get_routes__() if route.arrival is not None)
+
+    @property
+    @memoized
+    def total_ride_time(self) -> Duration:
+        return sum((route.get_total_time() for route in self.__get_routes__() if route.trasport_method != 'foot'), Duration(0))
+
+    @property
+    @memoized
+    def total_time(self) -> Duration:
+        return Duration.as_difference(self.start_time, self.finish_time)
+
+    @property
+    @memoized
+    def total_length(self) -> Quantity:
+        return sum((route.get_total_length() for route in self.__get_routes__()), Quantity(0, 'm')).convert(multiplier=kilo)
 
     @staticmethod
     def load(raid_id: str, players: list[Player]):
         with open(f'{ref.raiddata_path}/{raid_id}.json', 'r') as file:
             raid_data = json.load(file)
-            return Raid(raid_id, DateAndOrder(date_string=raid_data['date']),
-                        [find_first(lambda p: p.nickname == nickname, players) for nickname in raid_data['participants']],
-                        [RaidElement.from_dict(element) for element in raid_data['elements']])
+            raid: Raid = Raid(raid_id, raid_data['icon'], DateAndOrder(date_string=raid_data['date']),
+                              [find_first(lambda p: p.nickname == nickname, players) for nickname in raid_data['participants']],
+                              [RaidElement.from_dict(element) for element in raid_data['elements']])
+            for i in range(1, len(raid._elements) - 1):
+                if isinstance(raid._elements[i], RouteRaidElement):
+                    raid._elements[i - 1].departure = raid._elements[i].departure
+                    raid._elements[i + 1].arrival = raid._elements[i].arrival
+            return raid
 
     @staticmethod
     def read_list(source: str, players: list[Player]) -> list[Raid]:
@@ -645,9 +675,9 @@ class Raid:
         # noinspection PyTypeChecker
         return __read_collection__(source, [], lambda i: Raid.load(i, players), list.append)
 
-    def get_total_length(self) -> Quantity:
-        return sum((element.get_total_length() for element in self.elements if isinstance(element, RouteRaidElement)),
-                   Quantity(0, 'm')).convert(multiplier=kilo)
+    @memoized
+    def __get_routes__(self) -> list[RouteRaidElement]:
+        return [element for element in self._elements if isinstance(element, RouteRaidElement)]
 
 
 class Database:

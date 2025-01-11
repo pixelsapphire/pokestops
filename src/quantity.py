@@ -1,5 +1,7 @@
 from __future__ import annotations
+from datetime import datetime
 from decimal import Decimal
+from util import strif
 
 
 class Multiplier:
@@ -11,9 +13,40 @@ class Multiplier:
         return f'Multiplier x{self.value} [{self.symbol}]'
 
 
+yocto: Multiplier = Multiplier(Decimal('0.000000000000000000000001'), 'y')
+zepto: Multiplier = Multiplier(Decimal('0.000000000000000000001'), 'z')
+atto: Multiplier = Multiplier(Decimal('0.000000000000000001'), 'a')
+femto: Multiplier = Multiplier(Decimal('0.000000000000001'), 'f')
+pico: Multiplier = Multiplier(Decimal('0.000000000001'), 'p')
+nano: Multiplier = Multiplier(Decimal('0.000000001'), 'n')
+micro: Multiplier = Multiplier(Decimal('0.000001'), 'µ')
+milli: Multiplier = Multiplier(Decimal('0.001'), 'm')
+centi: Multiplier = Multiplier(Decimal('0.01'), 'c')
+deci: Multiplier = Multiplier(Decimal('0.1'), 'd')
+one: Multiplier = Multiplier(Decimal('1'), '')
+deca: Multiplier = Multiplier(Decimal('10'), 'da')
+hecto: Multiplier = Multiplier(Decimal('100'), 'h')
+kilo: Multiplier = Multiplier(Decimal('1000'), 'k')
+mega: Multiplier = Multiplier(Decimal('1000000'), 'M')
+giga: Multiplier = Multiplier(Decimal('1000000000'), 'G')
+tera: Multiplier = Multiplier(Decimal('1000000000000'), 'T')
+peta: Multiplier = Multiplier(Decimal('1000000000000000'), 'P')
+exa: Multiplier = Multiplier(Decimal('1000000000000000000'), 'E')
+zetta: Multiplier = Multiplier(Decimal('1000000000000000000000'), 'Z')
+yotta: Multiplier = Multiplier(Decimal('1000000000000000000000000'), 'Y')
+kibi: Multiplier = Multiplier('1024', 'Ki')
+mebi: Multiplier = Multiplier('1048576', 'Mi')
+gibi: Multiplier = Multiplier('1073741824', 'Gi')
+tebi: Multiplier = Multiplier('1099511627776', 'Ti')
+pebi: Multiplier = Multiplier('1125899906842624', 'Pi')
+exbi: Multiplier = Multiplier('1152921504606846976', 'Ei')
+zebi: Multiplier = Multiplier('1180591620717411303424', 'Zi')
+yobi: Multiplier = Multiplier('1208925819614629174706176', 'Yi')
+
+
 class Unit:
-    def __init__(self, symbol: str | None = '', multiplier: Multiplier = Multiplier(1, '')):
-        self.symbol: str = symbol if symbol is not None else ''
+    def __init__(self, symbol: str | None = '', multiplier: Multiplier = one):
+        self.symbol: str = strif(symbol, symbol)
         self.multiplier: Multiplier = multiplier
 
     def __str__(self) -> str:
@@ -109,9 +142,6 @@ class Quantity:
     def __floordiv__(self, scalar: float | int | str | Decimal) -> Quantity:
         return Quantity(self.magnitude // scalar, self.unit)
 
-    def __pow__(self, scalar: float | int | str | Decimal) -> Quantity:
-        return Quantity(self.magnitude ** scalar, self.unit)
-
     def __abs__(self) -> Quantity:
         return Quantity(abs(self.magnitude), self.unit)
 
@@ -132,27 +162,42 @@ class Quantity:
         return f'{round(magnitude, precision)}{self.unit}' if precision is not None else f'{magnitude}{self.unit}'
 
 
-yocto: Multiplier = Multiplier(Decimal('0.000000000000000000000001'), 'y')
-zepto: Multiplier = Multiplier(Decimal('0.000000000000000000001'), 'z')
-atto: Multiplier = Multiplier(Decimal('0.000000000000000001'), 'a')
-femto: Multiplier = Multiplier(Decimal('0.000000000000001'), 'f')
-pico: Multiplier = Multiplier(Decimal('0.000000000001'), 'p')
-nano: Multiplier = Multiplier(Decimal('0.000000001'), 'n')
-micro: Multiplier = Multiplier(Decimal('0.000001'), 'µ')
-milli: Multiplier = Multiplier(Decimal('0.001'), 'm')
-kilo: Multiplier = Multiplier(Decimal('1000'), 'k')
-mega: Multiplier = Multiplier(Decimal('1000000'), 'M')
-giga: Multiplier = Multiplier(Decimal('1000000000'), 'G')
-tera: Multiplier = Multiplier(Decimal('1000000000000'), 'T')
-peta: Multiplier = Multiplier(Decimal('1000000000000000'), 'P')
-exa: Multiplier = Multiplier(Decimal('1000000000000000000'), 'E')
-zetta: Multiplier = Multiplier(Decimal('1000000000000000000000'), 'Z')
-yotta: Multiplier = Multiplier(Decimal('1000000000000000000000000'), 'Y')
-kibi: Multiplier = Multiplier('1024', 'Ki')
-mebi: Multiplier = Multiplier('1048576', 'Mi')
-gibi: Multiplier = Multiplier('1073741824', 'Gi')
-tebi: Multiplier = Multiplier('1099511627776', 'Ti')
-pebi: Multiplier = Multiplier('1125899906842624', 'Pi')
-exbi: Multiplier = Multiplier('1152921504606846976', 'Ei')
-zebi: Multiplier = Multiplier('1180591620717411303424', 'Zi')
-yobi: Multiplier = Multiplier('1208925819614629174706176', 'Yi')
+class Duration(Quantity):
+    def __init__(self, duration: float | int | str | Decimal | Quantity, multiplier: Multiplier = one):
+        super().__init__(duration, Unit('s', multiplier))
+
+    @staticmethod
+    def from_hms(*, hours: int = 0, minutes: int = 0, seconds: float = 0) -> Duration:
+        return Duration(hours * 3600 + minutes * 60 + seconds)
+
+    @staticmethod
+    def as_difference(start: datetime, end: datetime) -> Duration:
+        return Duration((end - start).total_seconds())
+
+    def format_as_hms(self, display_zero: bool = False) -> str:
+        hours, remainder = divmod(abs(self.base_magnitude), 3600)
+        minutes, seconds = divmod(remainder, 60)
+        h, m, s = f'{int(hours)}h', f'{int(minutes)}m', f'{int(seconds)}s'
+        return f'{h} {m} {s}' if display_zero else (f'{strif(h, hours > 0)} {strif(m, minutes > 0)} '
+                                                    f'{strif(s, seconds > 0 or (hours == 0 and minutes == 0))}').strip()
+
+    def __add__(self, other: Duration) -> Duration:
+        return Duration(self.base_magnitude + other.base_magnitude)
+
+    def __sub__(self, other: Duration) -> Duration:
+        return Duration(self.base_magnitude - other.base_magnitude)
+
+    def __mul__(self, scalar: float | int | str | Decimal) -> Duration:
+        return Duration(self.base_magnitude * scalar)
+
+    def __truediv__(self, scalar: float | int | str | Decimal) -> Duration:
+        return Duration(self.base_magnitude / scalar)
+
+    def __floordiv__(self, scalar: float | int | str | Decimal) -> Duration:
+        return Duration(self.base_magnitude // scalar)
+
+    def __abs__(self) -> Duration:
+        return Duration(abs(self.base_magnitude))
+
+    def __neg__(self) -> Duration:
+        return Duration(-self.base_magnitude)

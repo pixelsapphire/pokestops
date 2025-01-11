@@ -1,0 +1,9 @@
+{% set stop_visits = stop.visits | sort -%}
+<div class="marker
+    {%- for v in stop_visits %} v-{{ v.item.nickname.lower() }}{%- endfor -%}
+    {%- for v in stop_visits %}{% if not v.date.is_known() %} ev-{{ v.item.nickname.lower() }}{% endif %}{% endfor -%}
+    {%- for region in stop.regions %} r-{{ region.short_name }}{% endfor -%}
+    {%- for _, player, _ in stop.terminals_progress %} tp-{{- player.nickname.lower() }}{% endfor -%}
+">
+    {{- stop.marker() -}}
+</div>
