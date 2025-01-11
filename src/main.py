@@ -143,8 +143,8 @@ def place_line_markers(db: Database, fmap: folium.Map) -> None:
     def draw_line(pts: Sequence[geopoint], cls: HashableSet[str]) -> None:
         if isinstance(pts, LineSegment) and (pts, cls) in already_drawn:
             return
-        folium.PolyLine(fill_color=' '.join(cls),  # see: https://github.com/python-visualization/folium/issues/2055
-                        locations=[pts], fill_opacity=0, weight=3, bubbling_mouse_events=False).add_to(fmap)
+        folium.PolyLine(locations=[pts], class_name=' '.join(cls),
+                        fill_opacity=0, weight=3, bubbling_mouse_events=False).add_to(fmap)
 
     for line in [line for line in db.lines.values() if not line.is_discovered()]:
         for route in line.routes:

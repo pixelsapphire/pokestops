@@ -608,8 +608,8 @@ class RouteRaidElement(RaidElement):
         self.shape: list[geopoint] = shape
 
     def __draw__(self, fmap: folium.Map, raid_id: str) -> None:
-        folium.PolyLine(fill_color=f'raid r-{raid_id}',  # see: https://github.com/python-visualization/folium/issues/2055
-                        locations=[self.shape], fill_opacity=0, weight=3, bubbling_mouse_events=False).add_to(fmap)
+        folium.PolyLine(locations=[self.shape], class_name=f'raid r-{raid_id}',
+                        fill_opacity=0, weight=3, bubbling_mouse_events=False).add_to(fmap)
 
     def get_total_length(self) -> Quantity:
         return sum((geopoint.distance(self.shape[i], self.shape[i + 1]) for i in range(len(self.shape) - 1)), Quantity(0, 'm'))
