@@ -94,16 +94,6 @@
     font-size: min(3vh, 3dvw);
 }
 
-.details-table {
-    width: auto;
-    margin: min(1vh, 1dvw) 0 min(2vh, 2dvw);
-}
-
-.details-table td {
-    padding: min(0.25vh, 0.25dvw);
-    font-size: min(2vh, 2dvw);
-}
-
 .details-table td:last-child {
     width: 100%;
 }

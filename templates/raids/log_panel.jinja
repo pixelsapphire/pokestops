@@ -1,0 +1,39 @@
+<div class='content-section object-view' id='raid-view'>
+    {% for raid in db.raids %}
+        <div class='raid-log' id='{{ raid.raid_id }}'>
+            <p class='raid-log-title'>The raid of {{ raid.date.format('M y') }}</p>
+            <p style="max-width: 100%; text-align: center;">
+                <img class='raid-log-map' src='{{ ref.mapdata_paths_raids }}/{{ raid.raid_id }}.svg'>
+            </p>
+            <table id='raid-details' class='details-table'>
+                <tr>
+                    <td>date:</td>
+                    <td>{{ raid.date.format('W, M D, y') }}</td>
+                </tr>
+                <tr>
+                    <td>time:</td>
+                    <td>
+                        {{ raid.start_time.strftime('%-I:%M%p') }} ~ {{ raid.finish_time.strftime('%-I:%M%p') }}
+                        (total time: {{ raid.total_time.format_as_hms() }})
+                    </td>
+                </tr>
+                <tr>
+                    <td>participants:</td>
+                    <td>{% for player in raid.participants %}
+                        {{- player.nickname -}}
+                        {%- if not loop.last %}, {% endif -%}
+                    {% endfor %}</td>
+                </tr>
+                <tr>
+                    <td>rides taken:</td>
+                    <td>{{ raid.taken_rides }} (total ride time: {{ raid.total_ride_time.format_as_hms() }})</td>
+                </tr>
+                <tr>
+                    <td>stops visited:</td>
+                    <td>{{ raid.visited_stops }}</td>
+                </tr>
+            </table>
+            {% include 'raids.timeline' %}
+        </div>
+    {% endfor %}
+</div>

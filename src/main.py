@@ -61,9 +61,9 @@ def load_data(initial_db: Database) -> Database:
                     vehicles, models, initial_db.routes, initial_db.lines, raids, initial_db.scheduled_changes, announcements)
 
 
-def create_route_map(line: Line, db: Database, all_variants: bool) -> None:
+def create_line_map(line: Line, db: Database, all_variants: bool) -> None:
     variant: int = 0
-    for line_variant in line.stops if all_variants else [line.stops[0]]:
+    for line_variant in line.variants if all_variants else [line.variants[0]]:
         variant += 1
         stops: list[Stop] = []
         for stop_id in line_variant:
@@ -71,41 +71,12 @@ def create_route_map(line: Line, db: Database, all_variants: bool) -> None:
             if stop and not any(stop.full_name == s.full_name for s in stops):
                 stops.append(stop)
         stops_locations: list[geopoint] = list(map(db.group_location, stops))
-        lat_min: float = min(s.latitude for s in stops_locations)
-        lat_max: float = max(s.latitude for s in stops_locations)
-        lon_min: float = min(s.longitude for s in stops_locations)
-        lon_max: float = max(s.longitude for s in stops_locations)
-        lat_range: float = lat_max - lat_min
-        lon_range: float = lon_max - lon_min
-        coord_range: float = max(lat_range, lon_range)
-        scale_factor: float = 1000 / coord_range
-        points = [vector2f(12 + (s.longitude - lon_min) * scale_factor, 12 + (lat_max - s.latitude) * scale_factor)
-                  for s in stops_locations]
-        with open(prepare_path(f'{ref.mapdata_path}/{line.number}/{variant}.svg'), 'w') as file:
-            file.write(f'<svg'
-                       f' width="{24 + 1000 * lon_range / coord_range:.1f}"'
-                       f' height="{24 + 1000 * lat_range / coord_range:.1f}"'
-                       f' xmlns="http://www.w3.org/2000/svg">\n')
-            sequence: list[vector2f] = midpoints(points)
-            file.write(f'<path d="M{sequence[0].x} {sequence[0].y} ')
-            for p in sequence[1:]:
-                file.write(f'L{p.x:.1f} {p.y:.1f} ')
-            file.write(f'" />\n')
-            for p in sequence[::2]:
-                file.write(f'<circle cx="{p.x:.1f}" cy="{p.y:.1f}" r="8" />\n')
-            file.write(f'<style>\n{to_css({
-                'circle': {
-                    'fill': 'white',
-                    'stroke': f'#{line.background_color}' if line.background_color.lower() != 'ffffff' else 'black',
-                    'stroke-width': '4'
-                },
-                'path': {
-                    'fill': 'none',
-                    'stroke': f'#{line.background_color}',
-                    'stroke-width': '8'
-                }
-            })}</style>\n')
-            file.write('</svg>')
+        create_route_diagram(stops_locations, line.background_color, f'{ref.mapdata_paths_lines}/{line.number}/{variant}.svg')
+
+
+def create_raid_map(raid: Raid) -> None:
+    stops_locations: list[list[geopoint]] = [r.shape for r in raid.routes if r.shape_defined()]
+    create_multi_route_map(stops_locations, ref.color_raid_route, f'{ref.mapdata_paths_raids}/{raid.raid_id}.svg')
 
 
 def build_app(db: Database) -> None:
@@ -114,7 +85,7 @@ def build_app(db: Database) -> None:
     folium_html: str | None = None
     if build_map:
         log('  Building Folium map...')
-        fmap: folium.Map = builder.build_fmap()
+        fmap: Map = builder.build_fmap()
         log('    Compiling... ', end='')
         folium_html = fmap.get_root().render()
         log('Done!')
@@ -159,6 +130,12 @@ def build_app(db: Database) -> None:
         with open(prepare_path(ref.document_announcements), 'w') as file:
             file.write(announcements_html)
 
+    if build_raids:
+        [create_raid_map(raid) for raid in db.raids]
+        raids_html: str = clean_html(builder.create_raids().render())
+        with open(prepare_path(ref.document_raids), 'w') as file:
+            file.write(raids_html)
+
     log('Done!')
 
 
@@ -200,26 +177,36 @@ def main() -> None:
 
     if update_gtfs:
         log('Drawing line route diagrams... ', end='')
-        clear_directory(ref.mapdata_path)
+        clear_directory(ref.mapdata_paths_lines)
         for line in db.lines.values():
-            create_route_map(line, db, False)
+            create_line_map(line, db, False)
         log('Done!')
 
-    if build_map or build_archive or build_announcements:
+    if build_map or build_archive or build_announcements or build_raids:
         log('Compiling application...')
         build_app(db)
 
 
-args.validate_flags('-A', '-a', '-b', '-G', '-m', '-N', '-n', '-U')
-args.validate_options('--all', '--update-all', '--build-all',
-                      '--update-gtfs', '--update-announcements',
-                      '--build-map', '--build-archive', '--build-announcements')
+__options__: dict[str, str] = {
+    '-A': '--all',
+    '-U': '--update-all',
+    '-G': '--update-gtfs',
+    '-N': '--update-announcements',
+    '-b': '--build-all',
+    '-m': '--build-map',
+    '-a': '--build-archive',
+    '-n': '--build-announcements',
+    '-r': '--build-raids',
+}
+args.validate_flags(*__options__.keys())
+args.validate_options(*__options__.values())
 
 update_gtfs: bool = args.one_of_present('--update-gtfs', '--update-all', '--all', '-G', '-U', '-A')
 update_announcements: bool = args.one_of_present('--update-announcements', '--update-all', '--all', '-N', '-U', '-A')
 build_map: bool = args.one_of_present('--build-map', '--build-all', '--all', '-m', '-b', '-A')
 build_archive: bool = args.one_of_present('--build-archive', '--build-all', '--all', '-a', '-b', '-A')
 build_announcements: bool = args.one_of_present('--build-announcements', '--build-all', '--all', '-n', '-b', '-A')
+build_raids: bool = args.one_of_present('--build-raids', '--build-all', '--all', '-r', '-b', '-A')
 
 if __name__ == '__main__':
     os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

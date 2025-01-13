@@ -5,6 +5,8 @@ asset_path_brands: str = 'assets/brands'
 asset_path_markers: str = 'assets/markers'
 asset_path_vehicles: str = 'assets/vehicles'
 
+color_raid_route: str = 'ff61b1'
+
 compileddata_map: str = 'data/js/map.min.js'
 compileddata_players: str = 'data/js/players_data.min.js'
 compileddata_lines: str = 'data/js/lines_data.min.js'
@@ -15,14 +17,17 @@ controller_announcements: str = 'assets/scripts/announcements.js'
 controller_archive: str = 'assets/scripts/archive.js'
 controller_common: str = 'assets/scripts/common.js'
 controller_map: str = 'assets/scripts/map.js'
+controller_raids: str = 'assets/scripts/raids.js'
 
 document_announcements: str = 'announcements.html'
 document_archive: str = 'archive.html'
 document_map: str = 'index.html'
+document_raids: str = 'raids.html'
 
 lexmap_polish: str = 'assets/lang/alphabet/pl_pl.txt'
 
-mapdata_path: str = 'data/map'
+mapdata_paths_lines: str = 'data/map/lines'
+mapdata_paths_raids: str = 'data/map/raids'
 
 playerdata_file_ev_stops: str = 'ev_stops.csv'
 playerdata_file_lines: str = 'lines.csv'
@@ -39,6 +44,7 @@ stylesheet_announcements: str = 'assets/stylesheets/announcements.css'
 stylesheet_archive: str = 'assets/stylesheets/archive.css'
 stylesheet_common: str = 'assets/stylesheets/common.css'
 stylesheet_map: str = 'assets/stylesheets/map.css'
+stylesheet_raids: str = 'assets/stylesheets/raids.css'
 
 rawdata_announcements: str = 'data/raw/announcements.csv'
 rawdata_carriers: str = 'data/raw/carriers.csv'

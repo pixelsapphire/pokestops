@@ -177,7 +177,7 @@ class Duration(Quantity):
     def format_as_hms(self, display_zero: bool = False) -> str:
         hours, remainder = divmod(abs(self.base_magnitude), 3600)
         minutes, seconds = divmod(remainder, 60)
-        h, m, s = f'{int(hours)}h', f'{int(minutes)}m', f'{int(seconds)}s'
+        h, m, s = f'{int(hours)}h', f'{int(minutes)}min', f'{int(seconds)}s'
         return f'{h} {m} {s}' if display_zero else (f'{strif(h, hours > 0)} {strif(m, minutes > 0)} '
                                                     f'{strif(s, seconds > 0 or (hours == 0 and minutes == 0))}').strip()
 

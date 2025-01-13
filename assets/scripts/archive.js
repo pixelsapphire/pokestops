@@ -26,13 +26,6 @@ function makeAddress(address) {
     return `${road}${suburb}${address.postcode} ${town}`;
 }
 
-function cropSVG(svgImage, margin) {
-    const bbox = svgImage.getBBox();
-    svgImage.setAttribute("viewBox", `${bbox.x - margin} ${bbox.y - margin} ${bbox.width + 2 * margin} ${bbox.height + 2 * margin}`);
-    svgImage.setAttribute("width", bbox.width + 2 * margin);
-    svgImage.setAttribute("height", bbox.height + 2 * margin);
-}
-
 function selectStop(stopPreview, ctrl) {
     ctrl.stopDetails.classList.remove('hidden');
     const stopId = stopPreview.getAttribute('data-stop-id');

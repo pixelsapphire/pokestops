@@ -88,11 +88,15 @@
 <div id='tab-buttons' class='hud'>
     <div class='tab-button' onclick='window.location.href = "announcements.html"'>
         <div class="material-icons">newspaper</div>
-        <div class='label-new-tab-button'>The Steambird</div>
+        <div>The Steambird</div>
     </div>
     <div class='tab-button' onclick='window.location.href = "archive.html"'>
         <div class="material-icons">auto_stories</div>
         <div>Pokestops Archive</div>
+    </div>
+    <div class='tab-button' onclick='window.location.href = "raids.html"'>
+        <div class="material-icons">explore</div>
+        <div class='label-new-tab-button'>Raider's Logbook</div>
     </div>
     <div class='tab-button-divider'></div>
     <div class='tab-button' onclick='toggleSidebar("achievements")'>
@@ -106,7 +110,7 @@
     <div class='tab-button-divider'></div>
     <div class='tab-button' onclick='toggleSidebar("search")'>
         <div class="material-icons">search</div>
-        <div class='label-new-tab-button'>Search anything</div>
+        <div>Search anything</div>
     </div>
 </div>
 <div id='control' class='hud'>
@@ -260,7 +264,8 @@
     <span id='raid-info' class='mode-info-label hidden'>
         Total length:
         <span id='raid-length' data-202501='63.8km'>63.8km</span><br>Total time:
-        <span id='raid-time' data-202501='7h 24m'>7h 24m</span><br>(ride time: <span id='raid-ride-time' data-202501='2h 46m'>2h 46m</span>)
+        <span id='raid-time' data-202501='7h 24min'>7h 24min</span><br>(ride time: <span id='raid-ride-time'
+                                                                                         data-202501='2h 46min'>2h 46min</span>)
     </span>
 </p>
 <img id='compass' src='assets/images/compass.png'>

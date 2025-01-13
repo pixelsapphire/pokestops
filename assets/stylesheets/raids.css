@@ -1,0 +1,62 @@
+#raids-index {
+    flex: 1;
+}
+
+.raid-preview {
+    margin: min(1vh, 1dvw);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: min(1vh, 1dvw);
+    background-color: #282828;
+    cursor: pointer;
+}
+
+.raid-icon {
+    margin-right: min(0.5vw, 0.5dvh);
+    font-size: min(3vw, 3dvh);
+}
+
+.raid-name {
+    font-size: min(2vw, 2dvh);
+}
+
+.raid-log {
+    display: none;
+    width: 100%;
+    text-align: justify;
+    line-height: 150%;
+    font-size: min(1.75vw, 1.75dvh);
+}
+
+.raid-log.selected {
+    display: block;
+}
+
+.raid-log-title {
+    margin: min(0.5vh, 0.5dvw) 0 min(2vh, 2dvw) !important;
+    text-align: center;
+    font-size: min(3vw, 3dvh);
+    font-style: italic;
+}
+
+.raid-log-map {
+    margin: min(1vh, 1dvw) 0;
+    max-width: 100%;
+    max-height: 66.67dvh;
+}
+
+.raid-log-title::before, .raid-log-title::after {
+    content: '~';
+    margin: 0 0.5em;
+}
+
+.details-table {
+    width: auto;
+    margin: min(1vh, 1dvw) 0 min(2vh, 2dvw);
+}
+
+.details-table td {
+    padding: min(0.25vh, 0.25dvw);
+    font-size: min(2vh, 2dvw);
+}

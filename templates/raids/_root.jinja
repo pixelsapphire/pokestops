@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <title>Raider's Logbook</title>
+    <link rel='icon' href='{{ ref.asset_img_compass }}'>
+    <link rel='stylesheet' type='text/css' href='{{ ref.url_material_symbols }}'>
+    <link rel='stylesheet' type='text/css' href='{{ ref.stylesheet_common }}'>
+    <link rel='stylesheet' type='text/css' href='{{ ref.stylesheet_raids }}'>
+    <script src='{{ ref.controller_common }}'></script>
+    <script src='{{ ref.controller_raids }}'></script>
+</head>
+<body>
+{% include 'raids.header' %}
+<div id='container'>
+    <div class='content-container selected' id='container-raids'>
+        <div class='content-section' id='raids-index'>
+            {% for raid in db.raids %}
+                {% include 'raids.tile' %}
+            {% endfor %}
+        </div>
+        {% include 'raids.log_panel' %}
+    </div>
+</div>
+</body>
+</html>

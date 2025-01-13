@@ -409,14 +409,14 @@ class Route:
 
 class Line(JsonSerializable):
     def __init__(self, number: str, terminals: str, description: str,
-                 background_color: str, text_color: str, routes: list[str], stops: list[list[str]]):
+                 background_color: str, text_color: str, routes: list[str], variants: list[list[str]]):
         self.number: str = number
         self.terminals: str = terminals
         self.description: str = description
         self.background_color: str = background_color
         self.text_color: str = text_color
         self.routes: list[str] = routes
-        self.stops: list[list[str]] = stops
+        self.variants: list[list[str]] = variants
         self.discoveries: list[Discovery] = []
         if self.background_color == self.text_color:
             self.text_color = invert_hex_color(self.text_color)
@@ -495,7 +495,7 @@ class Line(JsonSerializable):
                 f'k:"{self.kind()}",'
                 f't:"{self.terminals}",'
                 f'rd:"{self.description}",'
-                f'r:[{','.join(f'[{",".join(f"\"{stop}\"" for stop in seq)}]' for seq in self.stops)}],'
+                f'r:[{','.join(f'[{",".join(f"\"{stop}\"" for stop in seq)}]' for seq in self.variants)}],'
                 f'{f'd:[{','.join(f'["{visit.item.nickname}","{visit.date:y-m-d}"]'
                                   for visit in sorted(self.discoveries))}],' if self.discoveries else ''}'
                 f'}},')
@@ -577,6 +577,10 @@ class PointRaidElement(RaidElement):
         self.location: geopoint = location
         self.stop = stop
 
+    @property
+    def time(self) -> datetime | None:
+        return self.departure or self.arrival
+
     def marker(self) -> str:
         if self.phase == 'start' or self.phase == 'finish':
             return 'F'
@@ -595,23 +599,38 @@ class PointRaidElement(RaidElement):
 
 
 class RouteRaidElement(RaidElement):
-    def __init__(self, trasport_method: str, shape: list[geopoint], departure: datetime | None, arrival: datetime | None):
+    def __init__(self, departure: datetime | None, arrival: datetime | None,
+                 trasport_method: str, shape: list[geopoint], line_number: str | None = None):
         super().__init__(departure, arrival)
         self.trasport_method: str = trasport_method
         self.shape: list[geopoint] = shape
+        self.line_number: str | None = line_number
 
-    def get_total_length(self) -> Quantity:
+    @property
+    @memoized
+    def total_length(self) -> Quantity:
         return sum((geopoint.distance(self.shape[i], self.shape[i + 1]) for i in range(len(self.shape) - 1)), Quantity(0, 'm'))
 
-    def get_total_time(self) -> Duration:
+    @property
+    @memoized
+    def total_time(self) -> Duration:
         return Duration.as_difference(self.departure, self.arrival) \
             if self.departure is not None and self.arrival is not None else Duration(0)
 
+    def shape_defined(self):
+        return len(self.shape) > 0
+
     @staticmethod
     def from_dict(data: dict[str, Any]) -> RouteRaidElement:
-        return RouteRaidElement(data['transport_method'], [geopoint.parse(point) for point in data['shape'].split('&')],
-                                datetime.fromisoformat(data['departure']) if 'departure' in data else None,
-                                datetime.fromisoformat(data['arrival']) if 'arrival' in data else None)
+        return RouteRaidElement(datetime.fromisoformat(data['departure']) if 'departure' in data else None,
+                                datetime.fromisoformat(data['arrival']) if 'arrival' in data else None,
+                                data['transport_method'], [geopoint.parse(point) for point in data['shape'].split('&')],
+                                data.get('line'))
+
+
+class TransferRaidElement(RouteRaidElement):
+    def __init__(self):
+        super().__init__(None, None, 'foot', [])
 
 
 class Raid:
@@ -632,18 +651,28 @@ class Raid:
 
     @property
     @memoized
+    def stops(self) -> list[PointRaidElement]:
+        return [element for element in self._elements if isinstance(element, PointRaidElement)]
+
+    @property
+    @memoized
+    def routes(self) -> list[RouteRaidElement]:
+        return [element for element in self._elements if isinstance(element, RouteRaidElement)]
+
+    @property
+    @memoized
     def start_time(self) -> datetime:
-        return min(route.departure for route in self.__get_routes__() if route.departure is not None)
+        return min(route.departure for route in self.routes if route.departure is not None)
 
     @property
     @memoized
     def finish_time(self) -> datetime:
-        return max(route.arrival for route in self.__get_routes__() if route.arrival is not None)
+        return max(route.arrival for route in self.routes if route.arrival is not None)
 
     @property
     @memoized
     def total_ride_time(self) -> Duration:
-        return sum((route.get_total_time() for route in self.__get_routes__() if route.trasport_method != 'foot'), Duration(0))
+        return sum((route.total_time for route in self.routes if route.trasport_method != 'foot'), Duration(0))
 
     @property
     @memoized
@@ -653,7 +682,20 @@ class Raid:
     @property
     @memoized
     def total_length(self) -> Quantity:
-        return sum((route.get_total_length() for route in self.__get_routes__()), Quantity(0, 'm')).convert(multiplier=kilo)
+        return sum((route.total_length for route in self.routes), Quantity(0, 'm')).convert(multiplier=kilo)
+
+    @property
+    @memoized
+    def taken_rides(self) -> int:
+        return count(r for r in self.routes if r.trasport_method != 'foot')
+
+    @property
+    @memoized
+    def visited_stops(self) -> int:
+        unique_stops: set[str] = set()
+        for stop in self.stops:
+            unique_stops.add(re.sub(r'\[.+?]', '[]', stop.stop))
+        return len(unique_stops)
 
     @staticmethod
     def load(raid_id: str, players: list[Player]):
@@ -666,6 +708,12 @@ class Raid:
                 if isinstance(raid._elements[i], RouteRaidElement):
                     raid._elements[i - 1].departure = raid._elements[i].departure
                     raid._elements[i + 1].arrival = raid._elements[i].arrival
+            i: int = 0
+            while i < len(raid._elements) - 1:
+                if isinstance(raid._elements[i], PointRaidElement) and isinstance(raid._elements[i + 1], PointRaidElement):
+                    raid._elements.insert(i + 1, TransferRaidElement())
+                    i += 1
+                i += 1
             return raid
 
     @staticmethod
@@ -674,10 +722,6 @@ class Raid:
         # warning caused by Pycharm issue PY-70668
         # noinspection PyTypeChecker
         return __read_collection__(source, [], lambda i: Raid.load(i, players), list.append)
-
-    @memoized
-    def __get_routes__(self) -> list[RouteRaidElement]:
-        return [element for element in self._elements if isinstance(element, RouteRaidElement)]
 
 
 class Database:
@@ -785,7 +829,7 @@ class Database:
         added_lines: set[str] = {r for r in self.lines.keys() if r not in self.__old_data__.lines.keys()}
         removed_lines: set[str] = {r for r in self.__old_data__.lines.keys() if r not in self.lines.keys()}
         changed_lines: set[str] = {r for r in self.lines.keys() if r in self.__old_data__.lines.keys() and
-                                   self.lines[r].stops != self.__old_data__.lines[r].stops}
+                                   self.lines[r].variants != self.__old_data__.lines[r].variants}
         added_announcements: set[Announcement] = {a for a in self.announcements if a not in self.__old_data__.announcements}
         removed_announcements: set[Announcement] = {a for a in self.__old_data__.announcements if a not in self.announcements}
         effective_modifications: list[StopChange] = [c for c in self.get_effective_changes() if c.is_modification()]

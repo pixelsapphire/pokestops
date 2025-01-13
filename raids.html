@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <title>Raider's Logbook</title>
+    <link rel='icon' href='assets/images/compass.png'>
+    <link rel='stylesheet' type='text/css'
+          href='https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0'>
+    <link rel='stylesheet' type='text/css' href='assets/stylesheets/common.css'>
+    <link rel='stylesheet' type='text/css' href='assets/stylesheets/raids.css'>
+    <script src='assets/scripts/common.js'></script>
+    <script src='assets/scripts/raids.js'></script>
+</head>
+<body>
+<div id='title-container'>
+    <div id='back-icon' class='material-icon material-symbols-outlined' onclick='window.location.href = "index.html";'>
+        arrow_back_ios
+    </div>
+    <div id='title-icon' class='material-icon material-symbols-outlined'>explore</div>
+    <div id='title'>Raider's Logbook</div>
+</div>
+<div id='container'>
+    <div class='content-container selected' id='container-raids'>
+        <div class='content-section' id='raids-index'>
+            <div class='raid-preview' data-raid-id='202501'>
+                <div class='raid-icon material-symbols-outlined'>ac_unit</div>
+                <div class='raid-name'>January 2025</div>
+            </div>
+        </div>
+        <div class='content-section object-view' id='raid-view'>
+            <div class='raid-log' id='202501'>
+                <p class='raid-log-title'>The raid of January 2025</p>
+                <p style="max-width: 100%; text-align: center;">
+                    <img class='raid-log-map' src='data/map/raids/202501.svg'>
+                </p>
+                <table id='raid-details' class='details-table'>
+                    <tr>
+                        <td>date:</td>
+                        <td>Wednesday, January 8th, 2025</td>
+                    </tr>
+                    <tr>
+                        <td>time:</td>
+                        <td>1:45PM ~ 9:09PM
+                            (total time: 7h 24min)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>participants:</td>
+                        <td>Zorie, Sapphire</td>
+                    </tr>
+                    <tr>
+                        <td>rides taken:</td>
+                        <td>19 (total ride time: 2h 46min)</td>
+                    </tr>
+                    <tr>
+                        <td>stops visited:</td>
+                        <td>24</td>
+                    </tr>
+                </table>
+                <svg class='raid-timeline' preserveAspectRatio='xMinYMin meet'>
+                    <rect x='10' y='48.0' width='8'
+                          height='3168' fill='#ff61b1'></rect>
+                    <circle cx='14' cy='48.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='54.0'
+                          text-anchor='end' font-size='16' fill='white'>1:45PM
+                    </text>
+                    <text x='132' y='54.0'
+                          font-size='16' fill='white'>Kórnicka [KORN43]
+                    </text>
+                    <circle cx='14' cy='144.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='150.0'
+                          text-anchor='end' font-size='16' fill='white'>1:58PM
+                    </text>
+                    <text x='132' y='150.0'
+                          font-size='16' fill='white'>Szwajcarska [SZWA41]
+                    </text>
+                    <circle cx='14' cy='240.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='246.0'
+                          text-anchor='end' font-size='16' fill='white'>1:59PM
+                    </text>
+                    <text x='132' y='246.0'
+                          font-size='16' fill='white'>Franowo [FRWO41]
+                    </text>
+                    <circle cx='14' cy='336.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='342.0'
+                          text-anchor='end' font-size='16' fill='white'>2:15PM
+                    </text>
+                    <text x='132' y='342.0'
+                          font-size='16' fill='white'>Franowo [FRWO03]
+                    </text>
+                    <circle cx='14' cy='432.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='438.0'
+                          text-anchor='end' font-size='16' fill='white'>2:20PM
+                    </text>
+                    <text x='132' y='438.0'
+                          font-size='16' fill='white'>Piwna [PIWN01]
+                    </text>
+                    <circle cx='14' cy='528.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='534.0'
+                          text-anchor='end' font-size='16' fill='white'>2:28PM
+                    </text>
+                    <text x='132' y='534.0'
+                          font-size='16' fill='white'>Piwna [PIWN02]
+                    </text>
+                    <circle cx='14' cy='624.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='630.0'
+                          text-anchor='end' font-size='16' fill='white'>2:35PM
+                    </text>
+                    <text x='132' y='630.0'
+                          font-size='16' fill='white'>Chartowo [CHAR02]
+                    </text>
+                    <circle cx='14' cy='720.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='726.0'
+                          text-anchor='end' font-size='16' fill='white'>2:40PM
+                    </text>
+                    <text x='132' y='726.0'
+                          font-size='16' fill='white'>Chartowo [CHAR04]
+                    </text>
+                    <circle cx='14' cy='816.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='822.0'
+                          text-anchor='end' font-size='16' fill='white'>2:42PM
+                    </text>
+                    <text x='132' y='822.0'
+                          font-size='16' fill='white'>Os. Lecha [OSLE02]
+                    </text>
+                    <circle cx='14' cy='912.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='918.0'
+                          text-anchor='end' font-size='16' fill='white'>2:48PM
+                    </text>
+                    <text x='132' y='918.0'
+                          font-size='16' fill='white'>Os. Lecha [OSLE42]
+                    </text>
+                    <circle cx='14' cy='1008.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='1014.0'
+                          text-anchor='end' font-size='16' fill='white'>3:10PM
+                    </text>
+                    <text x='132' y='1014.0'
+                          font-size='16' fill='white'>Żniwna [ZNIW71]
+                    </text>
+                    <circle cx='14' cy='1104.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='1110.0'
+                          text-anchor='end' font-size='16' fill='white'>3:20PM
+                    </text>
+                    <text x='132' y='1110.0'
+                          font-size='16' fill='white'>Żniwna [ZNIW42]
+                    </text>
+                    <circle cx='14' cy='1200.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='1206.0'
+                          text-anchor='end' font-size='16' fill='white'>3:21PM
+                    </text>
+                    <text x='132' y='1206.0'
+                          font-size='16' fill='white'>Armii Poznań [ARPO42]
+                    </text>
+                    <circle cx='14' cy='1296.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='1302.0'
+                          text-anchor='end' font-size='16' fill='white'>3:26PM
+                    </text>
+                    <text x='132' y='1302.0'
+                          font-size='16' fill='white'>Armii Poznań [ARPO01]
+                    </text>
+                    <circle cx='14' cy='1392.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='1398.0'
+                          text-anchor='end' font-size='16' fill='white'>3:35PM
+                    </text>
+                    <text x='132' y='1398.0'
+                          font-size='16' fill='white'>Połabska [POLA02]
+                    </text>
+                    <circle cx='14' cy='1488.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='1494.0'
+                          text-anchor='end' font-size='16' fill='white'>3:54PM
+                    </text>
+                    <text x='132' y='1494.0'
+                          font-size='16' fill='white'>Połabska [POLA42]
+                    </text>
+                    <circle cx='14' cy='1584.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='1590.0'
+                          text-anchor='end' font-size='16' fill='white'>4:37PM
+                    </text>
+                    <text x='132' y='1590.0'
+                          font-size='16' fill='white'>Głogowska/Hetmańska [GLHE43]
+                    </text>
+                    <circle cx='14' cy='1680.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='1686.0'
+                          text-anchor='end' font-size='16' fill='white'>5:04PM
+                    </text>
+                    <text x='132' y='1686.0'
+                          font-size='16' fill='white'>Głogowska/Hetmańska [GLHE02]
+                    </text>
+                    <circle cx='14' cy='1776.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='1782.0'
+                          text-anchor='end' font-size='16' fill='white'>5:36PM
+                    </text>
+                    <text x='132' y='1782.0'
+                          font-size='16' fill='white'>Górecka [GORE01]
+                    </text>
+                    <circle cx='14' cy='1872.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='1878.0'
+                          text-anchor='end' font-size='16' fill='white'>6:01PM
+                    </text>
+                    <text x='132' y='1878.0'
+                          font-size='16' fill='white'>Korfantego [KORF01]
+                    </text>
+                    <circle cx='14' cy='1968.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='1974.0'
+                          text-anchor='end' font-size='16' fill='white'>6:02PM
+                    </text>
+                    <text x='132' y='1974.0'
+                          font-size='16' fill='white'>Świerczewo [SWIE01]
+                    </text>
+                    <circle cx='14' cy='2064.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='2070.0'
+                          text-anchor='end' font-size='16' fill='white'>6:19PM
+                    </text>
+                    <text x='132' y='2070.0'
+                          font-size='16' fill='white'>Luboń/Puszkina [LUPSZ02]
+                    </text>
+                    <circle cx='14' cy='2160.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='2166.0'
+                          text-anchor='end' font-size='16' fill='white'>6:28PM
+                    </text>
+                    <text x='132' y='2166.0'
+                          font-size='16' fill='white'>Sempołowskiej [SJNZ02]
+                    </text>
+                    <circle cx='14' cy='2256.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='2262.0'
+                          text-anchor='end' font-size='16' fill='white'>6:30PM
+                    </text>
+                    <text x='132' y='2262.0'
+                          font-size='16' fill='white'>Opolska [OPOL02]
+                    </text>
+                    <circle cx='14' cy='2352.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='2358.0'
+                          text-anchor='end' font-size='16' fill='white'>6:40PM
+                    </text>
+                    <text x='132' y='2358.0'
+                          font-size='16' fill='white'>Opolska [OPOL01]
+                    </text>
+                    <circle cx='14' cy='2448.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='2454.0'
+                          text-anchor='end' font-size='16' fill='white'>6:48PM
+                    </text>
+                    <text x='132' y='2454.0'
+                          font-size='16' fill='white'>Górczyn PKM [GORC21]
+                    </text>
+                    <circle cx='14' cy='2544.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='2550.0'
+                          text-anchor='end' font-size='16' fill='white'>7:42PM
+                    </text>
+                    <text x='132' y='2550.0'
+                          font-size='16' fill='white'>Górczyn PKM [GORC42]
+                    </text>
+                    <circle cx='14' cy='2640.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='2646.0'
+                          text-anchor='end' font-size='16' fill='white'>7:51PM
+                    </text>
+                    <text x='132' y='2646.0'
+                          font-size='16' fill='white'>Dworzec Zachodni [DWZA72]
+                    </text>
+                    <circle cx='14' cy='2736.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='2742.0'
+                          text-anchor='end' font-size='16' fill='white'>8:00PM
+                    </text>
+                    <text x='132' y='2742.0'
+                          font-size='16' fill='white'>Poznań Główny
+                    </text>
+                    <circle cx='14' cy='2832.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='2838.0'
+                          text-anchor='end' font-size='16' fill='white'>8:08PM
+                    </text>
+                    <text x='132' y='2838.0'
+                          font-size='16' fill='white'>Poznań Junikowo
+                    </text>
+                    <circle cx='14' cy='2928.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='2934.0'
+                          text-anchor='end' font-size='16' fill='white'>8:21PM
+                    </text>
+                    <text x='132' y='2934.0'
+                          font-size='16' fill='white'>Junikowo PKM [JUST01]
+                    </text>
+                    <circle cx='14' cy='3024.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='3030.0'
+                          text-anchor='end' font-size='16' fill='white'>8:25PM
+                    </text>
+                    <text x='132' y='3030.0'
+                          font-size='16' fill='white'>Junikowo [JUNI30]
+                    </text>
+                    <circle cx='14' cy='3120.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='3126.0'
+                          text-anchor='end' font-size='16' fill='white'>8:57PM
+                    </text>
+                    <text x='132' y='3126.0'
+                          font-size='16' fill='white'>Cmentarna [CMNA42]
+                    </text>
+                    <circle cx='14' cy='3216.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='116' y='3222.0'
+                          text-anchor='end' font-size='16' fill='white'>9:09PM
+                    </text>
+                    <text x='132' y='3222.0'
+                          font-size='16' fill='white'>Matejki [MATE42]
+                    </text>
+                    <text x='68' y='102.0'
+                          font-size='16' fill='#aaa'>tram ride, 9min
+                        (4.0km)
+                    </text>
+                    <text x='68' y='198.0'
+                          font-size='16' fill='#aaa'>tram ride, 1min
+                        (208m)
+                    </text>
+                    <text x='68' y='294.0'
+                          font-size='16' fill='#aaa'>(transfer)
+                    </text>
+                    <text x='68' y='390.0'
+                          font-size='16' fill='#aaa'>bus ride, 5min
+                        (2.2km)
+                    </text>
+                    <text x='68' y='486.0'
+                          font-size='16' fill='#aaa'>(transfer)
+                    </text>
+                    <text x='68' y='582.0'
+                          font-size='16' fill='#aaa'>bus ride, 7min
+                        (2.4km)
+                    </text>
+                    <text x='68' y='678.0'
+                          font-size='16' fill='#aaa'>(transfer)
+                    </text>
+                    <text x='68' y='774.0'
+                          font-size='16' fill='#aaa'>bus ride, 2min
+                        (716m)
+                    </text>
+                    <text x='68' y='870.0'
+                          font-size='16' fill='#aaa'>(transfer)
+                    </text>
+                    <text x='68' y='966.0'
+                          font-size='16' fill='#aaa'>tram ride, 22min
+                        (7.3km)
+                    </text>
+                    <text x='68' y='1062.0'
+                          font-size='16' fill='#aaa'>(transfer)
+                    </text>
+                    <text x='68' y='1158.0'
+                          font-size='16' fill='#aaa'>tram ride, 1min
+                        (607m)
+                    </text>
+                    <text x='68' y='1254.0'
+                          font-size='16' fill='#aaa'>(transfer)
+                    </text>
+                    <text x='68' y='1350.0'
+                          font-size='16' fill='#aaa'>bus ride, 9min
+                        (2.5km)
+                    </text>
+                    <text x='68' y='1446.0'
+                          font-size='16' fill='#aaa'>(transfer)
+                    </text>
+                    <text x='68' y='1542.0'
+                          font-size='16' fill='#aaa'>tram ride, 43min
+                        (14.2km)
+                    </text>
+                    <text x='68' y='1638.0'
+                          font-size='16' fill='#aaa'>(transfer)
+                    </text>
+                    <text x='68' y='1734.0'
+                          font-size='16' fill='#aaa'>bus ride, 11min
+                        (2.6km)
+                    </text>
+                    <text x='68' y='1830.0'
+                          font-size='16' fill='#aaa'>bus ride, 9min
+                        (3.0km)
+                    </text>
+                    <text x='68' y='1926.0'
+                          font-size='16' fill='#aaa'>bus ride, 1min
+                        (396m)
+                    </text>
+                    <text x='68' y='2022.0'
+                          font-size='16' fill='#aaa'>walk
+                        (664m)
+                    </text>
+                    <text x='68' y='2118.0'
+                          font-size='16' fill='#aaa'>bus ride, 3min
+                        (1.3km)
+                    </text>
+                    <text x='68' y='2214.0'
+                          font-size='16' fill='#aaa'>bus ride, 2min
+                        (589m)
+                    </text>
+                    <text x='68' y='2310.0'
+                          font-size='16' fill='#aaa'>(transfer)
+                    </text>
+                    <text x='68' y='2406.0'
+                          font-size='16' fill='#aaa'>bus ride, 8min
+                        (3.0km)
+                    </text>
+                    <text x='68' y='2502.0'
+                          font-size='16' fill='#aaa'>(transfer)
+                    </text>
+                    <text x='68' y='2598.0'
+                          font-size='16' fill='#aaa'>bus ride, 9min
+                        (3.0km)
+                    </text>
+                    <text x='68' y='2694.0'
+                          font-size='16' fill='#aaa'>(transfer)
+                    </text>
+                    <text x='68' y='2790.0'
+                          font-size='16' fill='#aaa'>train ride, 8min
+                        (8.4km)
+                    </text>
+                    <text x='68' y='2886.0'
+                          font-size='16' fill='#aaa'>(transfer)
+                    </text>
+                    <text x='68' y='2982.0'
+                          font-size='16' fill='#aaa'>bus ride, 4min
+                        (1.3km)
+                    </text>
+                    <text x='68' y='3078.0'
+                          font-size='16' fill='#aaa'>walk
+                        (574m)
+                    </text>
+                    <text x='68' y='3174.0'
+                          font-size='16' fill='#aaa'>tram ride, 12min
+                        (4.8km)
+                    </text>
+                </svg>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

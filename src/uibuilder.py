@@ -1,4 +1,5 @@
 import os.path
+import quantity
 import util
 from branca.element import MacroElement
 from data import *
@@ -129,6 +130,8 @@ class UIBuilder(Environment):
             for element in raid.elements:
                 if isinstance(element, PointRaidElement):
                     yield draw_point(element, raid.raid_id)
+                elif isinstance(element, TransferRaidElement):
+                    continue
                 elif isinstance(element, RouteRaidElement):
                     yield draw_route(element, raid.raid_id)
                 else:
@@ -146,3 +149,8 @@ class UIBuilder(Environment):
 
     def create_announcements(self) -> Template:
         return self.get_template('announcements')
+
+    def create_raids(self) -> Template:
+        raids_template: Template = self.get_template('raids')
+        raids_template.globals.update(Quantity=Quantity, kilo=quantity.kilo)
+        return raids_template

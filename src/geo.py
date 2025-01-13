@@ -3,7 +3,7 @@ from math import atan2, pi
 from pyproj import Geod
 from quantity import *
 from typing import Any, Protocol, Sequence, TypeVar
-from util import sign
+from util import prepare_path, sign, to_css
 
 TFloatSeq = TypeVar("TFloatSeq", bound=Sequence[float])
 __geod__ = Geod(ellps='WGS84')
@@ -147,6 +147,22 @@ class LineSegment[TFloatSeq](Sequence[TFloatSeq]):
         return self._b
 
 
+class MapMetrics:
+    def __init__(self, points: list[geopoint]):
+        self.lat_min: float = min(p.latitude for p in points)
+        self.lat_max: float = max(p.latitude for p in points)
+        self.lon_min: float = min(p.longitude for p in points)
+        self.lon_max: float = max(p.longitude for p in points)
+        self.lat_range: float = self.lat_max - self.lat_min
+        self.lon_range: float = self.lon_max - self.lon_min
+        self.coord_range: float = max(self.lat_range, self.lon_range)
+        self.scale_factor: float = 1000 / self.coord_range
+
+    def transform_point(self, point: geopoint) -> vector2f:
+        return vector2f(12 + (point.longitude - self.lon_min) * self.scale_factor,
+                        12 + (self.lat_max - point.latitude) * self.scale_factor)
+
+
 def next_midpoint(previous_dir: vector2f, current_point: vector2f, next_point: vector2f,
                   alternative_direction: bool) -> tuple[vector2f, vector2f, vector2f]:
     delta: vector2f = next_point - current_point
@@ -198,3 +214,66 @@ def midpoints(sequence: list[vector2f]) -> list[vector2f]:
         previous_dir = dir_after_midpoint
         current_point = next_point
     return new_sequence
+
+
+def create_route_diagram(points: list[geopoint], color: str, output_path: str) -> None:
+    metrics: MapMetrics = MapMetrics(points)
+    points: list[vector2f] = list(map(metrics.transform_point, points))
+    with open(prepare_path(output_path), 'w') as file:
+        file.write(f'<svg'
+                   f' width="{24 + 1000 * metrics.lon_range / metrics.coord_range:.1f}"'
+                   f' height="{24 + 1000 * metrics.lat_range / metrics.coord_range:.1f}"'
+                   f' xmlns="http://www.w3.org/2000/svg">\n')
+        sequence: list[vector2f] = midpoints(points)
+        file.write(f'<path d="M{sequence[0].x:.1f} {sequence[0].y:.1f} ')
+        for p in sequence[1:]:
+            file.write(f'L{p.x:.1f} {p.y:.1f} ')
+        file.write(f'" />\n')
+        for p in sequence[::2]:
+            file.write(f'<circle cx="{p.x:.1f}" cy="{p.y:.1f}" r="8" />\n')
+        file.write(f'<style>\n{to_css({
+            'circle': {
+                'fill': 'white',
+                'stroke': f'#{color}' if color.lower() != 'ffffff' else 'black',
+                'stroke-width': '4'
+            },
+            'path': {
+                'fill': 'none',
+                'stroke': f'#{color}',
+                'stroke-width': '8'
+            }
+        })}</style>\n')
+        file.write('</svg>')
+
+
+def create_multi_route_map(routes: list[list[geopoint]], color: str, output_path: str) -> None:
+    flat_points: list[geopoint] = [point for route in routes for point in route if route]
+    metrics: MapMetrics = MapMetrics(flat_points)
+    with open(prepare_path(output_path), 'w') as file:
+        file.write(f'<svg'
+                   f' width="{24 + 1000 * metrics.lon_range / metrics.coord_range:.1f}"'
+                   f' height="{24 + 1000 * metrics.lat_range / metrics.coord_range:.1f}"'
+                   f' xmlns="http://www.w3.org/2000/svg">\n')
+        foreground: list[str] = []
+        for route in routes:
+            sequence: list[vector2f] = list(map(metrics.transform_point, route))
+            file.write(f'<path d="M{sequence[0].x:.1f} {sequence[0].y:.1f} ')
+            for p in sequence[1:]:
+                file.write(f'L{p.x:.1f} {p.y:.1f} ')
+            file.write(f'" />\n')
+            for p in (sequence[0], sequence[-1]):
+                foreground.append(f'<circle cx="{p.x:.1f}" cy="{p.y:.1f}" r="8" />\n')
+        file.write(''.join(foreground))
+        file.write(f'<style>\n{to_css({
+            'circle': {
+                'fill': 'white',
+                'stroke': f'#{color}' if color.lower() != 'ffffff' else 'black',
+                'stroke-width': '4'
+            },
+            'path': {
+                'fill': 'none',
+                'stroke': f'#{color}',
+                'stroke-width': '8'
+            }
+        })}</style>\n')
+        file.write('</svg>')

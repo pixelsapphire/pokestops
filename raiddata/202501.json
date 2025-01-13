@@ -1,5 +1,6 @@
 {
   "id": "202501",
+  "icon": "ac_unit",
   "date": "2025-01-08",
   "participants": [
     "Zorie",
@@ -22,15 +23,9 @@
     },
     {
       "type": "point",
-      "phase": "arrival",
+      "phase": "transfer",
       "location": "52.38248185,16.99823703",
       "stop": "Szwajcarska [SZWA41]"
-    },
-    {
-      "type": "point",
-      "phase": "departure",
-      "location": "52.38255568,16.99823154",
-      "stop": "Szwajcarska [SZWA42]"
     },
     {
       "type": "route",
