@@ -367,6 +367,14 @@
     font-size: min(2dvh, 2dvw);
 }
 
+.dark .result-body .line-view {
+    background-color: rgba(255, 255, 255, 0.25);
+}
+
+.dark .result-body .line-number {
+    filter: invert(1);
+}
+
 #search-results .line-number {
     font-size: min(2dvh, 2dvw);
 }
