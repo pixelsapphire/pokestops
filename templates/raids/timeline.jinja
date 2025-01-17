@@ -28,7 +28,7 @@
               font-size='{{ font_size }}' fill='#aaa'>
         {% if route.shape_defined() %}
             {% if route.trasport_method != 'foot' %}
-                {{ route.trasport_method }} ride, {{ route.total_time.format_as_hms() }}
+                {{ route.trasport_method }} ride (line {{ route.line_number }}) :: {{ route.total_time.format_as_hms() }}
             {% else %}
                 walk
             {% endif %}

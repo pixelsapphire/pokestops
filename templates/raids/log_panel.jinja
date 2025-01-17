@@ -7,6 +7,13 @@
             </p>
             <table id='raid-details' class='details-table'>
                 <tr>
+                    <td>participants:</td>
+                    <td>{% for player in raid.participants %}
+                        {{- player.nickname -}}
+                        {%- if not loop.last %}, {% endif -%}
+                    {% endfor %}</td>
+                </tr>
+                <tr>
                     <td>date:</td>
                     <td>{{ raid.date.format('W, M D, y') }}</td>
                 </tr>
@@ -18,11 +25,8 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>participants:</td>
-                    <td>{% for player in raid.participants %}
-                        {{- player.nickname -}}
-                        {%- if not loop.last %}, {% endif -%}
-                    {% endfor %}</td>
+                    <td>total distance:</td>
+                    <td>{{ raid.total_length.format(precision=1) }}</td>
                 </tr>
                 <tr>
                     <td>rides taken:</td>

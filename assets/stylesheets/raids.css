@@ -60,3 +60,9 @@
     padding: min(0.25vh, 0.25dvw);
     font-size: min(2vh, 2dvw);
 }
+
+.raid-timeline {
+    margin-bottom: min(1vh, 1dvw);
+    max-width: 50vw;
+    height: auto;
+}
