@@ -1,8 +1,9 @@
 function selectRaid(preview) {
     document.querySelectorAll('.raid-log').forEach((log) => log.classList.remove('selected'));
-    document.getElementById(preview.getAttribute('data-raid-id')).classList.add('selected');
-    cropSVG(document.querySelector('.raid-timeline'), 8);
-    window.location.hash = preview.getAttribute('data-raid-id');
+    const raidId = preview.getAttribute('data-raid-id');
+    document.getElementById(raidId).classList.add('selected');
+    cropSVG(document.querySelector(`.raid-timeline[data-raid-id="${raidId}"]`), 8);
+    window.location.hash = raidId;
 }
 
 document.addEventListener('DOMContentLoaded', () => {

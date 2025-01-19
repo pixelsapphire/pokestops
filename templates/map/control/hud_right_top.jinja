@@ -28,7 +28,7 @@
     <label id='controls-city-raiders' class='hud-controls hidden'>
         <select class='dropdown hud' onchange='selectRaid()'>
             {% for raid in db.raids %}
-                <option value='{{ raid.raid_id }}'>{{ raid.date.format('M y') }}</option>
+                <option value='{{ raid.raid_id }}'>{{ util.coalesce(raid.name, raid.date.format('M y')) }}</option>
             {% endfor %}
         </select>
     </label>

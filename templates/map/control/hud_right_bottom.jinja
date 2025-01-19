@@ -29,7 +29,7 @@
                 {%- endfor -%}>
             {{ db.raids[0].total_length.format(precision=1) }}
         </span>
-        (walking:
+        (on foot:
         <span id='raid-walking-distance'
                 {%- for raid in db.raids -%}
               data-{{ raid.raid_id }}='{{ raid.walking_distance.format(precision=1) }}'
@@ -37,19 +37,21 @@
             {{ db.raids[0].walking_distance.format(precision=1) }}
         </span>)
         <br>
-        Total time:
-        <span id='raid-time'
+        <span id='raid-time-info'>
+            Total time:
+            <span id='raid-time'
+                    {%- for raid in db.raids -%}
+                  data-{{ raid.raid_id }}='{{ raid.total_time.format_as_hms() if raid.total_time else '?' }}'
+                    {%- endfor -%}>
+                {{ db.raids[0].total_time.format_as_hms() }}
+            </span>
+            (on rides: <span id='raid-ride-time'
                 {%- for raid in db.raids -%}
-              data-{{ raid.raid_id }}='{{ raid.total_time.format_as_hms() }}'
+                             data-{{ raid.raid_id }}='{{ raid.total_ride_time.format_as_hms() }}'
                 {%- endfor -%}>
-            {{ db.raids[0].total_time.format_as_hms() }}
+                {{ db.raids[0].total_ride_time.format_as_hms() }}
+            </span>)
         </span>
-        (on rides: <span id='raid-ride-time'
-            {%- for raid in db.raids -%}
-                         data-{{ raid.raid_id }}='{{ raid.total_ride_time.format_as_hms() }}'
-            {%- endfor -%}>
-            {{ db.raids[0].total_ride_time.format_as_hms() }}
-        </span>)
     </span>
 </p>
 <img id='compass' src='{{ ref.asset_img_compass }}'>

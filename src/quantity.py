@@ -148,6 +148,9 @@ class Quantity:
     def __neg__(self) -> Quantity:
         return Quantity(-self.magnitude, self.unit)
 
+    def __bool__(self):
+        return bool(self.magnitude)
+
     @property
     def base_magnitude(self) -> Decimal:
         return self.magnitude * self.unit.multiplier.value

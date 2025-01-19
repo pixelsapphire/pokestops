@@ -40,8 +40,8 @@ def count(iterable: Iterable[Any]) -> int:
     return sum(1 for _ in iterable)
 
 
-def find_first[T](predicate: Callable[[T], bool], iterable: Iterable[T]) -> T | None:
-    return next(filter(predicate, iterable), None)
+def find_first[T](predicate: Callable[[T], bool], iterable: Iterable[T], /, default: T | None = None) -> T | None:
+    return next(filter(predicate, iterable), default)
 
 
 def coalesce(*args: Any) -> Any:

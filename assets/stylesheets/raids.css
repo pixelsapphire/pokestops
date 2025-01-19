@@ -17,8 +17,15 @@
     font-size: min(3vw, 3dvh);
 }
 
-.raid-name {
+.raid-name-and-date {
+    display: flex;
+    flex-direction: column;
     font-size: min(2vw, 2dvh);
+}
+
+.raid-date {
+    opacity: 0.6;
+    font-size: min(1.5vw, 1.5dvh);
 }
 
 .raid-log {

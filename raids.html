@@ -23,12 +23,15 @@
         <div class='content-section' id='raids-index'>
             <div class='raid-preview' data-raid-id='202501'>
                 <div class='raid-icon material-symbols-outlined'>ac_unit</div>
-                <div class='raid-name'>January 2025</div>
+                <div class='raid-name-and-date'>
+                    <div class='raid-name'>Milky Raid</div>
+                    <div class='raid-date'>January 8th, 2025</div>
+                </div>
             </div>
         </div>
         <div class='content-section object-view' id='raid-view'>
             <div class='raid-log' id='202501'>
-                <p class='raid-log-title'>The raid of January 2025</p>
+                <p class='raid-log-title'>The Milky Raid</p>
                 <p style="max-width: 100%; text-align: center;">
                     <img class='raid-log-map' src='data/map/raids/202501.svg'>
                 </p>
@@ -55,14 +58,16 @@
                     </tr>
                     <tr>
                         <td>rides taken:</td>
-                        <td>19 (total ride time: 2h 46min)</td>
+                        <td>19
+                            (total ride time: 2h 46min)
+                        </td>
                     </tr>
                     <tr>
                         <td>stops:</td>
                         <td>26</td>
                     </tr>
                 </table>
-                <svg class='raid-timeline' preserveAspectRatio='xMinYMin meet'>
+                <svg class='raid-timeline' data-raid-id='202501' preserveAspectRatio='xMinYMin meet'>
                     <line x1='14' y1='48.0' x2='14'
                           y2='144.0' stroke='#ff61b1'
                           stroke-width='8' class='rtm-tram'></line>

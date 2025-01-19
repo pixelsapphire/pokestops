@@ -653,13 +653,17 @@ class RouteRaidElement(RaidElement):
 
 
 class Raid:
-    def __init__(self, raid_id: str, icon: str, date: DateAndOrder, participants: list[Player], elements: list[RaidElement]):
+    def __init__(self, raid_id: str, name: str, icon: str, date: DateAndOrder,
+                 participants: list[Player], elements: list[RaidElement]):
         self.raid_id: Final[str] = raid_id
+        self.name: Final[str] = name
         self.icon: Final[str] = icon
         self.date: Final[DateAndOrder] = date
         self._participants: list[Player] = participants
         self._elements: list[RaidElement] = elements
         routes: list[RouteRaidElement] = self.routes
+        if not routes:
+            raise ValueError('Raid must contain at least one route')
         for i in range(1, len(self.routes) - 1):
             if routes[i].shape[-1] != routes[i + 1].shape[0]:
                 raise ValueError(f'Disconnected parts of the route in raid {raid_id}: '
@@ -719,13 +723,13 @@ class Raid:
 
     @property
     @memoized
-    def start_time(self) -> datetime:
-        return min(route.departure for route in self.routes if route.departure is not None)
+    def start_time(self) -> datetime | None:
+        return min((route.departure for route in self.routes if route.departure is not None), default=None)
 
     @property
     @memoized
-    def finish_time(self) -> datetime:
-        return max(route.arrival for route in self.routes if route.arrival is not None)
+    def finish_time(self) -> datetime | None:
+        return max((route.arrival for route in self.routes if route.arrival is not None), default=None)
 
     @property
     @memoized
@@ -735,7 +739,8 @@ class Raid:
     @property
     @memoized
     def total_time(self) -> Duration:
-        return Duration.as_difference(self.start_time, self.finish_time)
+        return Duration.as_difference(self.start_time, self.finish_time) \
+            if self.start_time and self.finish_time else Duration(0)
 
     @property
     @memoized
@@ -763,10 +768,12 @@ class Raid:
 
     @staticmethod
     def load(raid_id: str, players: list[Player]):
+        from player import Player
         with open(f'{ref.raiddata_path}/{raid_id}.json', 'r') as file:
             raid_data = json.load(file)
-            raid: Raid = Raid(raid_id, raid_data['icon'], DateAndOrder(date_string=raid_data['date']),
-                              [find_first(lambda p: p.nickname == nickname, players) for nickname in raid_data['participants']],
+            raid: Raid = Raid(raid_id, raid_data.get('name'), raid_data['icon'], DateAndOrder(date_string=raid_data['date']),
+                              [find_first(lambda p: p.nickname == nickname, players, default=Player.guest(nickname))
+                               for nickname in raid_data['participants']],
                               [RaidElement.from_dict(element) for element in raid_data['elements']])
             for i in range(1, len(raid._elements) - 1):
                 if isinstance(raid._elements[i], RouteRaidElement):

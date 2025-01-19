@@ -128,14 +128,21 @@ function prepareCityRaiders() {
 
     document.getElementById('exploration-progress').classList.add('hidden');
     document.getElementById('raid-info').classList.remove('hidden');
-    const length = document.getElementById('raid-length');
-    length.innerHTML = `${length.getAttribute(`data-${activeRaid}`)}`;
-    const walkingDistance = document.getElementById('raid-walking-distance');
-    walkingDistance.innerHTML = `${walkingDistance.getAttribute(`data-${activeRaid}`)}`;
-    const time = document.getElementById('raid-time');
-    time.innerHTML = `${time.getAttribute(`data-${activeRaid}`)}`;
-    const rideTime = document.getElementById('raid-ride-time');
-    rideTime.innerHTML = `${rideTime.getAttribute(`data-${activeRaid}`)}`;
+    const lengthLabel = document.getElementById('raid-length');
+    lengthLabel.innerHTML = lengthLabel.getAttribute(`data-${activeRaid}`);
+    const walkingDistanceLabel = document.getElementById('raid-walking-distance');
+    walkingDistanceLabel.innerHTML = walkingDistanceLabel.getAttribute(`data-${activeRaid}`);
+    const timeInfoLine = document.getElementById('raid-time-info');
+    const timeLabel = document.getElementById('raid-time');
+    const rideTimeLabel = document.getElementById('raid-ride-time');
+    const raidTime = timeLabel.getAttribute(`data-${activeRaid}`);
+    if (raidTime !== '?') {
+        timeInfoLine.style.display = null;
+        timeLabel.innerHTML = timeLabel.getAttribute(`data-${activeRaid}`);
+        rideTimeLabel.innerHTML = `${rideTimeLabel.getAttribute(`data-${activeRaid}`)}`;
+    } else {
+        timeInfoLine.style.display = 'none';
+    }
 }
 
 function refreshMap() {
@@ -189,7 +196,7 @@ function selectMode() {
 }
 
 function selectRaid() {
-    activeRaid = document.querySelector("#raid-selection select").value;
+    activeRaid = document.querySelector("#controls-city-raiders select").value;
     localStorage.setItem('activeRaid', activeRaid);
     refreshMap();
 }
@@ -280,5 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
     injectThemeSwitcher();
     activeMode = localStorage.getItem('activeMode') || activeMode;
     document.querySelector("#mode-selection select").value = activeMode;
+    activeRaid = localStorage.getItem('activeRaid') || activeRaid;
+    document.querySelector("#controls-city-raiders select").value = activeRaid;
     refreshMap();
 });

@@ -8,7 +8,7 @@
 {% set stop_label_x = stop_radius * 2 + line_width + 8 %}
 {% set route_label_x = stop_label_x + 16 %}
 
-<svg class='raid-timeline' preserveAspectRatio='xMinYMin meet'>
+<svg class='raid-timeline' data-raid-id='{{ raid.raid_id }}' preserveAspectRatio='xMinYMin meet'>
     {% for route in raid.routes %}
         {% set y_offset = (loop.index + 0.5) * stop_spacing %}
         <line x1='{{ stop_radius }}' y1='{{ y_offset - stop_spacing }}' x2='{{ stop_radius }}'
@@ -30,8 +30,12 @@
               font-size='{{ font_size }}' fill='#aaa'>
             {% if route.comment %} // {{ route.comment }}{% endif %}
             {% if route.transport_method != 'foot' %}
-                {{ route.total_time.format_as_hms() }}
-                ({{ util.format_distance(route.total_length) }})
+                {% if route.total_time %}
+                    {{ route.total_time.format_as_hms() }}
+                    ({{ util.format_distance(route.total_length) }})
+                {% else %}
+                    {{ util.format_distance(route.total_length) }}
+                {% endif %}
             {% endif %}
         </text>
     {% endfor %}

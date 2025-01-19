@@ -246,6 +246,10 @@ class Player(JsonSerializable):
         self.__load_vehicles__(db)
 
     @staticmethod
+    def guest(nickname: str) -> Player:
+        return Player(nickname, '888', 'aaa')
+
+    @staticmethod
     def read_list(source: str) -> list[Player]:
         log(f'  Reading players index from {source}... ', end='')
         # warning caused by Pycharm issue PY-70668
