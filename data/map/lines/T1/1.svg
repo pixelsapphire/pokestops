@@ -1,0 +1,26 @@
+<svg width="1024.0" height="428.2" xmlns="http://www.w3.org/2000/svg">
+<path d="M12.0 416.2 L55.9 372.2 L77.4 372.2 L167.1 372.2 L282.7 256.6 L318.8 220.5 L380.1 220.5 L395.7 220.5 L460.9 155.3 L525.6 90.6 L607.3 90.6 L614.0 90.6 L685.3 19.4 L726.4 60.5 L774.6 60.5 L814.9 60.5 L873.5 119.1 L946.6 46.1 L975.1 46.1 L977.9 46.1 L1012.0 12.0 L1012.0 140.1 L966.9 185.2 " />
+<circle cx="12.0" cy="416.2" r="8" />
+<circle cx="77.4" cy="372.2" r="8" />
+<circle cx="282.7" cy="256.6" r="8" />
+<circle cx="380.1" cy="220.5" r="8" />
+<circle cx="460.9" cy="155.3" r="8" />
+<circle cx="607.3" cy="90.6" r="8" />
+<circle cx="685.3" cy="19.4" r="8" />
+<circle cx="774.6" cy="60.5" r="8" />
+<circle cx="873.5" cy="119.1" r="8" />
+<circle cx="975.1" cy="46.1" r="8" />
+<circle cx="1012.0" cy="12.0" r="8" />
+<circle cx="966.9" cy="185.2" r="8" />
+<style>
+circle {
+fill: white;
+stroke: #525252;
+stroke-width: 4;
+}
+path {
+fill: none;
+stroke: #525252;
+stroke-width: 8;
+}</style>
+</svg>
