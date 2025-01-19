@@ -155,10 +155,28 @@
       "predicate": {
         "type": "in_any_of",
         "towns": [
+          "Borkowice",
+          "Czołowo",
+          "Drużyna",
+          "Dymaczewo Nowe",
+          "Dymaczewo Stare",
+          "Krajkowo",
+          "Krosinko",
+          "Krosno",
           "Luboń",
+          "Ludwikowo",
           "Łęczyca",
+          "Mieczewo",
           "Mosina",
-          "Puszczykowo"
+          "Puszczykowo",
+          "Radzewice",
+          "Rogalin",
+          "Rogalinek",
+          "Sasinowo",
+          "Sowiniec",
+          "Sowinki",
+          "Świątniki",
+          "Żabinko"
         ]
       }
     },
@@ -204,6 +222,7 @@
         "type": "in_any_of",
         "towns": [
           "Baranowo",
+          "Baranowo.",
           "Batorowo",
           "Brzezno",
           "Bytkowo",

@@ -1,12 +1,12 @@
-symbol,name,full_name
-PZ,MPK Poznań,Miejskie Przedsiębiorstwo Komunikacyjne w Poznaniu Sp. z o.o.
-KR,Kombus Kórnik,Kórnickie Przedsiębiorstwo Autobusowe KOMBUS Sp. z o.o.
-KZ,Transkom Koziegłowy,Przedsiębiorstwo Wielobranżowe TRANSKOM Sp. z o.o.
-LB,Translub Luboń,Przedsiębiorstwo Transportowe Translub Sp. z o.o.
-KM,PUK Komorniki,Przedsiębiorstwo Usług Komunalnych Komorniki Sp. z o.o.
-RK,Rokbus Rokietnica,Zakład Usług Komunikacyjnych ROKBUS Sp. z o.o.
-SL,ZKP Suchy Las,Zakład Komunikacji Publicznej Suchy Las Sp. z o.o.
-TP,TPbus Tarnowo Pdg.,Komunikacja Gminy Tarnowo Podgórne TPBUS Sp. z o.o.
-SW,SPK Swarzędz,Swarzędzkie Przedsiębiorstwo Komunalne Sp. z o.o.
-KL,ZK Kleszczewo,Zakład Komunalny w Kleszczewie Sp. z o.o.
-DP,UG Dopiewo,Urząd Gminy Dopiewo
+symbol,name,full_name,color1,color2,color3
+PZ,MPK Poznań,Miejskie Przedsiębiorstwo Komunikacyjne w Poznaniu Sp. z o.o.,038b03,038b03,efb000
+KR,Kombus Kórnik,Kórnickie Przedsiębiorstwo Autobusowe KOMBUS Sp. z o.o.,025cc2,ffffff,025cc2
+KZ,Transkom Koziegłowy,Przedsiębiorstwo Wielobranżowe TRANSKOM Sp. z o.o.,f6d702,03c900,014bac
+LB,Translub Luboń,Przedsiębiorstwo Transportowe Translub Sp. z o.o.,0091da,ffc401,ce0004
+KM,PUK Komorniki,Przedsiębiorstwo Usług Komunalnych Komorniki Sp. z o.o.,e64d12,d4aa19,e64d12
+RK,Rokbus Rokietnica,Zakład Usług Komunikacyjnych ROKBUS Sp. z o.o.,0b946b,ede7d9,f4250e
+SL,ZKP Suchy Las,Zakład Komunikacji Publicznej Suchy Las Sp. z o.o.,ffffff,d80303,ffffff
+TP,TPbus Tarnowo Pdg.,Komunikacja Gminy Tarnowo Podgórne TPBUS Sp. z o.o.,50a01f,e5b300,e86403
+SW,SPK Swarzędz,Swarzędzkie Przedsiębiorstwo Komunalne Sp. z o.o.,b8b8b8,fed503,991826
+KL,ZK Kleszczewo,Zakład Komunalny w Kleszczewie Sp. z o.o.,028566,ffffff,cb243e
+DP,UG Dopiewo,Urząd Gminy Dopiewo,ffffff,ffffff,ecce2a

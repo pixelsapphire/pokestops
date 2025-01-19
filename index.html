@@ -178,6 +178,8 @@
     </table>
     <label id='controls-city-raiders' class='hud-controls hidden'>
         <select class='dropdown hud' onchange='selectRaid()'>
+            <option value='202206'>Peach Raid</option>
+            <option value='202407'>Lemon Raid</option>
             <option value='202501'>Milky Raid</option>
         </select>
     </label>
@@ -198,52 +200,52 @@
     </label><br><span id='exploration-progress' class='mode-info-label'>
         Exploration progress:
         <span id='exploration-percentage'
-              data-lines-zorie='25.7'
+              data-lines-zorie='29.7'
               data-sv-zorie='42.3'
-              data-pzd-zorie='15.8'
-              data-pzd-ev-zorie='19.2'
-              data-poz-zorie='30.6'
-              data-poz-ev-zorie='37.2'
+              data-pzd-zorie='16.7'
+              data-pzd-ev-zorie='19.3'
+              data-poz-zorie='33.7'
+              data-poz-ev-zorie='39.2'
               data-sar-zorie='0.0'
               data-sar-ev-zorie='0.0'
               data-yor-zorie='0.3'
               data-yor-ev-zorie='0.3'
               data-gor-zorie='0.0'
               data-gor-ev-zorie='0.0'
-              data-ror-zorie='1.7'
-              data-ror-ev-zorie='1.7'
-              data-shr-zorie='3.0'
-              data-shr-ev-zorie='3.0'
+              data-ror-zorie='1.0'
+              data-ror-ev-zorie='1.0'
+              data-shr-zorie='2.8'
+              data-shr-ev-zorie='2.8'
               data-har-zorie='0.0'
               data-har-ev-zorie='0.0'
               data-kyr-zorie='0.0'
               data-kyr-ev-zorie='0.0'
-              data-lines-sapphire='35.0'
-              data-sv-sapphire='80.8'
-              data-pzd-sapphire='14.6'
-              data-pzd-ev-sapphire='27.8'
-              data-poz-sapphire='28.7'
-              data-poz-ev-sapphire='48.4'
+              data-lines-sapphire='41.5'
+              data-sv-sapphire='84.6'
+              data-pzd-sapphire='16.5'
+              data-pzd-ev-sapphire='27.9'
+              data-poz-sapphire='33.3'
+              data-poz-ev-sapphire='50.2'
               data-sar-sapphire='0.0'
               data-sar-ev-sapphire='17.3'
               data-yor-sapphire='0.0'
               data-yor-ev-sapphire='1.7'
               data-gor-sapphire='0.0'
-              data-gor-ev-sapphire='3.3'
-              data-ror-sapphire='1.7'
-              data-ror-ev-sapphire='20.7'
-              data-shr-sapphire='0.0'
-              data-shr-ev-sapphire='10.6'
+              data-gor-ev-sapphire='3.1'
+              data-ror-sapphire='1.0'
+              data-ror-ev-sapphire='16.8'
+              data-shr-sapphire='3.2'
+              data-shr-ev-sapphire='11.1'
               data-har-sapphire='0.0'
               data-har-ev-sapphire='0.0'
               data-kyr-sapphire='0.0'
               data-kyr-ev-sapphire='0.0'
               data-lines-camomile='0.0'
               data-sv-camomile='0.0'
-              data-pzd-camomile='1.3'
-              data-pzd-ev-camomile='1.7'
-              data-poz-camomile='2.6'
-              data-poz-ev-camomile='3.4'
+              data-pzd-camomile='1.5'
+              data-pzd-ev-camomile='2.8'
+              data-poz-camomile='3.0'
+              data-poz-ev-camomile='5.7'
               data-sar-camomile='0.0'
               data-sar-ev-camomile='0.0'
               data-yor-camomile='0.0'
@@ -258,17 +260,18 @@
               data-har-ev-camomile='0.0'
               data-kyr-camomile='0.0'
               data-kyr-ev-camomile='0.0'>
-        15.8
+        16.7
         </span>
     </span>
     <span id='raid-info' class='mode-info-label hidden'>
         Total length:
-        <span id='raid-length' data-202501='69.9km'>69.9km</span>
+        <span id='raid-length' data-202206='79.4km' data-202407='50.6km' data-202501='69.9km'>79.4km</span>
         (on foot:
-        <span id='raid-walking-distance' data-202501='7.9km'>7.9km</span>)<br><span id='raid-time-info'>
+        <span id='raid-walking-distance' data-202206='4.9km' data-202407='2.6km' data-202501='7.9km'>4.9km</span>)<br><span
+            id='raid-time-info'>
             Total time:
-            <span id='raid-time' data-202501='7h 24min'>7h 24min</span>
-            (on rides: <span id='raid-ride-time' data-202501='2h 46min'>2h 46min</span>)
+            <span id='raid-time' data-202206='?' data-202407='?' data-202501='7h 24min'>0s</span>
+            (on rides: <span id='raid-ride-time' data-202206='0s' data-202407='0s' data-202501='2h 46min'>0s</span>)
         </span>
     </span>
 </p>
@@ -280,9 +283,103 @@
         <div class='sidebar-close-icon material-symbols-outlined' onclick='toggleSidebar("achievements")'>close</div>
     </div>
     <div class='progress-list' data-player='zorie'>
-        <p class='list-title center'>Achievements completed: 160</p>
+        <p class='list-title center'>Achievements completed: 174</p>
         <table>
             <tbody>
+            <tr>
+                <td class='achievement-stars'>★★★★</td>
+                <td class='achievement-details'>Rondo Nowaka-Jeziorańskiego<br>
+                    <p class='achievement-description'>Collect all of the following: RONJ01, RONJ04, RONJ41, RONJ42, RONJ73,
+                        RONJ74</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-03-19</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Arena<br>
+                    <p class='achievement-description'>Collect all of the following: AREN41, AREN42</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-03-19</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Literacka<br>
+                    <p class='achievement-description'>Collect all of the following: LITA91, LITA92</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-03-18</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★★★</td>
+                <td class='achievement-details'>Żeromskiego<br>
+                    <p class='achievement-description'>Collect all of the following: ZERO01, ZERO02, ZERO06, ZERO71, ZERO72</p>
+                </td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-03-18</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Sanocka<br>
+                    <p class='achievement-description'>Collect all of the following: SANT01, SANT02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-03-17</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Lubieńska<br>
+                    <p class='achievement-description'>Collect all of the following: LUBI01, LUBI02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-03-16</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Antoninek PKM<br>
+                    <p class='achievement-description'>Collect all of the following: ANST01, ANST02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-03-06</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Os. Przyjaźni<br>
+                    <p class='achievement-description'>Collect all of the following: OPRZ01, OPRZ02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-03-01</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Bliźniąt<br>
+                    <p class='achievement-description'>Collect all of the following: BLIZ01, BLIZ02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-02-17</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Suszki<br>
+                    <p class='achievement-description'>Collect all of the following: SUSZ01, SUSZ02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-02-11</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Wierzbięcice<br>
+                    <p class='achievement-description'>Collect all of the following: WIER41, WIER42</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-01-26</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Droga Dębińska<br>
+                    <p class='achievement-description'>Collect all of the following: DRDE01, DRDE02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-01-26</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★★</td>
+                <td class='achievement-details'>Os. Piastowskie<br>
+                    <p class='achievement-description'>Collect all of the following: OPIA01, OPIA02, OPIA41, OPIA42</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-01-26</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★★★</td>
+                <td class='achievement-details'>Serbska<br>
+                    <p class='achievement-description'>Collect all of the following: SERB01, SERB02, SERB03, SERB04, SERB06,
+                        SERB41, SERB42</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-01-25</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★★★</td>
+                <td class='achievement-details'>Wilczak<br>
+                    <p class='achievement-description'>Collect all of the following: WILC01, WILC02, WILC03, WILC41, WILC42</p>
+                </td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-01-25</td>
+            </tr>
             <tr>
                 <td class='achievement-stars'>★★★</td>
                 <td class='achievement-details'>Junikowo<br>
@@ -353,6 +450,12 @@
             </tr>
             <tr>
                 <td class='achievement-stars'>★★★</td>
+                <td class='achievement-details'>Armii Poznań<br>
+                    <p class='achievement-description'>Collect all of the following: ARPO01, ARPO41, ARPO42</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-01-08</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★★</td>
                 <td class='achievement-details'>Os. Lecha<br>
                     <p class='achievement-description'>Collect all of the following: OSLE01, OSLE02, OSLE41, OSLE42</p></td>
                 <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-01-08</td>
@@ -417,6 +520,12 @@
                 <td class='achievement-details'>Łąkowa<br>
                     <p class='achievement-description'>Collect all of the following: LAKO41, LAKO42</p></td>
                 <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-12-05</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Wyspiańskiego<br>
+                    <p class='achievement-description'>Collect all of the following: WYSP01, WYSP02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-11-25</td>
             </tr>
             <tr>
                 <td class='achievement-stars'>★★★</td>
@@ -540,12 +649,6 @@
             </tr>
             <tr>
                 <td class='achievement-stars'>★★</td>
-                <td class='achievement-details'>Jasielska I<br>
-                    <p class='achievement-description'>Collect all of the following: JAI01, JAI02</p></td>
-                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-10-19</td>
-            </tr>
-            <tr>
-                <td class='achievement-stars'>★★</td>
                 <td class='achievement-details'>Truskawiecka<br>
                     <p class='achievement-description'>Collect all of the following: TRUS01, TRUS02</p></td>
                 <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-10-19</td>
@@ -622,12 +725,6 @@
                 <td class='achievement-details'>Sczanieckiej<br>
                     <p class='achievement-description'>Collect all of the following: SOEJ01, SOEJ02</p></td>
                 <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-09-06</td>
-            </tr>
-            <tr>
-                <td class='achievement-stars'>★★</td>
-                <td class='achievement-details'>Wierzbięcice<br>
-                    <p class='achievement-description'>Collect all of the following: WIER41, WIER42</p></td>
-                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-09-05</td>
             </tr>
             <tr>
                 <td class='achievement-stars'>★★</td>
@@ -936,12 +1033,6 @@
                 <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-06-21</td>
             </tr>
             <tr>
-                <td class='achievement-stars'>★★</td>
-                <td class='achievement-details'>Nad Wierzbakiem<br>
-                    <p class='achievement-description'>Collect all of the following: NADW01, NADW02</p></td>
-                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-06-20</td>
-            </tr>
-            <tr>
                 <td class='achievement-stars'>★★★★★</td>
                 <td class='achievement-details'>Rondo Kaponiera<br>
                     <p class='achievement-description'>Collect all of the following: RKAP01, RKAP02, RKAP05, RKAP06, RKAP45,
@@ -960,6 +1051,12 @@
                 <td class='achievement-details'>Os. Bajkowe<br>
                     <p class='achievement-description'>Collect all of the following: OBA01, OBA02</p></td>
                 <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-06-10</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★</td>
+                <td class='achievement-details'>Safony<br>
+                    <p class='achievement-description'>Collect all of the following: SAFO01</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-06-09</td>
             </tr>
             <tr>
                 <td class='achievement-stars'>★★</td>
@@ -987,15 +1084,15 @@
             </tr>
             <tr>
                 <td class='achievement-stars'>★★</td>
-                <td class='achievement-details'>Piłsudskiego<br>
-                    <p class='achievement-description'>Collect all of the following: PILS01, PILS02</p></td>
-                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-06-03</td>
+                <td class='achievement-details'>Palmiarnia<br>
+                    <p class='achievement-description'>Collect all of the following: PALM01, PALM02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-06-05</td>
             </tr>
             <tr>
                 <td class='achievement-stars'>★★</td>
-                <td class='achievement-details'>Żołnierzy Wyklętych<br>
-                    <p class='achievement-description'>Collect all of the following: ZOWY91, ZOWY92</p></td>
-                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-05-31</td>
+                <td class='achievement-details'>Piłsudskiego<br>
+                    <p class='achievement-description'>Collect all of the following: PILS01, PILS02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-06-03</td>
             </tr>
             <tr>
                 <td class='achievement-stars'>★★</td>
@@ -1014,13 +1111,6 @@
                 <td class='achievement-details'>Święty Marcin<br>
                     <p class='achievement-description'>Collect all of the following: SWMN71</p></td>
                 <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-05-28</td>
-            </tr>
-            <tr>
-                <td class='achievement-stars'>★★★★</td>
-                <td class='achievement-details'>Wilczak<br>
-                    <p class='achievement-description'>Collect all of the following: WILC01, WILC02, WILC03, WILC41, WILC42</p>
-                </td>
-                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-05-26</td>
             </tr>
             <tr>
                 <td class='achievement-stars'>★</td>
@@ -1089,6 +1179,12 @@
                 <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-05-21</td>
             </tr>
             <tr>
+                <td class='achievement-stars'>★</td>
+                <td class='achievement-details'>Konopnickiej<br>
+                    <p class='achievement-description'>Collect all of the following: KONZ02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-05-21</td>
+            </tr>
+            <tr>
                 <td class='achievement-stars'>★★</td>
                 <td class='achievement-details'>Hezjoda<br>
                     <p class='achievement-description'>Collect all of the following: HEZJ01, HEZJ02</p></td>
@@ -1119,6 +1215,12 @@
                 <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-05-15</td>
             </tr>
             <tr>
+                <td class='achievement-stars'>★★★</td>
+                <td class='achievement-details'>Matejki<br>
+                    <p class='achievement-description'>Collect all of the following: MATE01, MATE02, MATE42, MATE71</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-05-13</td>
+            </tr>
+            <tr>
                 <td class='achievement-stars'>★★</td>
                 <td class='achievement-details'>Strzeszyn Grecki<br>
                     <p class='achievement-description'>Collect all of the following: STGR01, STGR02</p></td>
@@ -1126,15 +1228,15 @@
             </tr>
             <tr>
                 <td class='achievement-stars'>★</td>
+                <td class='achievement-details'>Wojskowa<br>
+                    <p class='achievement-description'>Collect all of the following: WOJS41</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-05-10</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★</td>
                 <td class='achievement-details'>27 Grudnia - Teatr Polski<br>
                     <p class='achievement-description'>Collect all of the following: GRUD72</p></td>
                 <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-05-07</td>
-            </tr>
-            <tr>
-                <td class='achievement-stars'>★★</td>
-                <td class='achievement-details'>Lubieńska<br>
-                    <p class='achievement-description'>Collect all of the following: LUBI01, LUBI02</p></td>
-                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-05-04</td>
             </tr>
             <tr>
                 <td class='achievement-stars'>★★</td>
@@ -1147,14 +1249,6 @@
                 <td class='achievement-details'>Polanka<br>
                     <p class='achievement-description'>Collect all of the following: POKA41, POKA42</p></td>
                 <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-05-01</td>
-            </tr>
-            <tr>
-                <td class='achievement-stars'>★★</td>
-                <td class='achievement-details'>Bliźniąt<br>
-                    <p class='achievement-description'>Collect all of the following: BLIZ01, BLIZ02</p></td>
-                <td class='achievement-progress'>
-                    <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
-                </td>
             </tr>
             <tr>
                 <td class='achievement-stars'>★★</td>
@@ -1184,14 +1278,6 @@
                 <td class='achievement-stars'>★★</td>
                 <td class='achievement-details'>Krajenecka<br>
                     <p class='achievement-description'>Collect all of the following: KRAJ01, KRAJ02</p></td>
-                <td class='achievement-progress'>
-                    <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
-                </td>
-            </tr>
-            <tr>
-                <td class='achievement-stars'>★★</td>
-                <td class='achievement-details'>Literacka<br>
-                    <p class='achievement-description'>Collect all of the following: LITA91, LITA92</p></td>
                 <td class='achievement-progress'>
                     <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
                 </td>
@@ -1294,13 +1380,6 @@
             </tr>
             <tr>
                 <td class='achievement-stars'>★★★★</td>
-                <td class='achievement-details'>Rondo Nowaka-Jeziorańskiego<br>
-                    <p class='achievement-description'>Collect all of the following: RONJ01, RONJ02, RONJ41, RONJ42, RONJ73,
-                        RONJ74, RONJ94</p></td>
-                <td class='achievement-progress'>6/7</td>
-            </tr>
-            <tr>
-                <td class='achievement-stars'>★★★★</td>
                 <td class='achievement-details'>Aleje Solidarności<br>
                     <p class='achievement-description'>Collect all of the following: ALSO01, ALSO02, ALSO04, ALSO41, ALSO42</p>
                 </td>
@@ -1308,8 +1387,8 @@
             </tr>
             <tr>
                 <td class='achievement-stars'>★★★★</td>
-                <td class='achievement-details'>Żeromskiego<br>
-                    <p class='achievement-description'>Collect all of the following: ZERO01, ZERO02, ZERO06, ZERO71, ZERO72</p>
+                <td class='achievement-details'>Stary Strzeszyn<br>
+                    <p class='achievement-description'>Collect all of the following: STST01, STST02, STST03, STST04, STST21</p>
                 </td>
                 <td class='achievement-progress'>4/5</td>
             </tr>
@@ -1322,8 +1401,8 @@
             </tr>
             <tr>
                 <td class='achievement-stars'>★★★</td>
-                <td class='achievement-details'>Matejki<br>
-                    <p class='achievement-description'>Collect all of the following: MATE02, MATE42, MATE71, MATE91</p></td>
+                <td class='achievement-details'>Niestachowska<br>
+                    <p class='achievement-description'>Collect all of the following: NIES01, NIES02, NIES03, NIES04</p></td>
                 <td class='achievement-progress'>3/4</td>
             </tr>
             <tr>
@@ -1340,22 +1419,22 @@
                 <td class='achievement-progress'>9/12</td>
             </tr>
             <tr>
-                <td class='achievement-stars'>★★★</td>
-                <td class='achievement-details'>Stary Strzeszyn<br>
-                    <p class='achievement-description'>Collect all of the following: STST01, STST02, STST04, STST21</p></td>
-                <td class='achievement-progress'>3/4</td>
-            </tr>
-            <tr>
                 <td class='achievement-stars'>★★★★</td>
-                <td class='achievement-details'>Serbska<br>
-                    <p class='achievement-description'>Collect all of the following: SERB01, SERB02, SERB03, SERB04, SERB06,
-                        SERB41, SERB42</p></td>
+                <td class='achievement-details'>Słowiańska<br>
+                    <p class='achievement-description'>Collect all of the following: SLKA01, SLKA02, SLKA03, SLKA04, SLKA06,
+                        SLKA41, SLKA42</p></td>
                 <td class='achievement-progress'>5/7</td>
             </tr>
             <tr>
                 <td class='achievement-stars'>★★★</td>
                 <td class='achievement-details'>Fredry<br>
                     <p class='achievement-description'>Collect all of the following: FRRY41, FRRY42, FRRY92</p></td>
+                <td class='achievement-progress'>2/3</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★★</td>
+                <td class='achievement-details'>Kolorowa<br>
+                    <p class='achievement-description'>Collect all of the following: KLRA01, KLRA02, KLRA03</p></td>
                 <td class='achievement-progress'>2/3</td>
             </tr>
             <tr>
@@ -1385,11 +1464,17 @@
                 <td class='achievement-progress'>2/3</td>
             </tr>
             <tr>
-                <td class='achievement-stars'>★★★★</td>
-                <td class='achievement-details'>Armii Poznań<br>
-                    <p class='achievement-description'>Collect all of the following: ARPO01, ARPO41, ARPO42, ARPO91, ARPO92</p>
-                </td>
-                <td class='achievement-progress'>3/5</td>
+                <td class='achievement-stars'>★★★</td>
+                <td class='achievement-details'>Żołnierzy Wyklętych<br>
+                    <p class='achievement-description'>Collect all of the following: ZOWY01, ZOWY91, ZOWY92</p></td>
+                <td class='achievement-progress'>2/3</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★★★★</td>
+                <td class='achievement-details'>Rondo Starołęka<br>
+                    <p class='achievement-description'>Collect all of the following: RSTA01, RSTA02, RSTA03, RSTA41, RSTA42,
+                        RSTA43, RSTA44, RSTA45, RSTA46, RSTA47, RSTA48</p></td>
+                <td class='achievement-progress'>7/11</td>
             </tr>
             <tr>
                 <td class='achievement-stars'>★★★★</td>
@@ -1406,32 +1491,6 @@
                 <td class='achievement-progress'>3/5</td>
             </tr>
             <tr>
-                <td class='achievement-stars'>★★★★</td>
-                <td class='achievement-details'>Słowiańska<br>
-                    <p class='achievement-description'>Collect all of the following: SLKA01, SLKA02, SLKA03, SLKA04, SLKA06,
-                        SLKA41, SLKA42</p></td>
-                <td class='achievement-progress'>4/7</td>
-            </tr>
-            <tr>
-                <td class='achievement-stars'>★★★★★</td>
-                <td class='achievement-details'>Rondo Starołęka<br>
-                    <p class='achievement-description'>Collect all of the following: RSTA01, RSTA02, RSTA03, RSTA41, RSTA42,
-                        RSTA43, RSTA44, RSTA45, RSTA46, RSTA47, RSTA48</p></td>
-                <td class='achievement-progress'>6/11</td>
-            </tr>
-            <tr>
-                <td class='achievement-stars'>★★</td>
-                <td class='achievement-details'>Antoninek PKM<br>
-                    <p class='achievement-description'>Collect all of the following: ANST01, ANST02</p></td>
-                <td class='achievement-progress'>1/2</td>
-            </tr>
-            <tr>
-                <td class='achievement-stars'>★★</td>
-                <td class='achievement-details'>Arena<br>
-                    <p class='achievement-description'>Collect all of the following: AREN41, AREN42</p></td>
-                <td class='achievement-progress'>1/2</td>
-            </tr>
-            <tr>
                 <td class='achievement-stars'>★★</td>
                 <td class='achievement-details'>Brzask<br>
                     <p class='achievement-description'>Collect all of the following: BRZA01, BRZA02</p></td>
@@ -1443,6 +1502,12 @@
                     <p class='achievement-description'>Collect all of the following: BUDZ01, BUDZ02, BUDZ41, BUDZ42, BUDZ43,
                         BUDZ44</p></td>
                 <td class='achievement-progress'>3/6</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Bułgarska/Polska<br>
+                    <p class='achievement-description'>Collect all of the following: BUPO01, BUPO02</p></td>
+                <td class='achievement-progress'>1/2</td>
             </tr>
             <tr>
                 <td class='achievement-stars'>★★</td>
@@ -1487,6 +1552,18 @@
                 <td class='achievement-progress'>1/2</td>
             </tr>
             <tr>
+                <td class='achievement-stars'>★★★</td>
+                <td class='achievement-details'>Miłostowo<br>
+                    <p class='achievement-description'>Collect all of the following: MILO01, MILO02, MILO41, MILO42</p></td>
+                <td class='achievement-progress'>2/4</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Nad Wierzbakiem<br>
+                    <p class='achievement-description'>Collect all of the following: NADW01, NADW94</p></td>
+                <td class='achievement-progress'>1/2</td>
+            </tr>
+            <tr>
                 <td class='achievement-stars'>★★</td>
                 <td class='achievement-details'>Obodrzycka<br>
                     <p class='achievement-description'>Collect all of the following: OBOD01, OBOD02</p></td>
@@ -1505,16 +1582,16 @@
                 <td class='achievement-progress'>1/2</td>
             </tr>
             <tr>
-                <td class='achievement-stars'>★★★</td>
-                <td class='achievement-details'>Os. Piastowskie<br>
-                    <p class='achievement-description'>Collect all of the following: OPIA01, OPIA41, OPIA42, OPIA92</p></td>
-                <td class='achievement-progress'>2/4</td>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Os. Lecha I<br>
+                    <p class='achievement-description'>Collect all of the following: LI01, LI02</p></td>
+                <td class='achievement-progress'>1/2</td>
             </tr>
             <tr>
-                <td class='achievement-stars'>★★</td>
-                <td class='achievement-details'>Os. Przyjaźni<br>
-                    <p class='achievement-description'>Collect all of the following: OPRZ01, OPRZ02</p></td>
-                <td class='achievement-progress'>1/2</td>
+                <td class='achievement-stars'>★★★</td>
+                <td class='achievement-details'>Os. Rzeczypospolitej<br>
+                    <p class='achievement-description'>Collect all of the following: ORZE01, ORZE02, ORZE41, ORZE42</p></td>
+                <td class='achievement-progress'>2/4</td>
             </tr>
             <tr>
                 <td class='achievement-stars'>★★</td>
@@ -1538,6 +1615,12 @@
                 <td class='achievement-stars'>★★</td>
                 <td class='achievement-details'>Rynek Wschodni<br>
                     <p class='achievement-description'>Collect all of the following: RWSC01, RWSC02</p></td>
+                <td class='achievement-progress'>1/2</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Serafitek<br>
+                    <p class='achievement-description'>Collect all of the following: SERA71, SERA72</p></td>
                 <td class='achievement-progress'>1/2</td>
             </tr>
             <tr>
@@ -1586,6 +1669,12 @@
             </tr>
             <tr>
                 <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Urszulanek<br>
+                    <p class='achievement-description'>Collect all of the following: URSZ01, URSZ02</p></td>
+                <td class='achievement-progress'>1/2</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
                 <td class='achievement-details'>Urząd Marszałkowski<br>
                     <p class='achievement-description'>Collect all of the following: URMA01, URMA02</p></td>
                 <td class='achievement-progress'>1/2</td>
@@ -1600,18 +1689,6 @@
                 <td class='achievement-stars'>★★</td>
                 <td class='achievement-details'>Wieża RTV<br>
                     <p class='achievement-description'>Collect all of the following: WRTV01, WRTV02</p></td>
-                <td class='achievement-progress'>1/2</td>
-            </tr>
-            <tr>
-                <td class='achievement-stars'>★★</td>
-                <td class='achievement-details'>Wojskowa<br>
-                    <p class='achievement-description'>Collect all of the following: WOJS01, WOJS41</p></td>
-                <td class='achievement-progress'>1/2</td>
-            </tr>
-            <tr>
-                <td class='achievement-stars'>★★</td>
-                <td class='achievement-details'>Wyspiańskiego<br>
-                    <p class='achievement-description'>Collect all of the following: WYSP02, WYSP93</p></td>
                 <td class='achievement-progress'>1/2</td>
             </tr>
             <tr>
@@ -1649,6 +1726,12 @@
             </tr>
             <tr>
                 <td class='achievement-stars'>★★★</td>
+                <td class='achievement-details'>Torowa Wiadukt<br>
+                    <p class='achievement-description'>Collect all of the following: TORW01, TORW02, TORW03</p></td>
+                <td class='achievement-progress'>1/3</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★★</td>
                 <td class='achievement-details'>Wichrowa<br>
                     <p class='achievement-description'>Collect all of the following: WICH01, WICH02, WICH03</p></td>
                 <td class='achievement-progress'>1/3</td>
@@ -1657,12 +1740,6 @@
                 <td class='achievement-stars'>★★★</td>
                 <td class='achievement-details'>Marcelińska<br>
                     <p class='achievement-description'>Collect all of the following: MARC01, MARC02, MARC03, MARC04</p></td>
-                <td class='achievement-progress'>1/4</td>
-            </tr>
-            <tr>
-                <td class='achievement-stars'>★★★</td>
-                <td class='achievement-details'>Os. Rzeczypospolitej<br>
-                    <p class='achievement-description'>Collect all of the following: ORZE01, ORZE02, ORZE41, ORZE42</p></td>
                 <td class='achievement-progress'>1/4</td>
             </tr>
             <tr>
@@ -1680,6 +1757,13 @@
             </tr>
             <tr>
                 <td class='achievement-stars'>★★★★</td>
+                <td class='achievement-details'>Hetmańska Wiadukt<br>
+                    <p class='achievement-description'>Collect all of the following: HEWI01, HEWI02, HEWI03, HEWI04, HEWI41,
+                        HEWI42</p></td>
+                <td class='achievement-progress'>1/6</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★★★</td>
                 <td class='achievement-details'>Rolna<br>
                     <p class='achievement-description'>Collect all of the following: ROLN01, ROLN02, ROLN03, ROLN04, ROLN41,
                         ROLN42</p></td>
@@ -1693,19 +1777,212 @@
                 <td class='achievement-progress'>1/6</td>
             </tr>
             <tr>
-                <td class='achievement-stars'>★★★★</td>
+                <td class='achievement-stars'>★★★★★</td>
                 <td class='achievement-details'>Starołęka PKM<br>
                     <p class='achievement-description'>Collect all of the following: STAR01, STAR02, STAR04, STAR07, STAR21,
-                        STAR41, STAR42</p></td>
-                <td class='achievement-progress'>1/7</td>
+                        STAR30, STAR41, STAR42</p></td>
+                <td class='achievement-progress'>1/8</td>
             </tr>
             </tbody>
         </table>
     </div>
     <div class='progress-list' data-player='sapphire' style='display:none;'>
-        <p class='list-title center'>Achievements completed: 263</p>
+        <p class='list-title center'>Achievements completed: 285</p>
         <table>
             <tbody>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Szylinga<br>
+                    <p class='achievement-description'>Collect all of the following: SZYL01, SZYL02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-03-19</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Grodziska<br>
+                    <p class='achievement-description'>Collect all of the following: GROD01, GROD02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-03-19</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Ognik<br>
+                    <p class='achievement-description'>Collect all of the following: OGNI01, OGNI02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-03-19</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★★</td>
+                <td class='achievement-details'>Rycerska<br>
+                    <p class='achievement-description'>Collect all of the following: RYCE01, RYCE02, RYCE03, RYCE04</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-03-19</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Sczanieckiej<br>
+                    <p class='achievement-description'>Collect all of the following: SOEJ01, SOEJ02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-03-10</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Komorniki/Łąkowa<br>
+                    <p class='achievement-description'>Collect all of the following: KOLAK01, KOLAK02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-02-28</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Komorniki/Urząd Gminy<br>
+                    <p class='achievement-description'>Collect all of the following: KOUGM01, KOUGM02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-02-28</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Komorniki/Zakładowa Wirenka<br>
+                    <p class='achievement-description'>Collect all of the following: KOZAK01, KOZAK02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-02-28</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Komorniki/Centrum<br>
+                    <p class='achievement-description'>Collect all of the following: KOCEN01, KOCEN02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-02-28</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★★★</td>
+                <td class='achievement-details'>Rondo Solidarności<br>
+                    <p class='achievement-description'>Collect all of the following: ROSO01, ROSO02, ROSO03, ROSO04, ROSO41,
+                        ROSO42</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-02-17</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★</td>
+                <td class='achievement-details'>Safony<br>
+                    <p class='achievement-description'>Collect all of the following: SAFO01</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-02-07</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Hezjoda<br>
+                    <p class='achievement-description'>Collect all of the following: HEZJ01, HEZJ02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-02-07</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★</td>
+                <td class='achievement-details'>Wiencka<br>
+                    <p class='achievement-description'>Collect all of the following: WIEN92</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-02-07</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★</td>
+                <td class='achievement-details'>Poszwińskiego<br>
+                    <p class='achievement-description'>Collect all of the following: POSZ91</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-02-07</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★</td>
+                <td class='achievement-details'>Gruchmanowej<br>
+                    <p class='achievement-description'>Collect all of the following: GRUC91</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-02-07</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★</td>
+                <td class='achievement-details'>Dworzeckiego<br>
+                    <p class='achievement-description'>Collect all of the following: DWGO92</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-02-07</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Literacka<br>
+                    <p class='achievement-description'>Collect all of the following: LITA91, LITA92</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-02-07</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Kościelna<br>
+                    <p class='achievement-description'>Collect all of the following: KOSC01, KOSC02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-02-07</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★★</td>
+                <td class='achievement-details'>Kraszewskiego<br>
+                    <p class='achievement-description'>Collect all of the following: KRAS01, KRAS02, KRAS42, KRAS71</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-02-07</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★★</td>
+                <td class='achievement-details'>Rynek Jeżycki<br>
+                    <p class='achievement-description'>Collect all of the following: RJEZ71, RJEZ72, RJEZ73, RJEZ74</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-02-02</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★★</td>
+                <td class='achievement-details'>Szwajcarska Szpital<br>
+                    <p class='achievement-description'>Collect all of the following: SSZP02, SSZP03, SSZP04</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-02-02</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Żelazna<br>
+                    <p class='achievement-description'>Collect all of the following: ZELA01, ZELA02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-02-02</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★★</td>
+                <td class='achievement-details'>Dymka<br>
+                    <p class='achievement-description'>Collect all of the following: DYMK01, DYMK02, DYMK03</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-02-02</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Os. Zodiak<br>
+                    <p class='achievement-description'>Collect all of the following: OSZO01, OSZO02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-02-02</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Kurlandzka<br>
+                    <p class='achievement-description'>Collect all of the following: KURL01, KURL02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-02-02</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Bliźniąt<br>
+                    <p class='achievement-description'>Collect all of the following: BLIZ01, BLIZ02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-02-02</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★★</td>
+                <td class='achievement-details'>Chartowo<br>
+                    <p class='achievement-description'>Collect all of the following: CHAR01, CHAR02, CHAR04</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-02-02</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Kopiec Wolności<br>
+                    <p class='achievement-description'>Collect all of the following: KOWO01, KOWO02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-02-02</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Wołkowyska<br>
+                    <p class='achievement-description'>Collect all of the following: WOLK01, WOLK02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-02-02</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Katowicka<br>
+                    <p class='achievement-description'>Collect all of the following: KATO01, KATO02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-02-02</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Golęcin<br>
+                    <p class='achievement-description'>Collect all of the following: GOLE01, GOLE02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-01-26</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★★</td>
+                <td class='achievement-details'>Park Wilsona<br>
+                    <p class='achievement-description'>Collect all of the following: PAWI01, PAWI02, PAWI71, PAWI72</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-01-20</td>
+            </tr>
             <tr>
                 <td class='achievement-stars'>★★★</td>
                 <td class='achievement-details'>Junikowo<br>
@@ -1775,6 +2052,12 @@
                 <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-01-08</td>
             </tr>
             <tr>
+                <td class='achievement-stars'>★★★</td>
+                <td class='achievement-details'>Armii Poznań<br>
+                    <p class='achievement-description'>Collect all of the following: ARPO01, ARPO41, ARPO42</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-01-08</td>
+            </tr>
+            <tr>
                 <td class='achievement-stars'>★★</td>
                 <td class='achievement-details'>Żniwna<br>
                     <p class='achievement-description'>Collect all of the following: ZNIW42, ZNIW71</p></td>
@@ -1816,12 +2099,6 @@
                 <td class='achievement-details'>Kosińskiego<br>
                     <p class='achievement-description'>Collect all of the following: KOSI71, KOSI72</p></td>
                 <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-12-31</td>
-            </tr>
-            <tr>
-                <td class='achievement-stars'>★★★</td>
-                <td class='achievement-details'>Rynek Jeżycki<br>
-                    <p class='achievement-description'>Collect all of the following: RJEZ71, RJEZ72, RJEZ73, RJEZ74</p></td>
-                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-12-19</td>
             </tr>
             <tr>
                 <td class='achievement-stars'>★★</td>
@@ -1944,12 +2221,6 @@
                 <td class='achievement-details'>AWF<br>
                     <p class='achievement-description'>Collect all of the following: AWF01, AWF02, AWF03, AWF04, AWF05, AWF41,
                         AWF42, AWF73</p></td>
-                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-09-29</td>
-            </tr>
-            <tr>
-                <td class='achievement-stars'>★★</td>
-                <td class='achievement-details'>Nad Wierzbakiem<br>
-                    <p class='achievement-description'>Collect all of the following: NADW01, NADW02</p></td>
                 <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-09-29</td>
             </tr>
             <tr>
@@ -2170,6 +2441,12 @@
             </tr>
             <tr>
                 <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Palmiarnia<br>
+                    <p class='achievement-description'>Collect all of the following: PALM01, PALM02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-06-10</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
                 <td class='achievement-details'>Piaśnicka Rynek<br>
                     <p class='achievement-description'>Collect all of the following: PIAR41, PIAR42</p></td>
                 <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-06-10</td>
@@ -2279,7 +2556,7 @@
             <tr>
                 <td class='achievement-stars'>★★★</td>
                 <td class='achievement-details'>Os. Piastowskie<br>
-                    <p class='achievement-description'>Collect all of the following: OPIA01, OPIA41, OPIA42, OPIA92</p></td>
+                    <p class='achievement-description'>Collect all of the following: OPIA01, OPIA02, OPIA41, OPIA42</p></td>
                 <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-05-29</td>
             </tr>
             <tr>
@@ -2509,6 +2786,12 @@
                 <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-05-03</td>
             </tr>
             <tr>
+                <td class='achievement-stars'>★</td>
+                <td class='achievement-details'>Glinianki<br>
+                    <p class='achievement-description'>Collect all of the following: GLIN02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-05-03</td>
+            </tr>
+            <tr>
                 <td class='achievement-stars'>★★★</td>
                 <td class='achievement-details'>Bałtycka<br>
                     <p class='achievement-description'>Collect all of the following: BALA01, BALA02, BALA03</p></td>
@@ -2534,24 +2817,8 @@
             </tr>
             <tr>
                 <td class='achievement-stars'>★★</td>
-                <td class='achievement-details'>Bliźniąt<br>
-                    <p class='achievement-description'>Collect all of the following: BLIZ01, BLIZ02</p></td>
-                <td class='achievement-progress'>
-                    <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
-                </td>
-            </tr>
-            <tr>
-                <td class='achievement-stars'>★★</td>
                 <td class='achievement-details'>Browarna<br>
                     <p class='achievement-description'>Collect all of the following: BROW01, BROW02</p></td>
-                <td class='achievement-progress'>
-                    <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
-                </td>
-            </tr>
-            <tr>
-                <td class='achievement-stars'>★★★</td>
-                <td class='achievement-details'>Chartowo<br>
-                    <p class='achievement-description'>Collect all of the following: CHAR01, CHAR02, CHAR04</p></td>
                 <td class='achievement-progress'>
                     <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
                 </td>
@@ -2606,9 +2873,9 @@
                 </td>
             </tr>
             <tr>
-                <td class='achievement-stars'>★★★</td>
-                <td class='achievement-details'>Dymka<br>
-                    <p class='achievement-description'>Collect all of the following: DYMK01, DYMK02, DYMK03</p></td>
+                <td class='achievement-stars'>★</td>
+                <td class='achievement-details'>Dymaczewo Nowe/<br>
+                    <p class='achievement-description'>Collect all of the following: DNDYM02</p></td>
                 <td class='achievement-progress'>
                     <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
                 </td>
@@ -2641,14 +2908,6 @@
                 <td class='achievement-stars'>★★</td>
                 <td class='achievement-details'>Gnieźnieńska Cmentarz<br>
                     <p class='achievement-description'>Collect all of the following: CMEN01, CMEN02</p></td>
-                <td class='achievement-progress'>
-                    <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
-                </td>
-            </tr>
-            <tr>
-                <td class='achievement-stars'>★★</td>
-                <td class='achievement-details'>Golęcin<br>
-                    <p class='achievement-description'>Collect all of the following: GOLE01, GOLE02</p></td>
                 <td class='achievement-progress'>
                     <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
                 </td>
@@ -2752,14 +3011,6 @@
             </tr>
             <tr>
                 <td class='achievement-stars'>★★</td>
-                <td class='achievement-details'>Katowicka<br>
-                    <p class='achievement-description'>Collect all of the following: KATO01, KATO02</p></td>
-                <td class='achievement-progress'>
-                    <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
-                </td>
-            </tr>
-            <tr>
-                <td class='achievement-stars'>★★</td>
                 <td class='achievement-details'>Kicin/Jonschera<br>
                     <p class='achievement-description'>Collect all of the following: KCJON01, KCJON02</p></td>
                 <td class='achievement-progress'>
@@ -2815,17 +3066,9 @@
                 </td>
             </tr>
             <tr>
-                <td class='achievement-stars'>★★</td>
-                <td class='achievement-details'>Komorniki/Centrum<br>
-                    <p class='achievement-description'>Collect all of the following: KOCEN01, KOCEN02</p></td>
-                <td class='achievement-progress'>
-                    <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
-                </td>
-            </tr>
-            <tr>
                 <td class='achievement-stars'>★★★</td>
                 <td class='achievement-details'>Komorniki/Jeziorna<br>
-                    <p class='achievement-description'>Collect all of the following: KOJEZ01, KOJEZ02, KOJEZ03</p></td>
+                    <p class='achievement-description'>Collect all of the following: KOJEZ01, KOJEZ02, KOJEZ03, KOJEZ05</p></td>
                 <td class='achievement-progress'>
                     <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
                 </td>
@@ -2834,14 +3077,6 @@
                 <td class='achievement-stars'>★★</td>
                 <td class='achievement-details'>Komorniki/Lubońska<br>
                     <p class='achievement-description'>Collect all of the following: KOLUB01, KOLUB02</p></td>
-                <td class='achievement-progress'>
-                    <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
-                </td>
-            </tr>
-            <tr>
-                <td class='achievement-stars'>★★</td>
-                <td class='achievement-details'>Komorniki/Łąkowa<br>
-                    <p class='achievement-description'>Collect all of the following: KOLAK01, KOLAK02</p></td>
                 <td class='achievement-progress'>
                     <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
                 </td>
@@ -2872,14 +3107,6 @@
             </tr>
             <tr>
                 <td class='achievement-stars'>★★</td>
-                <td class='achievement-details'>Komorniki/Urząd Gminy<br>
-                    <p class='achievement-description'>Collect all of the following: KOUGM01, KOUGM02</p></td>
-                <td class='achievement-progress'>
-                    <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
-                </td>
-            </tr>
-            <tr>
-                <td class='achievement-stars'>★★</td>
                 <td class='achievement-details'>Komorniki/Wirowska<br>
                     <p class='achievement-description'>Collect all of the following: KOWIR01, KOWIR02</p></td>
                 <td class='achievement-progress'>
@@ -2895,9 +3122,9 @@
                 </td>
             </tr>
             <tr>
-                <td class='achievement-stars'>★★</td>
-                <td class='achievement-details'>Kopiec Wolności<br>
-                    <p class='achievement-description'>Collect all of the following: KOWO01, KOWO02</p></td>
+                <td class='achievement-stars'>★</td>
+                <td class='achievement-details'>Konopnickiej<br>
+                    <p class='achievement-description'>Collect all of the following: KONZ02</p></td>
                 <td class='achievement-progress'>
                     <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
                 </td>
@@ -2906,14 +3133,6 @@
                 <td class='achievement-stars'>★★</td>
                 <td class='achievement-details'>Koronkarska<br>
                     <p class='achievement-description'>Collect all of the following: KORO01, KORO02</p></td>
-                <td class='achievement-progress'>
-                    <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
-                </td>
-            </tr>
-            <tr>
-                <td class='achievement-stars'>★★</td>
-                <td class='achievement-details'>Kościelna<br>
-                    <p class='achievement-description'>Collect all of the following: KOSC01, KOSC02</p></td>
                 <td class='achievement-progress'>
                     <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
                 </td>
@@ -2999,17 +3218,25 @@
                 </td>
             </tr>
             <tr>
-                <td class='achievement-stars'>★★★</td>
-                <td class='achievement-details'>Kraszewskiego<br>
-                    <p class='achievement-description'>Collect all of the following: KRAS01, KRAS02, KRAS42, KRAS71</p></td>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Krauthofera<br>
+                    <p class='achievement-description'>Collect all of the following: KRAU71, KRAU72</p></td>
                 <td class='achievement-progress'>
                     <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
                 </td>
             </tr>
             <tr>
                 <td class='achievement-stars'>★★</td>
-                <td class='achievement-details'>Krauthofera<br>
-                    <p class='achievement-description'>Collect all of the following: KRAU71, KRAU72</p></td>
+                <td class='achievement-details'>Krosinko/<br>
+                    <p class='achievement-description'>Collect all of the following: KKKRO01, KKKRO02</p></td>
+                <td class='achievement-progress'>
+                    <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
+                </td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Krosinko/Grzybowa<br>
+                    <p class='achievement-description'>Collect all of the following: KKGRZ01, KKGRZ02</p></td>
                 <td class='achievement-progress'>
                     <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
                 </td>
@@ -3026,14 +3253,6 @@
                 <td class='achievement-stars'>★★</td>
                 <td class='achievement-details'>Krzyżowa<br>
                     <p class='achievement-description'>Collect all of the following: KRZA01, KRZA02</p></td>
-                <td class='achievement-progress'>
-                    <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
-                </td>
-            </tr>
-            <tr>
-                <td class='achievement-stars'>★★</td>
-                <td class='achievement-details'>Kurlandzka<br>
-                    <p class='achievement-description'>Collect all of the following: KURL01, KURL02</p></td>
                 <td class='achievement-progress'>
                     <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
                 </td>
@@ -3103,9 +3322,25 @@
                 </td>
             </tr>
             <tr>
+                <td class='achievement-stars'>★</td>
+                <td class='achievement-details'>Mosina/Jeziorna<br>
+                    <p class='achievement-description'>Collect all of the following: MOJEZ01</p></td>
+                <td class='achievement-progress'>
+                    <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
+                </td>
+            </tr>
+            <tr>
                 <td class='achievement-stars'>★★</td>
                 <td class='achievement-details'>Mosina/Rondo<br>
                     <p class='achievement-description'>Collect all of the following: MORON01, MORON02</p></td>
+                <td class='achievement-progress'>
+                    <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
+                </td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Mosina/Stadion<br>
+                    <p class='achievement-description'>Collect all of the following: MOSTA01, MOSTA02</p></td>
                 <td class='achievement-progress'>
                     <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
                 </td>
@@ -3162,14 +3397,6 @@
                 <td class='achievement-stars'>★★</td>
                 <td class='achievement-details'>Os. Przyjaźni<br>
                     <p class='achievement-description'>Collect all of the following: OPRZ01, OPRZ02</p></td>
-                <td class='achievement-progress'>
-                    <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
-                </td>
-            </tr>
-            <tr>
-                <td class='achievement-stars'>★★</td>
-                <td class='achievement-details'>Os. Zodiak<br>
-                    <p class='achievement-description'>Collect all of the following: OSZO01, OSZO02</p></td>
                 <td class='achievement-progress'>
                     <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
                 </td>
@@ -3280,15 +3507,6 @@
                 </td>
             </tr>
             <tr>
-                <td class='achievement-stars'>★★★★</td>
-                <td class='achievement-details'>Rondo Solidarności<br>
-                    <p class='achievement-description'>Collect all of the following: ROSO01, ROSO02, ROSO03, ROSO04, ROSO41,
-                        ROSO42</p></td>
-                <td class='achievement-progress'>
-                    <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
-                </td>
-            </tr>
-            <tr>
                 <td class='achievement-stars'>★</td>
                 <td class='achievement-details'>Rosnówko/PKM<br>
                     <p class='achievement-description'>Collect all of the following: ROPKM01</p></td>
@@ -3337,10 +3555,10 @@
                 </td>
             </tr>
             <tr>
-                <td class='achievement-stars'>★★★★</td>
+                <td class='achievement-stars'>★★★★★</td>
                 <td class='achievement-details'>Starołęka PKM<br>
                     <p class='achievement-description'>Collect all of the following: STAR01, STAR02, STAR04, STAR07, STAR21,
-                        STAR41, STAR42</p></td>
+                        STAR30, STAR41, STAR42</p></td>
                 <td class='achievement-progress'>
                     <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
                 </td>
@@ -3381,14 +3599,6 @@
                 <td class='achievement-stars'>★</td>
                 <td class='achievement-details'>Sypniewo<br>
                     <p class='achievement-description'>Collect all of the following: SYPN02</p></td>
-                <td class='achievement-progress'>
-                    <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
-                </td>
-            </tr>
-            <tr>
-                <td class='achievement-stars'>★★★</td>
-                <td class='achievement-details'>Szwajcarska Szpital<br>
-                    <p class='achievement-description'>Collect all of the following: SSZP01, SSZP02, SSZP04</p></td>
                 <td class='achievement-progress'>
                     <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
                 </td>
@@ -3525,14 +3735,6 @@
             </tr>
             <tr>
                 <td class='achievement-stars'>★★</td>
-                <td class='achievement-details'>Wołkowyska<br>
-                    <p class='achievement-description'>Collect all of the following: WOLK01, WOLK02</p></td>
-                <td class='achievement-progress'>
-                    <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
-                </td>
-            </tr>
-            <tr>
-                <td class='achievement-stars'>★★</td>
                 <td class='achievement-details'>Wspólna<br>
                     <p class='achievement-description'>Collect all of the following: WSPO41, WSPO42</p></td>
                 <td class='achievement-progress'>
@@ -3572,14 +3774,6 @@
                 </td>
             </tr>
             <tr>
-                <td class='achievement-stars'>★★</td>
-                <td class='achievement-details'>Żelazna<br>
-                    <p class='achievement-description'>Collect all of the following: ZELA01, ZELA02</p></td>
-                <td class='achievement-progress'>
-                    <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
-                </td>
-            </tr>
-            <tr>
                 <td class='achievement-stars'>★★★★</td>
                 <td class='achievement-details'>Grochowska<br>
                     <p class='achievement-description'>Collect all of the following: GROC01, GROC02, GROC03, GROC04, GROC41,
@@ -3587,17 +3781,17 @@
                 <td class='achievement-progress'>5/6</td>
             </tr>
             <tr>
-                <td class='achievement-stars'>★★★</td>
-                <td class='achievement-details'>Matejki<br>
-                    <p class='achievement-description'>Collect all of the following: MATE02, MATE42, MATE71, MATE91</p></td>
-                <td class='achievement-progress'>3/4</td>
-            </tr>
-            <tr>
                 <td class='achievement-stars'>★★★★</td>
                 <td class='achievement-details'>Rondo Nowaka-Jeziorańskiego<br>
-                    <p class='achievement-description'>Collect all of the following: RONJ01, RONJ02, RONJ41, RONJ42, RONJ73,
-                        RONJ74, RONJ94</p></td>
-                <td class='achievement-progress'>5/7</td>
+                    <p class='achievement-description'>Collect all of the following: RONJ01, RONJ04, RONJ41, RONJ42, RONJ73,
+                        RONJ74</p></td>
+                <td class='achievement-progress'>5/6</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★★</td>
+                <td class='achievement-details'>Matejki<br>
+                    <p class='achievement-description'>Collect all of the following: MATE01, MATE02, MATE42, MATE71</p></td>
+                <td class='achievement-progress'>3/4</td>
             </tr>
             <tr>
                 <td class='achievement-stars'>★★★★</td>
@@ -3620,10 +3814,16 @@
             </tr>
             <tr>
                 <td class='achievement-stars'>★★★★</td>
-                <td class='achievement-details'>Armii Poznań<br>
-                    <p class='achievement-description'>Collect all of the following: ARPO01, ARPO41, ARPO42, ARPO91, ARPO92</p>
-                </td>
-                <td class='achievement-progress'>3/5</td>
+                <td class='achievement-details'>Rondo Skubiszewskiego<br>
+                    <p class='achievement-description'>Collect all of the following: ROSK01, ROSK02, ROSK03, ROSK04, ROSK41,
+                        ROSK42</p></td>
+                <td class='achievement-progress'>4/6</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★★</td>
+                <td class='achievement-details'>Żołnierzy Wyklętych<br>
+                    <p class='achievement-description'>Collect all of the following: ZOWY01, ZOWY91, ZOWY92</p></td>
+                <td class='achievement-progress'>2/3</td>
             </tr>
             <tr>
                 <td class='achievement-stars'>★★★</td>
@@ -3645,14 +3845,14 @@
             </tr>
             <tr>
                 <td class='achievement-stars'>★★</td>
-                <td class='achievement-details'>Fabianowo<br>
-                    <p class='achievement-description'>Collect all of the following: FABI01, FABI02</p></td>
+                <td class='achievement-details'>Instytut Genetyki<br>
+                    <p class='achievement-description'>Collect all of the following: STNZ01, STNZ02</p></td>
                 <td class='achievement-progress'>1/2</td>
             </tr>
             <tr>
                 <td class='achievement-stars'>★★</td>
-                <td class='achievement-details'>Instytut Genetyki<br>
-                    <p class='achievement-description'>Collect all of the following: STNZ01, STNZ02</p></td>
+                <td class='achievement-details'>Kartuska<br>
+                    <p class='achievement-description'>Collect all of the following: KART01, KART02</p></td>
                 <td class='achievement-progress'>1/2</td>
             </tr>
             <tr>
@@ -3711,6 +3911,12 @@
             </tr>
             <tr>
                 <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Nad Wierzbakiem<br>
+                    <p class='achievement-description'>Collect all of the following: NADW01, NADW94</p></td>
+                <td class='achievement-progress'>1/2</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
                 <td class='achievement-details'>Os. Jagiełły<br>
                     <p class='achievement-description'>Collect all of the following: OJLY01, OJLY02</p></td>
                 <td class='achievement-progress'>1/2</td>
@@ -3746,17 +3952,23 @@
                 <td class='achievement-progress'>2/4</td>
             </tr>
             <tr>
-                <td class='achievement-stars'>★★★★</td>
-                <td class='achievement-details'>Rondo Skubiszewskiego<br>
-                    <p class='achievement-description'>Collect all of the following: ROSK01, ROSK02, ROSK03, ROSK04, ROSK41,
-                        ROSK42</p></td>
-                <td class='achievement-progress'>3/6</td>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Polna Szpital<br>
+                    <p class='achievement-description'>Collect all of the following: POLN01, POLN02</p></td>
+                <td class='achievement-progress'>1/2</td>
             </tr>
             <tr>
                 <td class='achievement-stars'>★★</td>
                 <td class='achievement-details'>Rosnówko/Dworcowa<br>
                     <p class='achievement-description'>Collect all of the following: RODWO01, RODWO02</p></td>
                 <td class='achievement-progress'>1/2</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★★★</td>
+                <td class='achievement-details'>Stadion Miejski<br>
+                    <p class='achievement-description'>Collect all of the following: STMI01, STMI02, STMI04, STMI05, STMI41,
+                        STMI42</p></td>
+                <td class='achievement-progress'>3/6</td>
             </tr>
             <tr>
                 <td class='achievement-stars'>★★</td>
@@ -3833,19 +4045,6 @@
                 <td class='achievement-progress'>1/3</td>
             </tr>
             <tr>
-                <td class='achievement-stars'>★★★★</td>
-                <td class='achievement-details'>Stadion Miejski<br>
-                    <p class='achievement-description'>Collect all of the following: STMI01, STMI02, STMI04, STMI05, STMI41,
-                        STMI42</p></td>
-                <td class='achievement-progress'>2/6</td>
-            </tr>
-            <tr>
-                <td class='achievement-stars'>★★★</td>
-                <td class='achievement-details'>Szreniawa/Dworcowa<br>
-                    <p class='achievement-description'>Collect all of the following: SZDWO01, SZDWO02, SZDWO03</p></td>
-                <td class='achievement-progress'>1/3</td>
-            </tr>
-            <tr>
                 <td class='achievement-stars'>★★★</td>
                 <td class='achievement-details'>Niestachowska<br>
                     <p class='achievement-description'>Collect all of the following: NIES01, NIES02, NIES03, NIES04</p></td>
@@ -3859,8 +4058,8 @@
             </tr>
             <tr>
                 <td class='achievement-stars'>★★★</td>
-                <td class='achievement-details'>Park Wilsona<br>
-                    <p class='achievement-description'>Collect all of the following: PAWI01, PAWI02, PAWI71, PAWI72</p></td>
+                <td class='achievement-details'>Szreniawa/Dworcowa<br>
+                    <p class='achievement-description'>Collect all of the following: SZDWO01, SZDWO02, SZDWO03, SZDWO04</p></td>
                 <td class='achievement-progress'>1/4</td>
             </tr>
             <tr>
@@ -3870,13 +4069,32 @@
                 </td>
                 <td class='achievement-progress'>1/5</td>
             </tr>
+            <tr>
+                <td class='achievement-stars'>★★★★</td>
+                <td class='achievement-details'>Wojska Polskiego<br>
+                    <p class='achievement-description'>Collect all of the following: WOPO01, WOPO02, WOPO03, WOPO04, WOPO05,
+                        WOPO06, WOPO08</p></td>
+                <td class='achievement-progress'>1/7</td>
+            </tr>
             </tbody>
         </table>
     </div>
     <div class='progress-list' data-player='camomile' style='display:none;'>
-        <p class='list-title center'>Achievements completed: 11</p>
+        <p class='list-title center'>Achievements completed: 16</p>
         <table>
             <tbody>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Bliźniąt<br>
+                    <p class='achievement-description'>Collect all of the following: BLIZ01, BLIZ02</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2025-02-17</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★★</td>
+                <td class='achievement-details'>Rynek Jeżycki<br>
+                    <p class='achievement-description'>Collect all of the following: RJEZ71, RJEZ72, RJEZ73, RJEZ74</p></td>
+                <td class='achievement-progress'><span class='smaller'>Completed</span><br>2024-12-19</td>
+            </tr>
             <tr>
                 <td class='achievement-stars'>★★★</td>
                 <td class='achievement-details'>Port Lotniczy Ławica<br>
@@ -3947,16 +4165,72 @@
                 </td>
             </tr>
             <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Os. Armii Krajowej<br>
+                    <p class='achievement-description'>Collect all of the following: OAK01, OAK02</p></td>
+                <td class='achievement-progress'>
+                    <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
+                </td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Os. Oświecenia<br>
+                    <p class='achievement-description'>Collect all of the following: OSWI01, OSWI02</p></td>
+                <td class='achievement-progress'>
+                    <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
+                </td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★</td>
+                <td class='achievement-details'>Termy Maltańskie<br>
+                    <p class='achievement-description'>Collect all of the following: TEMA01</p></td>
+                <td class='achievement-progress'>
+                    <span class='smaller'>Completed</span><br><span class='smaller'>a long time ago</span>
+                </td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★★★★</td>
+                <td class='achievement-details'>Rondo Rataje<br>
+                    <p class='achievement-description'>Collect all of the following: RRAT06, RRAT30, RRAT71, RRAT72, RRAT73,
+                        RRAT74, RRAT75, RRAT76</p></td>
+                <td class='achievement-progress'>6/8</td>
+            </tr>
+            <tr>
                 <td class='achievement-stars'>★★★</td>
-                <td class='achievement-details'>Rondo Minikowo<br>
-                    <p class='achievement-description'>Collect all of the following: ROMI01, ROMI02, ROMI03, ROMI04</p></td>
-                <td class='achievement-progress'>3/4</td>
+                <td class='achievement-details'>Os. Jagiellońskie<br>
+                    <p class='achievement-description'>Collect all of the following: OJAG01, OJAG02, OJAG03</p></td>
+                <td class='achievement-progress'>2/3</td>
             </tr>
             <tr>
                 <td class='achievement-stars'>★★★</td>
                 <td class='achievement-details'>Szwedzka<br>
                     <p class='achievement-description'>Collect all of the following: SZWE01, SZWE41, SZWE42</p></td>
                 <td class='achievement-progress'>2/3</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★★</td>
+                <td class='achievement-details'>Uniwersytet Ekonomiczny<br>
+                    <p class='achievement-description'>Collect all of the following: UE01, UE42, UE71</p></td>
+                <td class='achievement-progress'>2/3</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★★★</td>
+                <td class='achievement-details'>Rondo Minikowo<br>
+                    <p class='achievement-description'>Collect all of the following: ROMI01, ROMI02, ROMI03, ROMI04, ROMI06</p>
+                </td>
+                <td class='achievement-progress'>3/5</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Łacina<br>
+                    <p class='achievement-description'>Collect all of the following: LACI41, LACI42</p></td>
+                <td class='achievement-progress'>1/2</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Piłsudskiego<br>
+                    <p class='achievement-description'>Collect all of the following: PILS01, PILS02</p></td>
+                <td class='achievement-progress'>1/2</td>
             </tr>
             <tr>
                 <td class='achievement-stars'>★★★</td>
@@ -3971,16 +4245,35 @@
                 <td class='achievement-progress'>1/2</td>
             </tr>
             <tr>
-                <td class='achievement-stars'>★★★</td>
-                <td class='achievement-details'>Rynek Jeżycki<br>
-                    <p class='achievement-description'>Collect all of the following: RJEZ71, RJEZ72, RJEZ73, RJEZ74</p></td>
-                <td class='achievement-progress'>2/4</td>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Różana<br>
+                    <p class='achievement-description'>Collect all of the following: ROZA41, ROZA42</p></td>
+                <td class='achievement-progress'>1/2</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Strzeszyn Grecki<br>
+                    <p class='achievement-description'>Collect all of the following: STGR01, STGR02</p></td>
+                <td class='achievement-progress'>1/2</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★</td>
+                <td class='achievement-details'>Św. Czesława<br>
+                    <p class='achievement-description'>Collect all of the following: SWCZ71, SWCZ72</p></td>
+                <td class='achievement-progress'>1/2</td>
             </tr>
             <tr>
                 <td class='achievement-stars'>★★</td>
                 <td class='achievement-details'>Wioślarska<br>
                     <p class='achievement-description'>Collect all of the following: WIOS71, WIOS72</p></td>
                 <td class='achievement-progress'>1/2</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★★★</td>
+                <td class='achievement-details'>Aleje Solidarności<br>
+                    <p class='achievement-description'>Collect all of the following: ALSO01, ALSO02, ALSO04, ALSO41, ALSO42</p>
+                </td>
+                <td class='achievement-progress'>2/5</td>
             </tr>
             <tr>
                 <td class='achievement-stars'>★★★★★</td>
@@ -3991,10 +4284,24 @@
             </tr>
             <tr>
                 <td class='achievement-stars'>★★★★</td>
+                <td class='achievement-details'>Głogowska/Hetmańska<br>
+                    <p class='achievement-description'>Collect all of the following: GLHE01, GLHE02, GLHE43, GLHE44, GLHE71,
+                        GLHE72</p></td>
+                <td class='achievement-progress'>2/6</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★★★</td>
                 <td class='achievement-details'>Małe Garbary<br>
                     <p class='achievement-description'>Collect all of the following: MAGA01, MAGA02, MAGA03, MAGA04, MAGA41,
                         MAGA42</p></td>
                 <td class='achievement-progress'>2/6</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★★★★</td>
+                <td class='achievement-details'>AWF<br>
+                    <p class='achievement-description'>Collect all of the following: AWF01, AWF02, AWF03, AWF04, AWF05, AWF41,
+                        AWF42, AWF73</p></td>
+                <td class='achievement-progress'>2/8</td>
             </tr>
             <tr>
                 <td class='achievement-stars'>★★★</td>
@@ -4004,9 +4311,29 @@
             </tr>
             <tr>
                 <td class='achievement-stars'>★★★</td>
+                <td class='achievement-details'>Kraszewskiego<br>
+                    <p class='achievement-description'>Collect all of the following: KRAS01, KRAS02, KRAS42, KRAS71</p></td>
+                <td class='achievement-progress'>1/4</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★★</td>
                 <td class='achievement-details'>Park Wilsona<br>
                     <p class='achievement-description'>Collect all of the following: PAWI01, PAWI02, PAWI71, PAWI72</p></td>
                 <td class='achievement-progress'>1/4</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★★★★</td>
+                <td class='achievement-details'>Rondo Starołęka<br>
+                    <p class='achievement-description'>Collect all of the following: RSTA01, RSTA02, RSTA03, RSTA41, RSTA42,
+                        RSTA43, RSTA44, RSTA45, RSTA46, RSTA47, RSTA48</p></td>
+                <td class='achievement-progress'>2/11</td>
+            </tr>
+            <tr>
+                <td class='achievement-stars'>★★★★</td>
+                <td class='achievement-details'>Termalna<br>
+                    <p class='achievement-description'>Collect all of the following: TERM01, TERM02, TERM03, TERM04, TERM41,
+                        TERM42</p></td>
+                <td class='achievement-progress'>1/6</td>
             </tr>
             <tr>
                 <td class='achievement-stars'>★★★★★</td>
@@ -4026,9 +4353,145 @@
         <div class='sidebar-close-icon material-symbols-outlined' onclick='toggleSidebar("vehicles")'>close</div>
     </div>
     <div class='progress-list' data-player='zorie'>
-        <p class='list-title center'>Vehicles discovered: 92</p>
+        <p class='list-title center'>Vehicles discovered: 106</p>
         <table>
             <tbody>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 18 electric IV gen</span><br><span
+                        class='larger'>#1705</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-03-19</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/man.webp'></td>
+                <td>
+                    <span class='smaller'>MAN</span><br><span class=''>Lion's City NL313</span><br><span
+                        class='larger'>#8027</span>
+                    <span class='smaller'>(TPbus Tarnowo Pdg.)</span>
+                </td>
+                <td class='achievement-progress'>2025-03-19</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 IV gen</span><br><span
+                        class='larger'>#8322</span>
+                    <span class='smaller'>(Rokbus Rokietnica)</span>
+                </td>
+                <td class='achievement-progress'>2025-03-19</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/mercedes-benz.webp'></td>
+                <td>
+                    <span class='smaller'>Mercedes-Benz</span><br><span class=''>Conecto G O345</span><br><span class='larger'>#1303</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-03-19</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 III gen</span><br><span class='larger'>#1453</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-03-19</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 18 III gen</span><br><span class='larger'>#4223</span>
+                    <span class='smaller'>(SPK Swarzędz)</span>
+                </td>
+                <td class='achievement-progress'>2025-03-06</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 18 IV gen</span><br><span
+                        class='larger'>#4235</span>
+                    <span class='smaller'>(SPK Swarzędz)</span>
+                </td>
+                <td class='achievement-progress'>2025-03-06</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 IV gen</span><br><span
+                        class='larger'>#1484</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-03-04</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/tram.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Tramino S105P</span><br><span
+                        class='larger'>#547</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-11</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 18 electric IV gen</span><br><span
+                        class='larger'>#1206</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-11</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/tram.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/čkd.webp'></td>
+                <td>
+                    <span class='smaller'>ČKD</span><br><span class=''>Tatra RT6 MF06 AC</span><br><span
+                        class='larger'>#402</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-01</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/man.webp'></td>
+                <td>
+                    <span class='smaller'>MAN</span><br><span
+                        class='smaller'>Lion's City 12 EfficientHybrid NL330</span><br><span class='larger'>#7018</span>
+                    <span class='smaller'>(PUK Komorniki)</span>
+                </td>
+                <td class='achievement-progress'>2025-01-31</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/man.webp'></td>
+                <td>
+                    <span class='smaller'>MAN</span><br><span class=''>Lion's City NL263</span><br><span
+                        class='larger'>#8009</span>
+                    <span class='smaller'>(TPbus Tarnowo Pdg.)</span>
+                </td>
+                <td class='achievement-progress'>2025-01-31</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Alpino 8,6 III gen</span><br><span class='larger'>#1401</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-01-31</td>
+            </tr>
             <tr>
                 <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
                 <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
@@ -4205,7 +4668,7 @@
                 <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
                 <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
                 <td>
-                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 hybrid IV gen</span><br><span
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 mild hybrid IV gen</span><br><span
                         class='larger'>#8311</span>
                     <span class='smaller'>(Rokbus Rokietnica)</span>
                 </td>
@@ -4922,9 +5385,711 @@
         </table>
     </div>
     <div class='progress-list' data-player='sapphire' style='display:none;'>
-        <p class='list-title center'>Vehicles discovered: 304</p>
+        <p class='list-title center'>Vehicles discovered: 382</p>
         <table>
             <tbody>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/mercedes-benz.webp'></td>
+                <td>
+                    <span class='smaller'>Mercedes-Benz</span><br><span class=''>Conecto G O345</span><br><span class='larger'>#1311</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-03-13</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 18 hybrid III gen</span><br><span
+                        class='larger'>#1890</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-03-10</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Alpino 8,6 III gen</span><br><span class='larger'>#1450</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-03-10</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 III gen</span><br><span class='larger'>#1467</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-03-10</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 III gen</span><br><span class='larger'>#1651</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-03-10</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/tram.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/čkd.webp'></td>
+                <td>
+                    <span class='smaller'>ČKD</span><br><span class=''>Tatra RT6 MF06 AC</span><br><span
+                        class='larger'>#414</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-03-10</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/tram.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/düwag.webp'></td>
+                <td>
+                    <span class='smaller'>Düwag</span><br><span class=''>GT8ZR</span><br><span class='larger'>#903</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-03-06</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/mercedes-benz.webp'></td>
+                <td>
+                    <span class='smaller'>Mercedes-Benz</span><br><span
+                        class='smaller'>Citaro G C2 BlueTec-Hybrid O530GDH</span><br><span class='larger'>#5028</span>
+                    <span class='smaller'>(Kombus Kórnik)</span>
+                </td>
+                <td class='achievement-progress'>2025-03-06</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 III gen</span><br><span class='larger'>#4018</span>
+                    <span class='smaller'>(SPK Swarzędz)</span>
+                </td>
+                <td class='achievement-progress'>2025-03-05</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 IV gen</span><br><span
+                        class='larger'>#1482</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-03-05</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/tram.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/modertrans.webp'></td>
+                <td>
+                    <span class='smaller'>Modertrans</span><br><span class=''>Moderus Beta MF20 AC</span><br><span
+                        class='larger'>#454</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-03-05</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/tram.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/modertrans.webp'></td>
+                <td>
+                    <span class='smaller'>Modertrans</span><br><span class=''>Moderus Alfa 105N HF07</span><br><span
+                        class='larger'>#336+337</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-03-05</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/tram.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/konstal.webp'></td>
+                <td>
+                    <span class='smaller'>Konstal</span><br><span class=''>105Na+105NaD</span><br><span
+                        class='larger'>#314+315</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-03-04</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/tram.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/modertrans.webp'></td>
+                <td>
+                    <span class='smaller'>Modertrans</span><br><span class=''>Moderus Beta MF02 AC</span><br><span
+                        class='larger'>#427</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-03-04</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/tram.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/modertrans.webp'></td>
+                <td>
+                    <span class='smaller'>Modertrans</span><br><span class=''>Moderus Alfa 105N HF07</span><br><span
+                        class='larger'>#226+225</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-03-04</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 IV gen</span><br><span
+                        class='larger'>#1484</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-03-04</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/tram.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/modertrans.webp'></td>
+                <td>
+                    <span class='smaller'>Modertrans</span><br><span class=''>Moderus Beta MF02 AC</span><br><span
+                        class='larger'>#431</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-03-04</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 18 III gen</span><br><span class='larger'>#1878</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-03-04</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 III gen</span><br><span class='larger'>#6052</span>
+                    <span class='smaller'>(Translub Luboń)</span>
+                </td>
+                <td class='achievement-progress'>2025-03-01</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 electric IV gen</span><br><span
+                        class='larger'>#1007</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-28</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 IV gen</span><br><span
+                        class='larger'>#7032</span>
+                    <span class='smaller'>(PUK Komorniki)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-28</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/man.webp'></td>
+                <td>
+                    <span class='smaller'>MAN</span><br><span class=''>Lion's City NL283</span><br><span
+                        class='larger'>#7002</span>
+                    <span class='smaller'>(PUK Komorniki)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-28</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 10,5 IV gen</span><br><span class='larger'>#7035</span>
+                    <span class='smaller'>(PUK Komorniki)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-28</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 18 IV gen</span><br><span
+                        class='larger'>#1905</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-28</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 18 III gen</span><br><span class='larger'>#1262</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-28</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 hybrid IV gen</span><br><span
+                        class='larger'>#6057</span>
+                    <span class='smaller'>(Translub Luboń)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-28</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 IV gen</span><br><span
+                        class='larger'>#6064</span>
+                    <span class='smaller'>(Translub Luboń)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-28</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 III gen</span><br><span class='larger'>#1471</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-28</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 18 IV gen</span><br><span
+                        class='larger'>#1911</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-28</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 electric IV gen</span><br><span
+                        class='larger'>#1504</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-28</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 IV gen</span><br><span
+                        class='larger'>#1667</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-21</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/tram.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/čkd.webp'></td>
+                <td>
+                    <span class='smaller'>ČKD</span><br><span class=''>Tatra RT6 MF06 AC</span><br><span
+                        class='larger'>#400</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-21</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 hydrogen IV gen</span><br><span
+                        class='larger'>#1625</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-21</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/tram.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/modertrans.webp'></td>
+                <td>
+                    <span class='smaller'>Modertrans</span><br><span class=''>Moderus Beta MF20 AC</span><br><span
+                        class='larger'>#458</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-21</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/tram.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/modertrans.webp'></td>
+                <td>
+                    <span class='smaller'>Modertrans</span><br><span class=''>Moderus Gamma LF02 AC</span><br><span
+                        class='larger'>#620</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-17</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/tram.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/modertrans.webp'></td>
+                <td>
+                    <span class='smaller'>Modertrans</span><br><span class=''>Moderus Alfa 105N HF07</span><br><span
+                        class='larger'>#228+227</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-17</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 18 IV gen</span><br><span
+                        class='larger'>#1920</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-17</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 electric IV gen</span><br><span
+                        class='larger'>#1506</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-17</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 IV gen</span><br><span
+                        class='larger'>#5057</span>
+                    <span class='smaller'>(Kombus Kórnik)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-17</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/tram.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/modertrans.webp'></td>
+                <td>
+                    <span class='smaller'>Modertrans</span><br><span class=''>Moderus Gamma LF05 AC</span><br><span
+                        class='larger'>#600</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-17</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 III gen</span><br><span class='larger'>#3010</span>
+                    <span class='smaller'>(Transkom Koziegłowy)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-17</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 18 electric IV gen</span><br><span
+                        class='larger'>#1713</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-15</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 18 IV gen</span><br><span
+                        class='larger'>#1918</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-15</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 18 III gen</span><br><span class='larger'>#5049</span>
+                    <span class='smaller'>(Kombus Kórnik)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-11</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 III gen</span><br><span class='larger'>#1645</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-11</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 III gen</span><br><span class='larger'>#1650</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-11</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 LE III gen</span><br><span class='larger'>#6139</span>
+                    <span class='smaller'>(Translub Luboń)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-10</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 electric IV gen</span><br><span
+                        class='larger'>#1019</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-07</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 III gen</span><br><span class='larger'>#5012</span>
+                    <span class='smaller'>(Kombus Kórnik)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-07</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 hydrogen IV gen</span><br><span
+                        class='larger'>#1608</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-02</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 hydrogen IV gen</span><br><span
+                        class='larger'>#1615</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-02</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 18 IV gen</span><br><span
+                        class='larger'>#1930</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-01</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/mercedes-benz.webp'></td>
+                <td>
+                    <span class='smaller'>Mercedes-Benz</span><br><span class=''>Conecto G O345</span><br><span class='larger'>#1303</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-02-01</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 18 III gen</span><br><span class='larger'>#1868</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-01-28</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 III gen</span><br><span class='larger'>#1469</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-01-28</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 18 III gen</span><br><span class='larger'>#1850</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-01-28</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/mercedes-benz.webp'></td>
+                <td>
+                    <span class='smaller'>Mercedes-Benz</span><br><span class=''>Citaro G C2 O530</span><br><span
+                        class='larger'>#5048</span>
+                    <span class='smaller'>(Kombus Kórnik)</span>
+                </td>
+                <td class='achievement-progress'>2025-01-28</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 15 III gen</span><br><span class='larger'>#5052</span>
+                    <span class='smaller'>(Kombus Kórnik)</span>
+                </td>
+                <td class='achievement-progress'>2025-01-28</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/tram.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/konstal.webp'></td>
+                <td>
+                    <span class='smaller'>Konstal</span><br><span class=''>105Na+105NaD</span><br><span
+                        class='larger'>#146+147</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-01-28</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/man.webp'></td>
+                <td>
+                    <span class='smaller'>MAN</span><br><span class=''>Lion's City NL293</span><br><span
+                        class='larger'>#8041</span>
+                    <span class='smaller'>(TPbus Tarnowo Pdg.)</span>
+                </td>
+                <td class='achievement-progress'>2025-01-26</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 mild hybrid IV gen</span><br><span
+                        class='larger'>#8311</span>
+                    <span class='smaller'>(Rokbus Rokietnica)</span>
+                </td>
+                <td class='achievement-progress'>2025-01-26</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 electric IV gen</span><br><span
+                        class='larger'>#1029</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-01-26</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 18 IV gen</span><br><span
+                        class='larger'>#1910</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-01-26</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/tram.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/konstal.webp'></td>
+                <td>
+                    <span class='smaller'>Konstal</span><br><span class=''>102N</span><br><span class='larger'>#1</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-01-26</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/tram.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/čkd.webp'></td>
+                <td>
+                    <span class='smaller'>ČKD</span><br><span class=''>Tatra RT6 MF06 AC</span><br><span
+                        class='larger'>#403</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-01-26</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/tram.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/düwag.webp'></td>
+                <td>
+                    <span class='smaller'>Düwag</span><br><span class=''>GT8</span><br><span class='larger'>#702</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-01-26</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 III gen</span><br><span class='larger'>#1639</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-01-26</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/mercedes-benz.webp'></td>
+                <td>
+                    <span class='smaller'>Mercedes-Benz</span><br><span class=''>Conecto G O345</span><br><span class='larger'>#1302</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-01-20</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 III gen</span><br><span class='larger'>#1485</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-01-20</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/mercedes-benz.webp'></td>
+                <td>
+                    <span class='smaller'>Mercedes-Benz</span><br><span class=''>Conecto G O345</span><br><span class='larger'>#1304</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-01-20</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/tram.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Tramino S105P</span><br><span
+                        class='larger'>#550</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-01-20</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/tram.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Tramino S105P</span><br><span
+                        class='larger'>#546</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-01-20</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 hydrogen IV gen</span><br><span
+                        class='larger'>#1603</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-01-20</td>
+            </tr>
             <tr>
                 <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
                 <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
@@ -4971,6 +6136,53 @@
                     <span class='smaller'>(MPK Poznań)</span>
                 </td>
                 <td class='achievement-progress'>2025-01-12</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/tram.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/konstal.webp'></td>
+                <td>
+                    <span class='smaller'>Konstal</span><br><span class=''>105Na+105NaD</span><br><span
+                        class='larger'>#190+189</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-01-08</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/mercedes-benz.webp'></td>
+                <td>
+                    <span class='smaller'>Mercedes-Benz</span><br><span class=''>Conecto G O345</span><br><span class='larger'>#1306</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-01-08</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/mercedes-benz.webp'></td>
+                <td>
+                    <span class='smaller'>Mercedes-Benz</span><br><span class=''>Conecto G O345</span><br><span class='larger'>#1309</span>
+                    <span class='smaller'>(MPK Poznań)</span>
+                </td>
+                <td class='achievement-progress'>2025-01-08</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 10 III gen</span><br><span class='larger'>#7009</span>
+                    <span class='smaller'>(PUK Komorniki)</span>
+                </td>
+                <td class='achievement-progress'>2025-01-08</td>
+            </tr>
+            <tr>
+                <td><img class='vehicle-icon' src='assets/vehicles/bus.webp'></td>
+                <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
+                <td>
+                    <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 mild hybrid IV gen</span><br><span
+                        class='larger'>#7024</span>
+                    <span class='smaller'>(PUK Komorniki)</span>
+                </td>
+                <td class='achievement-progress'>2025-01-08</td>
             </tr>
             <tr>
                 <td><img class='vehicle-icon' src='assets/vehicles/tram.webp'></td>
@@ -6783,7 +7995,7 @@
                 <td><img class='brand-logo' src='assets/brands/solaris.webp'></td>
                 <td>
                     <span class='smaller'>Solaris</span><br><span class=''>Urbino 12 electric IV gen</span><br><span
-                        class='larger'>#1501</span>
+                        class='larger'>#1507</span>
                     <span class='smaller'>(MPK Poznań)</span>
                 </td>
                 <td class='achievement-progress'>2024-12-05</td>
