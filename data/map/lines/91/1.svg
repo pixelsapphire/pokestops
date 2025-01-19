@@ -1,0 +1,18 @@
+<svg width="1024.0" height="375.4" xmlns="http://www.w3.org/2000/svg">
+<path d="M12.0 363.4 L110.7 264.7 L285.8 264.7 L505.0 264.7 L615.5 154.2 L757.7 12.0 L1012.0 12.0 " />
+<circle cx="12.0" cy="363.4" r="8" />
+<circle cx="285.8" cy="264.7" r="8" />
+<circle cx="615.5" cy="154.2" r="8" />
+<circle cx="1012.0" cy="12.0" r="8" />
+<style>
+circle {
+fill: white;
+stroke: black;
+stroke-width: 4;
+}
+path {
+fill: none;
+stroke: #FFFFFF;
+stroke-width: 8;
+}</style>
+</svg>

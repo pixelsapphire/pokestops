@@ -21,6 +21,20 @@
 <div id='container'>
     <div class='content-container selected' id='container-raids'>
         <div class='content-section' id='raids-index'>
+            <div class='raid-preview' data-raid-id='202206'>
+                <div class='raid-icon material-symbols-outlined'>ac_unit</div>
+                <div class='raid-name-and-date'>
+                    <div class='raid-name'>Peach Raid</div>
+                    <div class='raid-date'>June 30th, 2022</div>
+                </div>
+            </div>
+            <div class='raid-preview' data-raid-id='202407'>
+                <div class='raid-icon material-symbols-outlined'>ac_unit</div>
+                <div class='raid-name-and-date'>
+                    <div class='raid-name'>Lemon Raid</div>
+                    <div class='raid-date'>July 4th, 2024</div>
+                </div>
+            </div>
             <div class='raid-preview' data-raid-id='202501'>
                 <div class='raid-icon material-symbols-outlined'>ac_unit</div>
                 <div class='raid-name-and-date'>
@@ -30,6 +44,604 @@
             </div>
         </div>
         <div class='content-section object-view' id='raid-view'>
+            <div class='raid-log' id='202206'>
+                <p class='raid-log-title'>The Peach Raid</p>
+                <p style="max-width: 100%; text-align: center;">
+                    <img class='raid-log-map' src='data/map/raids/202206.svg'>
+                </p>
+                <table id='raid-details' class='details-table'>
+                    <tr>
+                        <td>participants:</td>
+                        <td>Zorie, Panini</td>
+                    </tr>
+                    <tr>
+                        <td>date:</td>
+                        <td>Thursday, June 30th, 2022</td>
+                    </tr>
+                    <tr>
+                        <td>total length:</td>
+                        <td>79.4km
+                            (walking distance: 4.9km)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>rides taken:</td>
+                        <td>12</td>
+                    </tr>
+                    <tr>
+                        <td>stops:</td>
+                        <td>18</td>
+                    </tr>
+                </table>
+                <svg class='raid-timeline' data-raid-id='202206' preserveAspectRatio='xMinYMin meet'>
+                    <line x1='14' y1='48.0' x2='14'
+                          y2='144.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-bus'></line>
+                    <text x='60' y='90.0'
+                          font-size='16' fill='#aaa'>bus ride (line 164)
+                    </text>
+                    <text x='60' y='114.0'
+                          font-size='16' fill='#aaa'>11.6km
+                    </text>
+                    <line x1='14' y1='144.0' x2='14'
+                          y2='240.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-foot'></line>
+                    <text x='60' y='186.0'
+                          font-size='16' fill='#aaa'>walk (153m)
+                    </text>
+                    <text x='60' y='210.0'
+                          font-size='16' fill='#aaa'>// transfer
+                    </text>
+                    <line x1='14' y1='240.0' x2='14'
+                          y2='336.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-bus'></line>
+                    <text x='60' y='282.0'
+                          font-size='16' fill='#aaa'>bus ride (line 145)
+                    </text>
+                    <text x='60' y='306.0'
+                          font-size='16' fill='#aaa'>6.8km
+                    </text>
+                    <line x1='14' y1='336.0' x2='14'
+                          y2='432.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-foot'></line>
+                    <text x='60' y='378.0'
+                          font-size='16' fill='#aaa'>walk (198m)
+                    </text>
+                    <text x='60' y='402.0'
+                          font-size='16' fill='#aaa'>// transfer
+                    </text>
+                    <line x1='14' y1='432.0' x2='14'
+                          y2='528.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-train'></line>
+                    <text x='60' y='474.0'
+                          font-size='16' fill='#aaa'>train ride (line PR)
+                    </text>
+                    <text x='60' y='498.0'
+                          font-size='16' fill='#aaa'>3.5km
+                    </text>
+                    <line x1='14' y1='528.0' x2='14'
+                          y2='624.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-foot'></line>
+                    <text x='60' y='570.0'
+                          font-size='16' fill='#aaa'>walk (292m)
+                    </text>
+                    <text x='60' y='594.0'
+                          font-size='16' fill='#aaa'>// transfer
+                    </text>
+                    <line x1='14' y1='624.0' x2='14'
+                          y2='720.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-bus'></line>
+                    <text x='60' y='666.0'
+                          font-size='16' fill='#aaa'>bus ride (line 149)
+                    </text>
+                    <text x='60' y='690.0'
+                          font-size='16' fill='#aaa'>10.4km
+                    </text>
+                    <line x1='14' y1='720.0' x2='14'
+                          y2='816.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-foot'></line>
+                    <text x='60' y='762.0'
+                          font-size='16' fill='#aaa'>walk (99m)
+                    </text>
+                    <text x='60' y='786.0'
+                          font-size='16' fill='#aaa'>// transfer
+                    </text>
+                    <line x1='14' y1='816.0' x2='14'
+                          y2='912.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-tram'></line>
+                    <text x='60' y='858.0'
+                          font-size='16' fill='#aaa'>tram ride (line 14)
+                    </text>
+                    <text x='60' y='882.0'
+                          font-size='16' fill='#aaa'>6.3km
+                    </text>
+                    <line x1='14' y1='912.0' x2='14'
+                          y2='1008.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-foot'></line>
+                    <text x='60' y='954.0'
+                          font-size='16' fill='#aaa'>walk (97m)
+                    </text>
+                    <text x='60' y='978.0'
+                          font-size='16' fill='#aaa'>// transfer
+                    </text>
+                    <line x1='14' y1='1008.0' x2='14'
+                          y2='1104.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-bus'></line>
+                    <text x='60' y='1050.0'
+                          font-size='16' fill='#aaa'>bus ride (line 190)
+                    </text>
+                    <text x='60' y='1074.0'
+                          font-size='16' fill='#aaa'>5.7km
+                    </text>
+                    <line x1='14' y1='1104.0' x2='14'
+                          y2='1200.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-foot'></line>
+                    <text x='60' y='1146.0'
+                          font-size='16' fill='#aaa'>walk (904m)
+                    </text>
+                    <text x='60' y='1170.0'
+                          font-size='16' fill='#aaa'>// going for a break
+                    </text>
+                    <line x1='14' y1='1200.0' x2='14'
+                          y2='1296.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-foot'></line>
+                    <text x='60' y='1242.0'
+                          font-size='16' fill='#aaa'>walk (823m)
+                    </text>
+                    <text x='60' y='1266.0'
+                          font-size='16' fill='#aaa'>// returning from the break
+                    </text>
+                    <line x1='14' y1='1296.0' x2='14'
+                          y2='1392.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-tram'></line>
+                    <text x='60' y='1338.0'
+                          font-size='16' fill='#aaa'>tram ride (line 12)
+                    </text>
+                    <text x='60' y='1362.0'
+                          font-size='16' fill='#aaa'>1.7km
+                    </text>
+                    <line x1='14' y1='1392.0' x2='14'
+                          y2='1488.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-foot'></line>
+                    <text x='60' y='1434.0'
+                          font-size='16' fill='#aaa'>walk (119m)
+                    </text>
+                    <text x='60' y='1458.0'
+                          font-size='16' fill='#aaa'>// transfer
+                    </text>
+                    <line x1='14' y1='1488.0' x2='14'
+                          y2='1584.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-bus'></line>
+                    <text x='60' y='1530.0'
+                          font-size='16' fill='#aaa'>bus ride (line 174)
+                    </text>
+                    <text x='60' y='1554.0'
+                          font-size='16' fill='#aaa'>3.7km
+                    </text>
+                    <line x1='14' y1='1584.0' x2='14'
+                          y2='1680.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-foot'></line>
+                    <text x='60' y='1626.0'
+                          font-size='16' fill='#aaa'>walk (807m)
+                    </text>
+                    <text x='60' y='1650.0'
+                          font-size='16' fill='#aaa'>// walk
+                    </text>
+                    <line x1='14' y1='1680.0' x2='14'
+                          y2='1776.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-bus'></line>
+                    <text x='60' y='1722.0'
+                          font-size='16' fill='#aaa'>bus ride (line 194)
+                    </text>
+                    <text x='60' y='1746.0'
+                          font-size='16' fill='#aaa'>9.5km
+                    </text>
+                    <line x1='14' y1='1776.0' x2='14'
+                          y2='1872.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-foot'></line>
+                    <text x='60' y='1818.0'
+                          font-size='16' fill='#aaa'>walk (35m)
+                    </text>
+                    <text x='60' y='1842.0'
+                          font-size='16' fill='#aaa'>// going for a break
+                    </text>
+                    <line x1='14' y1='1872.0' x2='14'
+                          y2='1968.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-foot'></line>
+                    <text x='60' y='1914.0'
+                          font-size='16' fill='#aaa'>walk (378m)
+                    </text>
+                    <text x='60' y='1938.0'
+                          font-size='16' fill='#aaa'>// returning from the break
+                    </text>
+                    <line x1='14' y1='1968.0' x2='14'
+                          y2='2064.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-tram'></line>
+                    <text x='60' y='2010.0'
+                          font-size='16' fill='#aaa'>tram ride (line 17)
+                    </text>
+                    <text x='60' y='2034.0'
+                          font-size='16' fill='#aaa'>2.4km
+                    </text>
+                    <line x1='14' y1='2064.0' x2='14'
+                          y2='2160.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-foot'></line>
+                    <text x='60' y='2106.0'
+                          font-size='16' fill='#aaa'>walk (41m)
+                    </text>
+                    <text x='60' y='2130.0'
+                          font-size='16' fill='#aaa'>// transfer
+                    </text>
+                    <line x1='14' y1='2160.0' x2='14'
+                          y2='2256.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-tram'></line>
+                    <text x='60' y='2202.0'
+                          font-size='16' fill='#aaa'>tram ride (line 1)
+                    </text>
+                    <text x='60' y='2226.0'
+                          font-size='16' fill='#aaa'>5.6km
+                    </text>
+                    <line x1='14' y1='2256.0' x2='14'
+                          y2='2352.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-foot'></line>
+                    <text x='60' y='2298.0'
+                          font-size='16' fill='#aaa'>walk (945m)
+                    </text>
+                    <text x='60' y='2322.0'
+                          font-size='16' fill='#aaa'>// walk
+                    </text>
+                    <line x1='14' y1='2352.0' x2='14'
+                          y2='2448.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-bus'></line>
+                    <text x='60' y='2394.0'
+                          font-size='16' fill='#aaa'>bus ride (line 164)
+                    </text>
+                    <text x='60' y='2418.0'
+                          font-size='16' fill='#aaa'>7.4km
+                    </text>
+                    <circle cx='14' cy='48.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='54.0' font-size='16' fill='white'>Strzeszyn Grecki [STGR02]</text>
+                    <circle cx='14' cy='144.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='150.0' font-size='16' fill='white'>Mrągowska [MRAG01]</text>
+                    <circle cx='14' cy='240.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='246.0' font-size='16' fill='white'>Mrągowska [MRAG02]</text>
+                    <circle cx='14' cy='336.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='342.0' font-size='16' fill='white'>Dworzec Zachodni [DWZA02]</text>
+                    <circle cx='14' cy='432.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='438.0' font-size='16' fill='white'>Poznań Główny / platform 5 track 54</text>
+                    <circle cx='14' cy='528.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='534.0' font-size='16' fill='white'>Poznań Dębiec / platform 1 track 2</text>
+                    <circle cx='14' cy='624.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='630.0' font-size='16' fill='white'>Kalinowa [KALI01]</text>
+                    <circle cx='14' cy='720.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='726.0' font-size='16' fill='white'>Górczyn PKM [GORC21]</text>
+                    <circle cx='14' cy='816.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='822.0' font-size='16' fill='white'>Górczyn PKM [GORC42]</text>
+                    <circle cx='14' cy='912.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='918.0' font-size='16' fill='white'>Słowiańska [SLKA41]</text>
+                    <circle cx='14' cy='1008.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='1014.0' font-size='16' fill='white'>Słowiańska [SLKA04]</text>
+                    <circle cx='14' cy='1104.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='1110.0' font-size='16' fill='white'>AWF [AWF03]</text>
+                    <circle cx='14' cy='1200.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='1206.0' font-size='16' fill='white'>Stary Browar // lunch & bubble tea break</text>
+                    <circle cx='14' cy='1296.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='1302.0' font-size='16' fill='white'>AWF [AWF73]</text>
+                    <circle cx='14' cy='1392.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='1398.0' font-size='16' fill='white'>Os. Piastowskie [OPIA41]</text>
+                    <circle cx='14' cy='1488.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='1494.0' font-size='16' fill='white'>Os. Piastowskie [OPIA01]</text>
+                    <circle cx='14' cy='1584.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='1590.0' font-size='16' fill='white'>Obodrzycka Orbit [OBOD01]</text>
+                    <circle cx='14' cy='1680.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='1686.0' font-size='16' fill='white'>Warowna [WARO01]</text>
+                    <circle cx='14' cy='1776.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='1782.0' font-size='16' fill='white'>Starołęka PKM [STAR21]</text>
+                    <circle cx='14' cy='1872.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='1878.0' font-size='16' fill='white'>Lewiatan // snack break</text>
+                    <circle cx='14' cy='1968.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='1974.0' font-size='16' fill='white'>Starołęka PKM [STAR42]</text>
+                    <circle cx='14' cy='2064.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='2070.0' font-size='16' fill='white'>Rondo Żegrze [RZEG42]</text>
+                    <circle cx='14' cy='2160.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='2166.0' font-size='16' fill='white'>Rondo Żegrze [RZEG41]</text>
+                    <circle cx='14' cy='2256.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='2262.0' font-size='16' fill='white'>Arena [AREN41]</text>
+                    <circle cx='14' cy='2352.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='2358.0' font-size='16' fill='white'>Wyspiańskiego [WYSP02]</text>
+                    <circle cx='14' cy='2448.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='2454.0' font-size='16' fill='white'>Strzeszyn Grecki [STGR01]</text>
+                </svg>
+            </div>
+            <div class='raid-log' id='202407'>
+                <p class='raid-log-title'>The Lemon Raid</p>
+                <p style="max-width: 100%; text-align: center;">
+                    <img class='raid-log-map' src='data/map/raids/202407.svg'>
+                </p>
+                <table id='raid-details' class='details-table'>
+                    <tr>
+                        <td>participants:</td>
+                        <td>Zorie, Panini</td>
+                    </tr>
+                    <tr>
+                        <td>date:</td>
+                        <td>Thursday, July 4th, 2024</td>
+                    </tr>
+                    <tr>
+                        <td>total length:</td>
+                        <td>50.6km
+                            (walking distance: 2.6km)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>rides taken:</td>
+                        <td>11</td>
+                    </tr>
+                    <tr>
+                        <td>stops:</td>
+                        <td>18</td>
+                    </tr>
+                </table>
+                <svg class='raid-timeline' data-raid-id='202407' preserveAspectRatio='xMinYMin meet'>
+                    <line x1='14' y1='48.0' x2='14'
+                          y2='144.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-tram'></line>
+                    <text x='60' y='90.0'
+                          font-size='16' fill='#aaa'>tram ride (line 3)
+                    </text>
+                    <text x='60' y='114.0'
+                          font-size='16' fill='#aaa'>5.4km
+                    </text>
+                    <line x1='14' y1='144.0' x2='14'
+                          y2='240.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-foot'></line>
+                    <text x='60' y='186.0'
+                          font-size='16' fill='#aaa'>walk (227m)
+                    </text>
+                    <text x='60' y='210.0'
+                          font-size='16' fill='#aaa'>// transfer & hunting session, snack break
+                    </text>
+                    <line x1='14' y1='240.0' x2='14'
+                          y2='336.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-tram'></line>
+                    <text x='60' y='282.0'
+                          font-size='16' fill='#aaa'>tram ride (line 10)
+                    </text>
+                    <text x='60' y='306.0'
+                          font-size='16' fill='#aaa'>9.8km
+                    </text>
+                    <line x1='14' y1='336.0' x2='14'
+                          y2='432.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-foot'></line>
+                    <text x='60' y='378.0'
+                          font-size='16' fill='#aaa'>walk (469m)
+                    </text>
+                    <text x='60' y='402.0'
+                          font-size='16' fill='#aaa'>// hunting session & going for a break
+                    </text>
+                    <line x1='14' y1='432.0' x2='14'
+                          y2='528.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-foot'></line>
+                    <text x='60' y='474.0'
+                          font-size='16' fill='#aaa'>walk (230m)
+                    </text>
+                    <text x='60' y='498.0'
+                          font-size='16' fill='#aaa'>// returning from the break
+                    </text>
+                    <line x1='14' y1='528.0' x2='14'
+                          y2='624.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-tram'></line>
+                    <text x='60' y='570.0'
+                          font-size='16' fill='#aaa'>tram ride (line 7)
+                    </text>
+                    <text x='60' y='594.0'
+                          font-size='16' fill='#aaa'>4.3km
+                    </text>
+                    <line x1='14' y1='624.0' x2='14'
+                          y2='720.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-foot'></line>
+                    <text x='60' y='666.0'
+                          font-size='16' fill='#aaa'>walk (249m)
+                    </text>
+                    <text x='60' y='690.0'
+                          font-size='16' fill='#aaa'>// hunting session & going for a break
+                    </text>
+                    <line x1='14' y1='720.0' x2='14'
+                          y2='816.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-foot'></line>
+                    <text x='60' y='762.0'
+                          font-size='16' fill='#aaa'>walk (217m)
+                    </text>
+                    <text x='60' y='786.0'
+                          font-size='16' fill='#aaa'>// returning from the break
+                    </text>
+                    <line x1='14' y1='816.0' x2='14'
+                          y2='912.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-tram'></line>
+                    <text x='60' y='858.0'
+                          font-size='16' fill='#aaa'>tram ride (line 18)
+                    </text>
+                    <text x='60' y='882.0'
+                          font-size='16' fill='#aaa'>3.4km
+                    </text>
+                    <line x1='14' y1='912.0' x2='14'
+                          y2='1008.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-tram'></line>
+                    <text x='60' y='954.0'
+                          font-size='16' fill='#aaa'>tram ride (line 92)
+                    </text>
+                    <text x='60' y='978.0'
+                          font-size='16' fill='#aaa'>220m
+                    </text>
+                    <line x1='14' y1='1008.0' x2='14'
+                          y2='1104.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-tram'></line>
+                    <text x='60' y='1050.0'
+                          font-size='16' fill='#aaa'>tram ride (line 2)
+                    </text>
+                    <text x='60' y='1074.0'
+                          font-size='16' fill='#aaa'>414m
+                    </text>
+                    <line x1='14' y1='1104.0' x2='14'
+                          y2='1200.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-tram'></line>
+                    <text x='60' y='1146.0'
+                          font-size='16' fill='#aaa'>tram ride (line 5)
+                    </text>
+                    <text x='60' y='1170.0'
+                          font-size='16' fill='#aaa'>1.9km
+                    </text>
+                    <line x1='14' y1='1200.0' x2='14'
+                          y2='1296.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-tram'></line>
+                    <text x='60' y='1242.0'
+                          font-size='16' fill='#aaa'>tram ride (line 3)
+                    </text>
+                    <text x='60' y='1266.0'
+                          font-size='16' fill='#aaa'>3.8km
+                    </text>
+                    <line x1='14' y1='1296.0' x2='14'
+                          y2='1392.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-foot'></line>
+                    <text x='60' y='1338.0'
+                          font-size='16' fill='#aaa'>walk (703m)
+                    </text>
+                    <text x='60' y='1362.0'
+                          font-size='16' fill='#aaa'>// transfer
+                    </text>
+                    <line x1='14' y1='1392.0' x2='14'
+                          y2='1488.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-bus'></line>
+                    <text x='60' y='1434.0'
+                          font-size='16' fill='#aaa'>bus ride (line 174)
+                    </text>
+                    <text x='60' y='1458.0'
+                          font-size='16' fill='#aaa'>10.6km
+                    </text>
+                    <line x1='14' y1='1488.0' x2='14'
+                          y2='1584.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-foot'></line>
+                    <text x='60' y='1530.0'
+                          font-size='16' fill='#aaa'>walk (532m)
+                    </text>
+                    <text x='60' y='1554.0'
+                          font-size='16' fill='#aaa'>// transfer
+                    </text>
+                    <line x1='14' y1='1584.0' x2='14'
+                          y2='1680.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-bus'></line>
+                    <text x='60' y='1626.0'
+                          font-size='16' fill='#aaa'>bus ride (line 191)
+                    </text>
+                    <text x='60' y='1650.0'
+                          font-size='16' fill='#aaa'>3.7km
+                    </text>
+                    <line x1='14' y1='1680.0' x2='14'
+                          y2='1776.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-foot'></line>
+                    <text x='60' y='1722.0'
+                          font-size='16' fill='#aaa'>walk (0m)
+                    </text>
+                    <text x='60' y='1746.0'
+                          font-size='16' fill='#aaa'>// transfer
+                    </text>
+                    <line x1='14' y1='1776.0' x2='14'
+                          y2='1872.0' stroke='#ff61b1'
+                          stroke-width='8' class='rtm-bus'></line>
+                    <text x='60' y='1818.0'
+                          font-size='16' fill='#aaa'>bus ride (line 164)
+                    </text>
+                    <text x='60' y='1842.0'
+                          font-size='16' fill='#aaa'>4.6km
+                    </text>
+                    <circle cx='14' cy='48.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='54.0' font-size='16' fill='white'>Poznańska [POZN41]</text>
+                    <circle cx='14' cy='144.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='150.0' font-size='16' fill='white'>Naramowice [NARA71]</text>
+                    <circle cx='14' cy='240.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='246.0' font-size='16' fill='white'>Os. Łokietka [OLOK42]</text>
+                    <circle cx='14' cy='336.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='342.0' font-size='16' fill='white'>HCP [HCP41]</text>
+                    <circle cx='14' cy='432.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='438.0' font-size='16' fill='white'>MAX Burgers // burger break</text>
+                    <circle cx='14' cy='528.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='534.0' font-size='16' fill='white'>Traugutta [TRAU44]</text>
+                    <circle cx='14' cy='624.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='630.0' font-size='16' fill='white'>Kórnicka [KORN42]</text>
+                    <circle cx='14' cy='720.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='726.0' font-size='16' fill='white'>Posnania // toilet and bubble tea break</text>
+                    <circle cx='14' cy='816.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='822.0' font-size='16' fill='white'>Kórnicka [KORN44]</text>
+                    <circle cx='14' cy='912.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='918.0' font-size='16' fill='white'>Uniwersytet Ekonomiczny [UE42]</text>
+                    <circle cx='14' cy='1008.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='1014.0' font-size='16' fill='white'>Zamek [ZAME71]</text>
+                    <circle cx='14' cy='1104.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='1110.0' font-size='16' fill='white'>Ratajczaka [RATA72]</text>
+                    <circle cx='14' cy='1200.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='1206.0' font-size='16' fill='white'>Politechnika [PP71]</text>
+                    <circle cx='14' cy='1296.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='1302.0' font-size='16' fill='white'>Żegrze II [Z II41]</text>
+                    <circle cx='14' cy='1392.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='1398.0' font-size='16' fill='white'>Sarbinowska [SARB02]</text>
+                    <circle cx='14' cy='1488.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='1494.0' font-size='16' fill='white'>Rondo Solidarności [ROSO03]</text>
+                    <circle cx='14' cy='1584.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='1590.0' font-size='16' fill='white'>Połabska [POLA01]</text>
+                    <circle cx='14' cy='1680.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='1686.0' font-size='16' fill='white'>Nad Wierzbakiem [NADW01]</text>
+                    <circle cx='14' cy='1776.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='1782.0' font-size='16' fill='white'>Nad Wierzbakiem [NADW02]</text>
+                    <circle cx='14' cy='1872.0' r='11.0'
+                            fill='white' stroke-width='6' stroke='#ff61b1'></circle>
+                    <text x='44' y='1878.0' font-size='16' fill='white'>Strzeszyn Grecki [STGR01]</text>
+                </svg>
+            </div>
             <div class='raid-log' id='202501'>
                 <p class='raid-log-title'>The Milky Raid</p>
                 <p style="max-width: 100%; text-align: center;">
