@@ -652,11 +652,6 @@ class RouteRaidElement(RaidElement):
                                 data.get('line'), data.get('comment'))
 
 
-class TransferRaidElement(RouteRaidElement):
-    def __init__(self):
-        super().__init__(None, None, 'foot', [])
-
-
 class Raid:
     def __init__(self, raid_id: str, icon: str, date: DateAndOrder, participants: list[Player], elements: list[RaidElement]):
         self.raid_id: Final[str] = raid_id
@@ -664,6 +659,11 @@ class Raid:
         self.date: Final[DateAndOrder] = date
         self._participants: list[Player] = participants
         self._elements: list[RaidElement] = elements
+        routes: list[RouteRaidElement] = self.routes
+        for i in range(1, len(self.routes) - 1):
+            if routes[i].shape[-1] != routes[i + 1].shape[0]:
+                raise ValueError(f'Disconnected parts of the route in raid {raid_id}: '
+                                 f'... {routes[i].shape[-1]} -x- {routes[i + 1].shape[0]} ...')
 
     @property
     def participants(self) -> list[Player]:
@@ -775,7 +775,7 @@ class Raid:
             i: int = 0
             while i < len(raid._elements) - 1:
                 if isinstance(raid._elements[i], PointRaidElement) and isinstance(raid._elements[i + 1], PointRaidElement):
-                    raid._elements.insert(i + 1, TransferRaidElement())
+                    raid._elements.insert(i + 1, RouteRaidElement(None, None, 'foot', []))
                     i += 1
                 i += 1
             return raid

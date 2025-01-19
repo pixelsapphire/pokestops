@@ -23,7 +23,7 @@
                     walk ({{ util.format_distance(route.total_length) }})
                 {% endif %}
             {% else %}
-                (transfer) {# TODO remove this, as well as TransferRaidElement #}
+                (transfer)
             {% endif %}
         </text>
         <text x='{{ route_label_x }}' y='{{ initial_y + stroke_width + font_size * 0.75 + y_offset }}'

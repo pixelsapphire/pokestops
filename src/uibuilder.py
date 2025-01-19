@@ -129,9 +129,7 @@ class UIBuilder(Environment):
 
         for r in self.__database__.raids:
             for element in r.map_elements:
-                if isinstance(element, TransferRaidElement):
-                    continue
-                elif isinstance(element, RepeatedPointRaidElement):
+                if isinstance(element, RepeatedPointRaidElement):
                     yield draw_point(element, r.raid_id)
                 elif isinstance(element, RouteRaidElement):
                     yield draw_route(element, r)
