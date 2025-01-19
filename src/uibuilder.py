@@ -70,7 +70,7 @@ class UIBuilder(Environment):
                 return
             already_drawn.add((pts, cls)) if isinstance(pts, LineSegment) else None
             paths.append(PolyLine(locations=[pts], class_name=' '.join(cls),
-                                  fill_opacity=0, weight=3, bubbling_mouse_events=False))
+                                  fill_opacity=0, bubbling_mouse_events=False))
 
         for line in [line for line in self.__database__.lines.values() if not line.is_discovered()]:
             for route in line.routes:
@@ -115,27 +115,28 @@ class UIBuilder(Environment):
         icon_template: Template = self.get_template('map.features.icons.raid_point')
         popup_template: Template = self.get_template('map.features.popups.raid_point')
 
-        def draw_point(point: PointRaidElement, raid_id: str) -> Marker:
+        def draw_point(point: RepeatedPointRaidElement, raid_id: str) -> Marker:
             return Marker(
                 location=point.location,
                 popup=Popup(popup_template.render(point=point, raid_id=raid_id).replace('\n', '')),
-                icon=DivIcon(html=icon_template.render(point=point, raid_id=raid_id).replace('\n', ''), icon_anchor=(12, 16))
+                icon=DivIcon(html=icon_template.render(point=point, raid_id=raid_id).replace('\n', ''),
+                             icon_anchor=(12 * len(point.marker()), 16))
             )
 
-        def draw_route(route: RouteRaidElement, raid_id: str) -> PolyLine:
-            return PolyLine(locations=[route.shape], class_name=f'raid r-{raid_id}',
+        def draw_route(route: RouteRaidElement, raid: Raid) -> PolyLine:
+            return PolyLine(locations=[route.shape], class_name=f'raid rtm-{route.transport_method} r-{raid.raid_id}',
                             fill_opacity=0, weight=3, bubbling_mouse_events=False)
 
-        for raid in self.__database__.raids:
-            for element in raid.elements:
-                if isinstance(element, PointRaidElement):
-                    yield draw_point(element, raid.raid_id)
-                elif isinstance(element, TransferRaidElement):
+        for r in self.__database__.raids:
+            for element in r.map_elements:
+                if isinstance(element, TransferRaidElement):
                     continue
+                elif isinstance(element, RepeatedPointRaidElement):
+                    yield draw_point(element, r.raid_id)
                 elif isinstance(element, RouteRaidElement):
-                    yield draw_route(element, raid.raid_id)
+                    yield draw_route(element, r)
                 else:
-                    raise ValueError(f'Unknown raid element type: {element}')
+                    raise ValueError(f'Unsupported raid element type: {element}')
 
     def create_map(self, initial_html: str) -> Template:
         folium_head: str = re.search(r'<head>(.*)</head>', initial_html, re.DOTALL).group(1).strip()

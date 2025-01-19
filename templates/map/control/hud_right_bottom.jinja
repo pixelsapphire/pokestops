@@ -11,11 +11,11 @@
         Exploration progress:
         <span id='exploration-percentage'
                 {%- for player in db.players -%}
-                    data-lines-{{ player.nickname.lower() }}='{{ db.progress['LN'][player.nickname] }}'
-                    data-sv-{{ player.nickname.lower() }}='{{ db.progress['SV'][player.nickname] }}'
+              data-lines-{{ player.nickname.lower() }}='{{ db.progress['LN'][player.nickname] }}'
+              data-sv-{{ player.nickname.lower() }}='{{ db.progress['SV'][player.nickname] }}'
                     {%- for region in db.regions.values() -%}
-                      data-{{ region.short_name.lower() }}-{{ player.nickname.lower() }}='{{ db.progress[region.short_name][player.nickname] }}'
-                      data-{{ region.short_name.lower() }}-ev-{{ player.nickname.lower() }}='{{ db.progress[region.short_name]['ev-' + player.nickname] }}'
+              data-{{ region.short_name.lower() }}-{{ player.nickname.lower() }}='{{ db.progress[region.short_name][player.nickname] }}'
+              data-{{ region.short_name.lower() }}-ev-{{ player.nickname.lower() }}='{{ db.progress[region.short_name]['ev-' + player.nickname] }}'
                     {%- endfor -%}
                 {%- endfor -%}>
             {{ db.progress[db.district.short_name][db.players[0].nickname] }}
@@ -25,23 +25,29 @@
         Total length:
         <span id='raid-length'
                 {%- for raid in db.raids -%}
-                    data-{{ raid.raid_id }}='{{ raid.total_length.format(precision=1) }}'
+              data-{{ raid.raid_id }}='{{ raid.total_length.format(precision=1) }}'
                 {%- endfor -%}>
             {{ db.raids[0].total_length.format(precision=1) }}
         </span>
+        (walking:
+        <span id='raid-walking-distance'
+                {%- for raid in db.raids -%}
+              data-{{ raid.raid_id }}='{{ raid.walking_distance.format(precision=1) }}'
+                {%- endfor -%}>
+            {{ db.raids[0].walking_distance.format(precision=1) }}
+        </span>)
         <br>
         Total time:
         <span id='raid-time'
                 {%- for raid in db.raids -%}
-                    data-{{ raid.raid_id }}='{{ raid.total_time.format_as_hms() }}'
+              data-{{ raid.raid_id }}='{{ raid.total_time.format_as_hms() }}'
                 {%- endfor -%}>
             {{ db.raids[0].total_time.format_as_hms() }}
         </span>
-        <br>
-        (ride time: <span id='raid-ride-time'
-                {%- for raid in db.raids -%}
-                    data-{{ raid.raid_id }}='{{ raid.total_ride_time.format_as_hms() }}'
-                {%- endfor -%}>
+        (on rides: <span id='raid-ride-time'
+            {%- for raid in db.raids -%}
+                         data-{{ raid.raid_id }}='{{ raid.total_ride_time.format_as_hms() }}'
+            {%- endfor -%}>
             {{ db.raids[0].total_ride_time.format_as_hms() }}
         </span>)
     </span>

@@ -2,44 +2,47 @@
 {% set stop_radius = 14 %}
 {% set stroke_width = 6 %}
 {% set line_width = 8 %}
-{% set time_label_width = 96 %}
 {% set font_size = 16 %}
 
 {% set initial_y = -stop_spacing / 2 %}
-{% set stop_label_x = time_label_width + stop_radius * 2 + line_width %}
-{% set route_label_x = 2 * font_size + stop_radius * 2 + line_width %}
+{% set stop_label_x = stop_radius * 2 + line_width + 8 %}
+{% set route_label_x = stop_label_x + 16 %}
 
 <svg class='raid-timeline' preserveAspectRatio='xMinYMin meet'>
-    <rect x='{{ stop_radius - 4 }}' y='{{ stop_spacing / 2 }}' width='{{ line_width }}'
-          height='{{ (raid.stops | length - 1) * stop_spacing }}' fill='#{{ ref.color_raid_route }}'></rect>
+    {% for route in raid.routes %}
+        {% set y_offset = (loop.index + 0.5) * stop_spacing %}
+        <line x1='{{ stop_radius }}' y1='{{ y_offset - stop_spacing }}' x2='{{ stop_radius }}'
+              y2='{{ y_offset }}' stroke='#{{ ref.color_raid_route }}'
+              stroke-width='{{ line_width }}' class='rtm-{{ route.transport_method }}'></line>
+        <text x='{{ route_label_x }}' y='{{ initial_y + stroke_width - font_size * 0.75 + y_offset }}'
+              font-size='{{ font_size }}' fill='#aaa'>
+            {% if route.shape_defined() %}
+                {% if route.transport_method != 'foot' %}
+                    {{ route.transport_method }} ride (line {{ route.line_number }})
+                {% else %}
+                    walk ({{ util.format_distance(route.total_length) }})
+                {% endif %}
+            {% else %}
+                (transfer) {# TODO remove this, as well as TransferRaidElement #}
+            {% endif %}
+        </text>
+        <text x='{{ route_label_x }}' y='{{ initial_y + stroke_width + font_size * 0.75 + y_offset }}'
+              font-size='{{ font_size }}' fill='#aaa'>
+            {% if route.comment %} // {{ route.comment }}{% endif %}
+            {% if route.transport_method != 'foot' %}
+                {{ route.total_time.format_as_hms() }}
+                ({{ util.format_distance(route.total_length) }})
+            {% endif %}
+        </text>
+    {% endfor %}
     {% for stop in raid.stops %}
         {% set y_offset = loop.index * stop_spacing %}
         <circle cx='{{ stop_radius }}' cy='{{ initial_y + y_offset }}' r='{{ stop_radius - stroke_width / 2 }}'
                 fill='white' stroke-width='{{ stroke_width }}' stroke='#{{ ref.color_raid_route }}'></circle>
-        <text x='{{ stop_label_x - font_size }}' y='{{ initial_y + stroke_width + y_offset }}'
-              text-anchor='end' font-size='{{ font_size }}' fill='white'>{{ stop.time.strftime('%-I:%M%p') }}</text>
-        <text x='{{ stop_label_x }}' y='{{ initial_y + stroke_width + y_offset }}'
-              font-size='{{ font_size }}' fill='white'>{{ stop.stop }}</text>
-    {% endfor %}
-
-    {% for route in raid.routes %}
-        {% set y_offset = (loop.index + 0.5) * stop_spacing %}
-        <text x='{{ route_label_x }}' y='{{ initial_y + stroke_width + y_offset }}'
-              font-size='{{ font_size }}' fill='#aaa'>
-        {% if route.shape_defined() %}
-            {% if route.trasport_method != 'foot' %}
-                {{ route.trasport_method }} ride (line {{ route.line_number }}) :: {{ route.total_time.format_as_hms() }}
-            {% else %}
-                walk
-            {% endif %}
-            {% if route.total_length >= Quantity(1000, 'm') %}
-                ({{ route.total_length.convert(multiplier=kilo).format(precision=1) }})
-            {% else %}
-                ({{ route.total_length.format(precision=0) }})
-            {% endif %}
-        {% else %}
-            (transfer)
-        {% endif %}
+        <text x='{{ stop_label_x }}' y='{{ initial_y + stroke_width + y_offset }}' font-size='{{ font_size }}' fill='white'>
+            {{ stop.stop }}
+            {%- if stop.time %} :: {{ stop.time.strftime('%-I:%M%p') }}{% endif -%}
+            {%- if stop.comment %} // {{ stop.comment }}{% endif -%}
         </text>
     {% endfor %}
 </svg>

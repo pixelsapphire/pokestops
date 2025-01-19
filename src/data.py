@@ -9,10 +9,8 @@ from date import DateAndOrder
 from datetime import datetime
 from geo import geopoint
 from log import log
-from quantity import kilo
+from quantity import Duration
 from typing import Final, get_args, Literal, Self, TYPE_CHECKING
-
-from src.quantity import Duration, Quantity
 from util import *
 
 if TYPE_CHECKING:
@@ -558,9 +556,10 @@ class Region:
 
 
 class RaidElement(ABC):
-    def __init__(self, departure: datetime | None, arrival: datetime | None):
+    def __init__(self, departure: datetime | None, arrival: datetime | None, comment: str | None = None):
         self.departure: datetime | None = departure
         self.arrival: datetime | None = arrival
+        self.comment: str | None = comment
 
     @staticmethod
     def from_dict(data: dict[str, Any]) -> RaidElement:
@@ -571,18 +570,22 @@ class RaidElement(ABC):
 
 
 class PointRaidElement(RaidElement):
-    def __init__(self, phase: str, location: geopoint, stop: str):
-        super().__init__(None, None)
+    def __init__(self, phase: str, location: geopoint, stop: str, icon: str | None = None, comment: str | None = None,
+                 departure: datetime | None = None, arrival: datetime | None = None):
+        super().__init__(departure, arrival, comment)
         self.phase: str = phase
         self.location: geopoint = location
-        self.stop = stop
+        self.stop: str = stop
+        self.icon: str | None = icon
 
     @property
     def time(self) -> datetime | None:
         return self.departure or self.arrival
 
     def marker(self) -> str:
-        if self.phase == 'start' or self.phase == 'finish':
+        if self.icon is not None:
+            return self.icon
+        elif self.phase == 'start' or self.phase == 'finish':
             return 'F'
         elif self.phase == 'departure':
             return 'D'
@@ -590,19 +593,40 @@ class PointRaidElement(RaidElement):
             return 'A'
         elif self.phase == 'transfer':
             return 'M'
+        elif self.phase == 'break':
+            return 'b'
         else:
             return 'B'
 
     @staticmethod
     def from_dict(data: dict[str, Any]) -> PointRaidElement:
-        return PointRaidElement(data['phase'], geopoint.parse(data['location']), data['stop'])
+        return PointRaidElement(data['phase'], geopoint.parse(data['location']), data['stop'],
+                                data.get('icon'), data.get('comment'))
+
+
+class RepeatedPointRaidElement(RaidElement):
+    def __init__(self, points: list[PointRaidElement]):
+        super().__init__(None, None)
+        if len(points) == 0:
+            raise ValueError('RepeatedPointRaidElement must contain at least one point')
+        if any(p.location != points[0].location or p.stop != points[0].stop for p in points):
+            raise ValueError('All points in RepeatedPointRaidElement must have the same location and stop name')
+        self.points: list[PointRaidElement] = points
+        self.location: geopoint = points[0].location
+        self.stop = points[0].stop
+
+    def marker(self) -> str:
+        return ''.join(point.marker() for point in self.points)
+
+    def add(self, point: PointRaidElement):
+        self.points.append(point)
 
 
 class RouteRaidElement(RaidElement):
     def __init__(self, departure: datetime | None, arrival: datetime | None,
-                 trasport_method: str, shape: list[geopoint], line_number: str | None = None):
-        super().__init__(departure, arrival)
-        self.trasport_method: str = trasport_method
+                 transport_method: str, shape: list[geopoint], line_number: str | None = None, comment: str | None = None):
+        super().__init__(departure, arrival, comment)
+        self.transport_method: str = transport_method
         self.shape: list[geopoint] = shape
         self.line_number: str | None = line_number
 
@@ -625,7 +649,7 @@ class RouteRaidElement(RaidElement):
         return RouteRaidElement(datetime.fromisoformat(data['departure']) if 'departure' in data else None,
                                 datetime.fromisoformat(data['arrival']) if 'arrival' in data else None,
                                 data['transport_method'], [geopoint.parse(point) for point in data['shape'].split('&')],
-                                data.get('line'))
+                                data.get('line'), data.get('comment'))
 
 
 class TransferRaidElement(RouteRaidElement):
@@ -651,6 +675,40 @@ class Raid:
 
     @property
     @memoized
+    def map_elements(self) -> list[RaidElement]:
+
+        elements_with_transfers: list[RaidElement] = []
+        i: int = 0
+        while i < len(self.elements) - 2:
+            e0, e1, e2 = self.elements[i], self.elements[i + 1], self.elements[i + 2]
+            if (isinstance(e0, PointRaidElement) and isinstance(e1, RouteRaidElement) and isinstance(e2, PointRaidElement) and
+                    e0.stop == e2.stop and e0.phase == 'arrival' and e1.transport_method == 'foot' and e2.phase == 'departure'):
+                elements_with_transfers.append(PointRaidElement('transfer', e0.location, e0.stop, None, None, e2.time, e0.time))
+                elements_with_transfers.append(e1)
+                i += 2
+            else:
+                elements_with_transfers.append(e0)
+            i += 1
+        while i < len(self.elements):
+            elements_with_transfers.append(self.elements[i])
+            i += 1
+
+        marked_stops: dict[str, RepeatedPointRaidElement] = {}
+        raid_map_elements: list[RaidElement] = []
+        for element in elements_with_transfers:
+            if not isinstance(element, PointRaidElement):
+                raid_map_elements.append(element)
+            else:
+                if element.stop not in marked_stops:
+                    marked_stops[element.stop] = (repeated_stop := RepeatedPointRaidElement([element]))
+                    raid_map_elements.append(repeated_stop)
+                else:
+                    marked_stops[element.stop].add(element)
+
+        return raid_map_elements
+
+    @property
+    @memoized
     def stops(self) -> list[PointRaidElement]:
         return [element for element in self._elements if isinstance(element, PointRaidElement)]
 
@@ -672,7 +730,7 @@ class Raid:
     @property
     @memoized
     def total_ride_time(self) -> Duration:
-        return sum((route.total_time for route in self.routes if route.trasport_method != 'foot'), Duration(0))
+        return sum((route.total_time for route in self.routes if route.transport_method != 'foot'), Duration(0))
 
     @property
     @memoized
@@ -687,7 +745,13 @@ class Raid:
     @property
     @memoized
     def taken_rides(self) -> int:
-        return count(r for r in self.routes if r.trasport_method != 'foot')
+        return count(r for r in self.routes if r.transport_method != 'foot')
+
+    @property
+    @memoized
+    def walking_distance(self) -> Quantity:
+        return (sum((route.total_length for route in self.routes if route.transport_method == 'foot'), Quantity(0, 'm'))
+                .convert(multiplier=kilo))
 
     @property
     @memoized

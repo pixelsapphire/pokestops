@@ -5,6 +5,7 @@ import subprocess
 import zipfile
 from functools import partial
 from log import error
+from quantity import kilo, Quantity
 from sortedcontainers import SortedSet
 from typing import Any, Callable, Hashable, Iterable, Protocol, TypeVar, runtime_checkable
 
@@ -72,6 +73,11 @@ def invert_hex_color(color: str) -> str:
     color: str = color.lstrip('#')
     inverted_color = ''.join(f'{255 - int(color[i:i + 2], 16):02x}' for i in range(0, 6, 2))
     return f'{strif('#', hashtag)}{inverted_color}{strif(color[-2:], len(color) > 6)}'
+
+
+def format_distance(distance: Quantity) -> str:
+    return distance.convert(multiplier=kilo).format(precision=1) \
+        if distance >= Quantity(1000, 'm') else distance.format(precision=0)
 
 
 def prepare_path(file_path: str | os.PathLike[str]) -> str | os.PathLike[str]:

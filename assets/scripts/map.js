@@ -6,8 +6,6 @@ let activeMode = 'pokestops';
 let activeRegion = 'POZ';
 let activeRaid = '202501';
 let darkMode = true;
-let raidRouteColor = '#ff61b1';
-let raidMarkerColor = '#ba56f6';
 
 const lightModeIcon = 'assets/images/light_mode.png';
 const darkModeIcon = 'assets/images/dark_mode.png';
@@ -56,7 +54,7 @@ function preparePokestops() {
             m.style.color = 'red';
             m.parentElement.style.display = showUnvisitedStops ? null : 'none';
         });
-    document.querySelectorAll(`.marker:not(.v-${activePlayer.toLowerCase()})`).forEach(m => {
+    document.querySelectorAll(`.marker:not(.v-${activePlayer.toLowerCase()}):not(.raid)`).forEach(m => {
         m.style.color = 'red';
         m.parentElement.style.display = showUnvisitedStops ? null : 'none';
     });
@@ -120,22 +118,20 @@ function prepareStellarVoyage() {
 function prepareCityRaiders() {
 
     document.querySelectorAll('path.leaflet-interactive').forEach(l => {
-        if (l.classList.contains('raid') && l.classList.contains(`r-${activeRaid}`)) {
-            l.style.display = null;
-            l.setAttribute('stroke', raidRouteColor);
-        } else l.style.display = 'none';
+        if (l.classList.contains('raid') && l.classList.contains(`r-${activeRaid}`)) l.style.display = null
+        else l.style.display = 'none';
     });
     document.querySelectorAll('.marker').forEach(m => {
-        if (m.classList.contains('raid') && m.classList.contains(`r-${activeRaid}`)) {
-            m.parentElement.style.display = null;
-            m.style.color = raidMarkerColor;
-        } else m.parentElement.style.display = 'none';
+        if (m.classList.contains('raid') && m.classList.contains(`r-${activeRaid}`)) m.parentElement.style.display = null
+        else m.parentElement.style.display = 'none';
     });
 
     document.getElementById('exploration-progress').classList.add('hidden');
     document.getElementById('raid-info').classList.remove('hidden');
     const length = document.getElementById('raid-length');
     length.innerHTML = `${length.getAttribute(`data-${activeRaid}`)}`;
+    const walkingDistance = document.getElementById('raid-walking-distance');
+    walkingDistance.innerHTML = `${walkingDistance.getAttribute(`data-${activeRaid}`)}`;
     const time = document.getElementById('raid-time');
     time.innerHTML = `${time.getAttribute(`data-${activeRaid}`)}`;
     const rideTime = document.getElementById('raid-ride-time');

@@ -21,19 +21,21 @@
                     <td>time:</td>
                     <td>
                         {{ raid.start_time.strftime('%-I:%M%p') }} ~ {{ raid.finish_time.strftime('%-I:%M%p') }}
-                        (total time: {{ raid.total_time.format_as_hms() }})
+                        ({{ raid.total_time.format_as_hms() }})
                     </td>
                 </tr>
                 <tr>
-                    <td>total distance:</td>
-                    <td>{{ raid.total_length.format(precision=1) }}</td>
+                    <td>total length:</td>
+                    <td>{{ raid.total_length.format(precision=1) }}
+                        (walking distance: {{ raid.walking_distance.format(precision=1) }})
+                    </td>
                 </tr>
                 <tr>
                     <td>rides taken:</td>
                     <td>{{ raid.taken_rides }} (total ride time: {{ raid.total_ride_time.format_as_hms() }})</td>
                 </tr>
                 <tr>
-                    <td>stops visited:</td>
+                    <td>stops:</td>
                     <td>{{ raid.visited_stops }}</td>
                 </tr>
             </table>

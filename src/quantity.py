@@ -1,7 +1,6 @@
 from __future__ import annotations
 from datetime import datetime
 from decimal import Decimal
-from util import strif
 
 
 class Multiplier:
@@ -46,6 +45,7 @@ yobi: Multiplier = Multiplier('1208925819614629174706176', 'Yi')
 
 class Unit:
     def __init__(self, symbol: str | None = '', multiplier: Multiplier = one):
+        from util import strif
         self.symbol: str = strif(symbol, symbol)
         self.multiplier: Multiplier = multiplier
 
@@ -175,6 +175,7 @@ class Duration(Quantity):
         return Duration((end - start).total_seconds())
 
     def format_as_hms(self, display_zero: bool = False) -> str:
+        from util import strif
         hours, remainder = divmod(abs(self.base_magnitude), 3600)
         minutes, seconds = divmod(remainder, 60)
         h, m, s = f'{int(hours)}h', f'{int(minutes)}min', f'{int(seconds)}s'

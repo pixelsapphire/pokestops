@@ -1,9 +1,14 @@
 <span class="stop-name">{{ point.stop }}</span>
-<span class="stop-visitors"><br>{{ point.phase }} point<br>
-    {%- if point.phase == 'transfer' -%}
-        arrival time: {{ point.arrival.strftime('%-I:%M%p') if point.arrival else '?' }}<br>
-        departure time: {{ point.departure.strftime('%-I:%M%p') if point.departure else '?' }}
-    {%- else -%}
-        time: {{ point.time.strftime('%-I:%M%p') if point.time else '?' }}
-    {%- endif -%}
+<span class="stop-visitors">
+    {%- for point in point.points -%}
+        <br><i>{{ point.phase }} point</i><br>
+        {%- if point.phase == 'transfer' -%}
+            &nbsp;arrival time: {{ point.arrival.strftime('%-I:%M%p') if point.arrival else '?' -}}
+            <br>&nbsp;departure time: {{ point.departure.strftime('%-I:%M%p') if point.departure else '?' }}
+        {%- elif point.phase in ['departure', 'arrival'] -%}
+            {% set time = point.departure or point.arrival -%}
+            &nbsp;time: {{ time.strftime('%-I:%M%p') if time else '?' }}
+        {%- endif -%}
+        {%- if point.comment %}&nbsp;{{ point.comment }}{% endif -%}
+    {%- endfor -%}
 </span>

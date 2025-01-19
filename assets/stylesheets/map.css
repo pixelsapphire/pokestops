@@ -144,6 +144,10 @@
     line-height: 85%;
 }
 
+#raid-info {
+    font-size: min(3.2dvh, 3.2dvw);
+}
+
 .mode-info-label {
     font-size: min(4dvh, 4dvw);
 }
@@ -420,11 +424,11 @@
     }
 
     .marker.raid {
-         text-shadow: 1px 1px white, -1px 1px white, 1px -1px white, -1px -1px white, 0 2px white, 0 -2px white, 2px 0 white, -2px 0 white;
+        text-shadow: 1px 1px white, -1px 1px white, 1px -1px white, -1px -1px white, 0 2px white, 0 -2px white, 2px 0 white, -2px 0 white;
     }
 
     .dark .marker.raid {
-         text-shadow: 1px 1px black, -1px 1px black, 1px -1px black, -1px -1px black, 0 2px black, 0 -2px black, 2px 0 black, -2px 0 black;
+        text-shadow: 1px 1px black, -1px 1px black, 1px -1px black, -1px -1px black, 0 2px black, 0 -2px black, 2px 0 black, -2px 0 black;
     }
 }
 
@@ -459,4 +463,23 @@
 
 .stellar-voyage .stop-tp {
     display: initial;
+}
+
+.marker.raid {
+    color: #ba56f6;
+}
+
+path.leaflet-interactive.raid {
+    stroke: #ff61b1;
+    stroke-width: 4;
+}
+
+path.leaflet-interactive.rtm-foot {
+    stroke-dasharray: 1 6;
+    stroke-width: 3;
+}
+
+path.leaflet-interactive.rtm-train {
+    stroke-dasharray: 12 12 4 12;
+    stroke-width: 6;
 }
