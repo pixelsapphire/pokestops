@@ -88,25 +88,19 @@ class DateAndOrder:
         return self.__cmp_key__() == other.__cmp_key__() if isinstance(other, DateAndOrder) else False
 
     def __le__(self, other):
-        if DateAndOrder.never in (self, other):
-            return self == DateAndOrder.never
-        if DateAndOrder.distant_past in (self, other):
-            return self == DateAndOrder.distant_past
-        if DateAndOrder.distant_future in (self, other):
-            return other == DateAndOrder.distant_future
-        return self.__cmp_key__() < other.__cmp_key__() if isinstance(other, DateAndOrder) else bool(self) < bool(other)
+        if ((self == DateAndOrder.never and other == DateAndOrder.never) or
+                self == DateAndOrder.distant_past or other == DateAndOrder.distant_future):
+            return True
+        return self.__cmp_key__() <= other.__cmp_key__()
 
     def __lt__(self, other):
         return self <= other and self != other
 
     def __ge__(self, other):
-        if DateAndOrder.never in (self, other):
-            return other == DateAndOrder.never
-        if DateAndOrder.distant_past in (self, other):
-            return other == DateAndOrder.distant_past
-        if DateAndOrder.distant_future in (self, other):
-            return self == DateAndOrder.distant_future
-        return self.__cmp_key__() > other.__cmp_key__() if isinstance(other, DateAndOrder) else bool(self) > bool(other)
+        if ((self == DateAndOrder.never and other == DateAndOrder.never) or
+                self == DateAndOrder.distant_future or other == DateAndOrder.distant_past):
+            return True
+        return self.__cmp_key__() >= other.__cmp_key__()
 
     def __gt__(self, other):
         return self >= other and self != other
