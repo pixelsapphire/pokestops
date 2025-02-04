@@ -894,15 +894,18 @@ class Database:
                 self.__reported_collections__.add(collection)
 
     def make_update_report(self) -> None:
-        added_stops: set[Stop] = {s for s in self.stops.values() if s not in self.__old_data__.stops.values()}
-        removed_stops: set[Stop] = {s for s in self.__old_data__.stops.values() if s not in self.stops.values()}
+        old_stops: set[Stop] = coalesce(self.__old_data__.stops, {}).values() if self.__old_data__ else set()
+        old_lines: dict[str, Line] = coalesce(self.__old_data__.lines, {}) if self.__old_data__ else {}
+        old_announcements: set[Announcement] = coalesce(self.__old_data__.announcements, set()) if self.__old_data__ else set()
+        added_stops: set[Stop] = {s for s in self.stops.values() if s not in old_stops}
+        removed_stops: set[Stop] = {s for s in old_stops if s not in self.stops.values()}
         changed_stops: set[tuple[Stop, Stop]] = set()
-        added_lines: set[str] = {r for r in self.lines.keys() if r not in self.__old_data__.lines.keys()}
-        removed_lines: set[str] = {r for r in self.__old_data__.lines.keys() if r not in self.lines.keys()}
-        changed_lines: set[str] = {r for r in self.lines.keys() if r in self.__old_data__.lines.keys() and
-                                   self.lines[r].variants != self.__old_data__.lines[r].variants}
-        added_announcements: set[Announcement] = {a for a in self.announcements if a not in self.__old_data__.announcements}
-        removed_announcements: set[Announcement] = {a for a in self.__old_data__.announcements if a not in self.announcements}
+        added_lines: set[str] = {r for r in self.lines.keys() if r not in old_lines.keys()}
+        removed_lines: set[str] = {r for r in old_lines.keys() if r not in self.lines.keys()}
+        changed_lines: set[str] = {r for r in self.lines.keys() if r in old_lines.keys() and
+                                   self.lines[r].variants != old_lines[r].variants}
+        added_announcements: set[Announcement] = {a for a in self.announcements if a not in old_announcements}
+        removed_announcements: set[Announcement] = {a for a in old_announcements if a not in self.announcements}
         effective_modifications: list[StopChange] = [c for c in self.get_effective_changes() if c.is_modification()]
         if effective_modifications:
             for change in effective_modifications:
