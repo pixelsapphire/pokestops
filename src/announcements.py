@@ -131,9 +131,13 @@ class MPKArticleScraper(ArticleScraper):
     @staticmethod
     def get_articles(browser: WebDriver, url: str) -> list[str]:
         browser.get(url)
-        container: WebElement = browser.find_element(By.ID, 'main-content').find_element(By.CLASS_NAME, 'row')
-        return list(map(lambda e: e.find_element(By.TAG_NAME, 'a').get_attribute('href'),
-                        container.find_elements(By.CLASS_NAME, 'col-md-6')))
+        try:
+            container: WebElement = browser.find_element(By.ID, 'main-content').find_element(By.CLASS_NAME, 'row')
+            return list(map(lambda e: e.find_element(By.TAG_NAME, 'a').get_attribute('href'),
+                            container.find_elements(By.CLASS_NAME, 'col-md-6')))
+        except Exception as e:
+            error(f'Error while fetching MPK announcements index: {type(e).__name__} - {e}')
+            return []
 
     @override
     @memoized
@@ -174,9 +178,13 @@ class ZTMArticleScraper(ArticleScraper):
     @staticmethod
     def get_articles(browser: WebDriver, url: str) -> list[str]:
         browser.get(url)
-        container: WebElement = browser.find_element(By.ID, 'main-content').find_element(By.CSS_SELECTOR, '.row.gy-4')
-        return list(map(lambda e: e.find_element(By.TAG_NAME, 'a').get_attribute('href'),
-                        container.find_elements(By.CLASS_NAME, 'col-lg-6')))
+        try:
+            container: WebElement = browser.find_element(By.ID, 'main-content').find_element(By.CSS_SELECTOR, '.row.gy-4')
+            return list(map(lambda e: e.find_element(By.TAG_NAME, 'a').get_attribute('href'),
+                            container.find_elements(By.CLASS_NAME, 'col-lg-6')))
+        except Exception as e:
+            error(f'Error while fetching ZTM announcements index: {type(e).__name__} - {e}')
+            return []
 
     @override
     @memoized
@@ -192,8 +200,9 @@ class ZTMArticleScraper(ArticleScraper):
             try:
                 seo: WebElement = self.driver.find_element(By.CSS_SELECTOR,
                                                            'script[type="application/ld+json"].yoast-schema-graph')
-                date_modified: str = json.loads(seo.get_attribute('innerHTML'))['@graph'][0]['dateModified'][:10]
-                published: DateAndOrder = DateAndOrder(date_string=date_modified, string_format='y-m-d')
+                graph_entry: dict[str, Any] = json.loads(seo.get_attribute('innerHTML'))['@graph'][0]
+                date_published: str = graph_entry['dateModified' if 'dateModified' in graph_entry else 'datePublished'][:10]
+                published: DateAndOrder = DateAndOrder(date_string=date_published, string_format='y-m-d')
             except NoSuchElementException:
                 pass
         return {'from': dates[0], 'to': dates[1], 'published': published}
@@ -222,17 +231,22 @@ def __fetch_article__(url: str, scrapper: type, announcements: list[Announcement
     with mutex:
         pbar.update(0.5)
     browser.open(url)
-    announcement_id: str = browser.get_announcement_id()
-    title: str = browser.get_title()
-    date_from: DateAndOrder | None = browser.get_date_from()
-    date_to: DateAndOrder | None = browser.get_date_to()
-    date_published: DateAndOrder | None = browser.get_date_published()
-    lines: list[Line] = browser.get_lines()
-    content: str = browser.get_content()
-    with mutex:
-        announcements.append(Announcement(announcement_id, title, date_from,
-                                          date_to, date_published, lines, content))
-        pbar.update(0.5)
+    try:
+        announcement_id: str = browser.get_announcement_id()
+        title: str = browser.get_title()
+        date_from: DateAndOrder | None = browser.get_date_from()
+        date_to: DateAndOrder | None = browser.get_date_to()
+        date_published: DateAndOrder | None = browser.get_date_published()
+        lines: list[Line] = browser.get_lines()
+        content: str = browser.get_content()
+        with mutex:
+            announcements.append(Announcement(announcement_id, title, date_from,
+                                              date_to, date_published, lines, content))
+    except Exception as e:
+        error(f'Error while processing announcement at {url}: {type(e).__name__} - {e}')
+    finally:
+        with mutex:
+            pbar.update(0.5)
 
 
 def fetch_announcements(first_update: bool, initial_db: Database) -> None:
