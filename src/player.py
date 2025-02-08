@@ -2,6 +2,7 @@ from __future__ import annotations
 import util
 from data import __read_collection__
 from data import *
+from functools import cmp_to_key
 from typing import Iterable
 
 
@@ -62,7 +63,7 @@ class Logbook:
                 prog.append(AchievementProgress(name, stops_list, visited, total, date))
             elif visited > 0:
                 prog.append(AchievementProgress(name, stops_list, visited, total))
-        return Comparator(Logbook.__cmp_achievements__).sorted(prog)
+        return sorted(prog, key=cmp_to_key(Logbook.__cmp_achievements__))
 
     def get_n_achievements(self, db: Database) -> int:
         # warning caused by Pycharm issue PY-70668

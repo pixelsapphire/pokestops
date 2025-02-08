@@ -169,23 +169,6 @@ class zip_file(zipfile.ZipFile):
         os.rename(member_name, output)
 
 
-class Comparator[T]:
-    def __init__(self, cmp: Callable[[T, T], int]):
-        self._cmp: Callable[[T, T], int] = cmp
-
-    def __sort__(self, items: list[T]) -> list[T]:
-        if len(items) <= 1:
-            return items
-        pivot = items[len(items) // 2]
-        less = [item for item in items if self._cmp(item, pivot) < 0]
-        equal = [item for item in items if self._cmp(item, pivot) == 0]
-        greater = [item for item in items if self._cmp(item, pivot) > 0]
-        return self.__sort__(less) + equal + self.__sort__(greater)
-
-    def sorted(self, items: Iterable[T]) -> list[T]:
-        return self.__sort__(list(items))
-
-
 class HashableSet[T](SortedSet[T]):
     def __init__(self, iterable: Iterable[T] = ()):
         super().__init__(iterable)
