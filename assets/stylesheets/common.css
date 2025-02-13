@@ -25,6 +25,10 @@ body {
     font-family: Genshin, sans-serif;
 }
 
+body::-webkit-scrollbar {
+    display: none;
+}
+
 body.default-light {
     color: #333333;
 }
