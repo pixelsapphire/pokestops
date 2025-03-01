@@ -1,0 +1,55 @@
+name: pokecon
+description: "Pokestops Admin Console"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.6.2
+
+dependencies:
+  cupertino_icons:
+  flutter:
+    sdk: flutter
+  flutter_staggered_grid_view:
+  http:
+  hue_rotation:
+  intl:
+  macos_ui:
+  provider:
+
+dev_dependencies:
+  flutter_lints:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+  assets:
+   - assets/brands/čkd.webp
+   - assets/brands/düwag.webp
+   - assets/brands/konstal.webp
+   - assets/brands/man.webp
+   - assets/brands/mercedes-benz.webp
+   - assets/brands/modertrans.webp
+   - assets/brands/siemens.webp
+   - assets/brands/solaris.webp
+   - assets/brands/waggonfabrik fuchs.webp
+   - assets/card_backgrounds/announcement.png
+   - assets/card_backgrounds/archive.png
+   - assets/card_backgrounds/code.png
+   - assets/card_backgrounds/database_refresh.webp
+   - assets/card_backgrounds/map.png
+   - assets/card_backgrounds/raids.png
+   - assets/card_backgrounds/steambird.png
+   - assets/card_backgrounds/update.jpg
+  # fonts:
+  #   - family: Schyler
+  #     fonts:
+  #       - asset: fonts/Schyler-Regular.ttf
+  #       - asset: fonts/Schyler-Italic.ttf
+  #         style: italic
+  #   - family: Trajan Pro
+  #     fonts:
+  #       - asset: fonts/TrajanPro.ttf
+  #       - asset: fonts/TrajanPro_Bold.ttf
+  #         weight: 700

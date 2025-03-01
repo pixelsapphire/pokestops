@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2"
+     xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+    <Document>
+        <name>GTFS</name>
+        <Style id="route">
+            <LineStyle>
+                <color>fff439ff</color>
+                <width>3.5</width>
+            </LineStyle>
+        </Style>
+        <Folder>
+            <name>stops</name>
+            {% for stop in db.stops.values() %}
+                <Placemark>
+                    <name>{{ stop.full_name }} [{{ stop.short_name }}]</name>
+                    <visibility>0</visibility>
+                    <Point>
+                        <gx:drawOrder>1</gx:drawOrder>
+                        <coordinates>{{ stop.location.longitude }},{{ stop.location.latitude }},0</coordinates>
+                    </Point>
+                </Placemark>
+            {% endfor %}
+        </Folder>
+    </Document>
+</kml>

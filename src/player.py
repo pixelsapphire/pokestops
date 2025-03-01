@@ -3,7 +3,7 @@ import util
 from data import __read_collection__
 from data import *
 from functools import cmp_to_key
-from typing import Iterable
+from typing import Iterable, Literal
 
 
 class AchievementProgress:
@@ -70,8 +70,15 @@ class Logbook:
         # noinspection PyTypeChecker
         return len(list(filter(AchievementProgress.is_completed, self.get_achievements(db))))
 
-    def get_stops(self) -> Iterable[Discovery[Stop]]:
-        return sorted(self.stops, reverse=True)
+    def get_stops(self, ev: Literal['include', 'exclude', 'only'] = 'include') -> Iterable[Discovery[Stop]]:
+        if ev == 'include':
+            return sorted(self.stops, reverse=True)
+        elif ev == 'exclude':
+            return sorted((s for s in self.stops if s.date.is_known()), reverse=True)
+        elif ev == 'only':
+            return sorted((s for s in self.stops if not s.date.is_known()), reverse=True)
+        else:
+            raise ValueError(f'Invalid argument for ev: {ev}')
 
     def get_lines(self) -> Iterable[Discovery[Line]]:
         return sorted(self.lines, reverse=True)

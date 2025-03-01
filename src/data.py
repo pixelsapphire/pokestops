@@ -6,19 +6,20 @@ import traceback
 from abc import ABC
 from collections import defaultdict
 from date import DateAndOrder
-from datetime import datetime
+from functools import cached_property
 from geo import geopoint
 from log import log
 from quantity import Duration
-from typing import Final, get_args, Literal, Self, TYPE_CHECKING
+from typing import Final, Literal, Self, TYPE_CHECKING
 from util import *
 
 if TYPE_CHECKING:
-    from announcements import Announcement
+    from database import Database
     from player import Player
 
-T = TypeVar('T')
-C = TypeVar('C')
+T: TypeVar = TypeVar('T')
+C: TypeVar = TypeVar('C')
+CompT: TypeVar = TypeVar('CompT', bound=RichComparisonT)
 
 
 def __read_collection__(source: str, identity: C, mapper: Callable[..., T], combiner: Callable[[C, T], None]) -> C:
@@ -45,9 +46,9 @@ class JsonSerializable(ABC):
         return obj.__json_entry__()
 
 
-class Discovery[RichComparisonT]:
-    def __init__(self, item: RichComparisonT, date: DateAndOrder = DateAndOrder.distant_past):
-        self.item: RichComparisonT = item
+class Discovery(Generic[CompT]):
+    def __init__(self, item: CompT, date: DateAndOrder = DateAndOrder.distant_past):
+        self.item: CompT = item
         self.date: DateAndOrder = date
 
     def __hash__(self):
@@ -273,10 +274,11 @@ class StopChange:
 
 
 class Carrier(JsonSerializable):
-    def __init__(self, symbol: str, short_name: str, full_name: str):
+    def __init__(self, symbol: str, short_name: str, full_name: str, colors: tuple[str, str, str]):
         self.symbol: str = symbol
         self.short_name: str = short_name
         self.full_name: str = full_name
+        self.colors: tuple[str, str, str] = colors
 
     def __hash__(self):
         return hash(self.symbol)
@@ -287,7 +289,8 @@ class Carrier(JsonSerializable):
     @staticmethod
     def read_dict(source: str) -> dict[str, Carrier]:
         log(f'  Reading carriers data from {source}... ', end='')
-        return __read_collection__(source, {}, Carrier, lambda c, v: c.update({v.symbol: v}))
+        constructor = lambda *row: Carrier(row[0], row[1], row[2], (row[3], row[4], row[5]))
+        return __read_collection__(source, {}, constructor, lambda c, v: c.update({v.symbol: v}))
 
     def __json_entry__(self) -> str:
         return (f'"{self.symbol}":{{'
@@ -451,6 +454,9 @@ class Line(JsonSerializable):
                   f'remove the {date.to_string(number=False)} entry from her lines file')
         self.discoveries.append(Discovery(player, date))
 
+    def get_zones(self, stops: dict[str, Stop]) -> list[str]:
+        return sorted(set(stops[stop].zone for seq in self.variants for stop in seq))
+
     def kind(self) -> str:
         if self.number.startswith('T'):
             return 'substitute'
@@ -518,6 +524,12 @@ class Region:
 
     def __eq__(self, other):
         return self.short_name == other.short_name if isinstance(other, type(self)) else False
+
+    def __bool__(self):  # for compatibility with database collecitons
+        return bool(self.full_name)
+
+    def __len__(self):  # for compatibility with database collecitons
+        return len(self.full_name)
 
     def add_stop(self, s: Stop) -> None:
         self.stops.add(s)
@@ -630,13 +642,11 @@ class RouteRaidElement(RaidElement):
         self.shape: list[geopoint] = shape
         self.line_number: str | None = line_number
 
-    @property
-    @memoized
+    @cached_property
     def total_length(self) -> Quantity:
         return sum((geopoint.distance(self.shape[i], self.shape[i + 1]) for i in range(len(self.shape) - 1)), Quantity(0, 'm'))
 
-    @property
-    @memoized
+    @cached_property
     def total_time(self) -> Duration:
         return Duration.as_difference(self.departure, self.arrival) \
             if self.departure is not None and self.arrival is not None else Duration(0)
@@ -677,8 +687,7 @@ class Raid:
     def elements(self) -> list[RaidElement]:
         return self._elements
 
-    @property
-    @memoized
+    @cached_property
     def map_elements(self) -> list[RaidElement]:
 
         elements_with_transfers: list[RaidElement] = []
@@ -711,55 +720,45 @@ class Raid:
 
         return raid_map_elements
 
-    @property
-    @memoized
+    @cached_property
     def stops(self) -> list[PointRaidElement]:
         return [element for element in self._elements if isinstance(element, PointRaidElement)]
 
-    @property
-    @memoized
+    @cached_property
     def routes(self) -> list[RouteRaidElement]:
         return [element for element in self._elements if isinstance(element, RouteRaidElement)]
 
-    @property
-    @memoized
+    @cached_property
     def start_time(self) -> datetime | None:
         return min((route.departure for route in self.routes if route.departure is not None), default=None)
 
-    @property
-    @memoized
+    @cached_property
     def finish_time(self) -> datetime | None:
         return max((route.arrival for route in self.routes if route.arrival is not None), default=None)
 
-    @property
-    @memoized
+    @cached_property
     def total_ride_time(self) -> Duration:
         return sum((route.total_time for route in self.routes if route.transport_method != 'foot'), Duration(0))
 
-    @property
-    @memoized
+    @cached_property
     def total_time(self) -> Duration:
         return Duration.as_difference(self.start_time, self.finish_time) \
             if self.start_time and self.finish_time else Duration(0)
 
-    @property
-    @memoized
+    @cached_property
     def total_length(self) -> Quantity:
         return sum((route.total_length for route in self.routes), Quantity(0, 'm')).convert(multiplier=kilo)
 
-    @property
-    @memoized
+    @cached_property
     def taken_rides(self) -> int:
         return count(r for r in self.routes if r.transport_method != 'foot')
 
-    @property
-    @memoized
+    @cached_property
     def walking_distance(self) -> Quantity:
         return (sum((route.total_length for route in self.routes if route.transport_method == 'foot'), Quantity(0, 'm'))
                 .convert(multiplier=kilo))
 
-    @property
-    @memoized
+    @cached_property
     def visited_stops(self) -> int:
         unique_stops: set[str] = set()
         for stop in self.stops:
@@ -793,165 +792,3 @@ class Raid:
         # warning caused by Pycharm issue PY-70668
         # noinspection PyTypeChecker
         return __read_collection__(source, [], lambda i: Raid.load(i, players), list.append)
-
-
-class Database:
-    CollectionName = Literal[
-        'players', 'progress', 'stops', 'stop_groups', 'terminals', 'carriers', 'regions',
-        'vehicles', 'models', 'lines', 'routes', 'raids', 'scheduled_changes', 'announcements']
-    __stars__: dict[tuple[int, int], int] = {(1, 1): 1, (2, 2): 2, (3, 4): 3, (5, 7): 4, (8, 100): 5}
-
-    def __init__(self, players: list[Player], progress: dict[str, dict[str, float]],
-                 stops: dict[str, Stop], stop_groups: dict[str, SortedSet[Stop]], terminals: list[Terminal],
-                 carriers: dict[str, Carrier], regions: dict[str, Region], district: Region,
-                 vehicles: dict[str, Vehicle], models: dict[str, VehicleModel],
-                 routes: dict[str, Route], lines: dict[str, Line], raids: list[Raid],
-                 scheduled_changes: list[StopChange], announcements: list[Announcement],
-
-                 *, is_old_data: bool = False):
-        self.__old_data__: Database | None = Database.partial(is_old_data=True) if is_old_data else None
-        self.__reported_collections__: set[Database.CollectionName] = set()
-        self.players: list[Player] = players
-        self.progress: dict[str, dict[str, float]] = progress
-        self.stops: dict[str, Stop] = stops
-        self.stop_groups: dict[str, SortedSet[Stop]] = stop_groups
-        self.terminals: list[Terminal] = terminals
-        self.carriers: dict[str, Carrier] = carriers
-        self.regions: dict[str, Region] = regions
-        self.district: Region = district
-        self.vehicles: dict[str, Vehicle] = vehicles
-        self.models: dict[str, VehicleModel] = models
-        self.routes: dict[str, Route] = routes
-        self.lines: dict[str, Line] = lines
-        self.raids: list[Raid] = raids
-        self.scheduled_changes: list[StopChange] = scheduled_changes
-        self.announcements: list[Announcement] = announcements
-
-    def __contains__(self, name: CollectionName) -> bool:
-        return bool(getattr(self, name))
-
-    @staticmethod
-    def partial(players: list[Player] | None = None, progress: dict[str, dict[str, float]] | None = None,
-                stops: dict[str, Stop] | None = None, stop_groups: dict[str, SortedSet[Stop]] | None = None,
-                terminals: list[Terminal] | None = None, carriers: dict[str, Carrier] | None = None,
-                regions: dict[str, Region] | None = None, district: Region | None = None,
-                vehicles: dict[str, Vehicle] | None = None, models: dict[str, VehicleModel] | None = None,
-                routes: dict[str, Route] | None = None, lines: dict[str, Line] | None = None, raids: list[Raid] | None = None,
-                scheduled_changes: list[StopChange] | None = None, announcements: list[Announcement] | None = None,
-                *, is_old_data: bool = False) -> Database:
-        return Database(players or [], progress or {}, stops or {}, stop_groups or {}, terminals or [],
-                        carriers or {}, regions or {}, district or Region(0, '', '', lambda _: False),
-                        vehicles or {}, models or {}, routes or {}, lines or {}, raids or [],
-                        scheduled_changes or [], announcements or [],
-                        is_old_data=is_old_data)
-
-    @staticmethod
-    def merge(db1: Database, db2: Database) -> Database:
-        if db1 and db2 is None:
-            return Database.partial()
-        elif (db1 is None) != (db2 is None):
-            return coalesce(db1, db2)
-        return Database(
-            db1.players + db2.players,
-            {**db1.progress, **db2.progress},
-            {**db1.stops, **db2.stops},
-            {**db1.stop_groups, **db2.stop_groups},
-            db1.terminals + db2.terminals,
-            {**db1.carriers, **db2.carriers},
-            {**db1.regions, **db2.regions},
-            db1.district,
-            {**db1.vehicles, **db2.vehicles},
-            {**db1.models, **db2.models},
-            {**db1.routes, **db2.routes},
-            {**db1.lines, **db2.lines},
-            db1.raids + db2.raids,
-            db1.scheduled_changes + db2.scheduled_changes,
-            db1.announcements + db2.announcements
-        )
-
-    @staticmethod
-    def get_stars_for_group(size: int):
-        return next((stars for ((min_size, max_size), stars) in Database.__stars__.items() if min_size <= size <= max_size), 0)
-
-    def regions_without_district(self) -> list[Region]:
-        return [region for region in self.regions.values() if region != self.district]
-
-    def region_of(self, stop: Stop) -> Region:
-        return next((region for region in stop.regions if stop and region != self.district), self.district)
-
-    def group_location(self, stop: Stop) -> geopoint:
-        stops: SortedSet[Stop] = self.stop_groups[stop.full_name]
-        return geopoint(sum(s.location.latitude for s in stops) / len(stops),
-                        sum(s.location.longitude for s in stops) / len(stops))
-
-    def get_effective_changes(self):
-        return [change for change in self.scheduled_changes if change.is_effective()]
-
-    def report_old_data(self, old_data: Database) -> None:
-        self.__old_data__ = Database.merge(self.__old_data__, old_data)
-        for collection in get_args(Database.CollectionName):
-            if len(getattr(old_data, collection)) > 0:
-                self.__reported_collections__.add(collection)
-
-    def make_update_report(self) -> None:
-        old_stops: set[Stop] = coalesce(self.__old_data__.stops, {}).values() if self.__old_data__ else set()
-        old_lines: dict[str, Line] = coalesce(self.__old_data__.lines, {}) if self.__old_data__ else {}
-        old_announcements: set[Announcement] = coalesce(self.__old_data__.announcements, set()) if self.__old_data__ else set()
-        added_stops: set[Stop] = {s for s in self.stops.values() if s not in old_stops}
-        removed_stops: set[Stop] = {s for s in old_stops if s not in self.stops.values()}
-        changed_stops: set[tuple[Stop, Stop]] = set()
-        added_lines: set[str] = {r for r in self.lines.keys() if r not in old_lines.keys()}
-        removed_lines: set[str] = {r for r in old_lines.keys() if r not in self.lines.keys()}
-        changed_lines: set[str] = {r for r in self.lines.keys() if r in old_lines.keys() and
-                                   self.lines[r].variants != old_lines[r].variants}
-        added_announcements: set[Announcement] = {a for a in self.announcements if a not in old_announcements}
-        removed_announcements: set[Announcement] = {a for a in old_announcements if a not in self.announcements}
-        effective_modifications: list[StopChange] = [c for c in self.get_effective_changes() if c.is_modification()]
-        if effective_modifications:
-            for change in effective_modifications:
-                removed_stops.discard(change.old_stop)
-                added_stops.discard(change.new_stop)
-                changed_stops.add((change.old_stop, change.new_stop))
-        if (added_stops or removed_stops or changed_stops or
-                added_lines or removed_lines or changed_lines or added_announcements):
-            log('Data has changed, creating report... ', end='')
-            lines: int = max(len(added_lines), len(removed_lines), len(changed_lines))
-            lexmap: dict[str, float] = create_lexicographic_mapping(file_to_string(ref.lexmap_polish))
-            line_key = lambda line: int(line) if line.isdigit() else int(re.sub(r'\D', '', line)) - lines
-            stop_key = lambda stop: lexicographic_sequence(f'{stop.full_name}{stop.short_name}', lexmap)
-            with (open(prepare_path(ref.report_gtfs), 'w') as file):
-                if (('stops' in self.__reported_collections__ and (added_stops or removed_stops or changed_stops)) or
-                        ('lines' in self.__reported_collections__ and (added_lines or removed_lines or changed_lines))):
-                    file.write('GTFS database updated.\n')
-                if 'stops' in self.__reported_collections__:
-                    if added_stops:
-                        file.write(f'Added stops:\n- {'\n- '.join(f'{s.full_name} [{s.short_name}]'
-                                                                  for s in sorted(added_stops, key=stop_key))}\n')
-                    if removed_stops:
-                        file.write(f'Removed stops:\n- {'\n- '.join(f'{s.full_name} [{s.short_name}]'
-                                                                    for s in sorted(removed_stops, key=stop_key))}\n')
-                    if changed_stops:
-                        file.write(f'Changed stops:\n- {'\n- '
-                                   .join(f'{old.full_name} [{old.short_name}] -> {new.full_name} [{new.short_name}]'
-                                         for old, new in sorted(changed_stops, key=lambda p: stop_key(p[0])))}\n')
-                if 'lines' in self.__reported_collections__:
-                    if added_lines:
-                        file.write(f'Added lines:\n- {"\n- ".join(sorted(added_lines, key=line_key))}\n')
-                    if removed_lines:
-                        file.write(f'Removed lines:\n- {"\n- ".join(sorted(removed_lines, key=line_key))}\n')
-                    if changed_lines:
-                        file.write(f'Changed lines:\n- {"\n- ".join(sorted(changed_lines, key=line_key))}\n')
-                if 'announcements' in self.__reported_collections__ and (added_announcements or removed_announcements):
-                    file.write('Announcements updated.\n')
-                    if added_announcements:
-                        file.write(f'New announcements:\n- {"\n- ".join(a.title for a in added_announcements)}\n')
-                    if removed_announcements:
-                        file.write(f'Expired announcements:\n- {"\n- ".join(a.title for a in removed_announcements)}\n')
-            log(f'Report stored in {ref.report_gtfs}!')
-            system_open(ref.report_gtfs)
-        else:
-            log('No changes, no report created.')
-
-    @staticmethod
-    def get_game_modes() -> list[str]:
-        return ['Pokestops', 'Pokelines', 'Stellar Voyage', 'City Raiders']

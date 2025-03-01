@@ -1,9 +1,18 @@
+asset_font_genshin: str = 'assets/fonts/genshin.ttf'
+asset_icon_database: str = 'assets/icons/database.svg'
+asset_icon_manufacturing: str = 'assets/icons/manufacturing.svg'
+asset_icon_group: str = 'assets/icons/group.svg'
+asset_icon_person: str = 'assets/icons/person.svg'
+asset_icon_route: str = 'assets/icons/route.svg'
 asset_img_banner: str = 'assets/images/banner.png'
 asset_img_compass: str = 'assets/images/compass.png'
 asset_path_agencies: str = 'assets/agencies'
 asset_path_brands: str = 'assets/brands'
 asset_path_markers: str = 'assets/markers'
 asset_path_vehicles: str = 'assets/vehicles'
+
+codegen_template_kml_gtfs: str = 'codegen/kml/gtfs.jinja'
+codegen_template_kml_raid: str = 'codegen/kml/raid.jinja'
 
 color_raid_route: str = 'ff61b1'
 

@@ -19,6 +19,15 @@ def error(*args: Any) -> None:
     __error_log__.append(' '.join(map(str, args)))
 
 
+def errors_present() -> bool:
+    return len(__error_log__) > 0
+
+
+def flush_errors() -> list[str]:
+    errors: list[str] = list(__error_log__)
+    __error_log__.clear()
+    return errors
+
+
 def print_errors() -> None:
-    for message in __error_log__:
-        print(message, file=sys.stderr)
+    [print(message, file=sys.stderr) for message in flush_errors()]

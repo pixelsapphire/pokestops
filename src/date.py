@@ -123,7 +123,7 @@ class DateAndOrder:
         format_parts: list[str] = format_spec.split('|')
         if len(format_spec) == 0 or len(format_parts) not in (1, 2, 4):
             raise ValueError(f'Invalid format specifier \'{format_spec}\' for object of type \'{type(self)}\'')
-        if not self.is_known():
+        if not self.is_known() and len(format_parts) > 1:
             if len(format_parts) == 2 or self == DateAndOrder.never:
                 return format_parts[1]
             return format_parts[2] if self == DateAndOrder.distant_past else format_parts[3]

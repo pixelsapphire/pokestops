@@ -3,14 +3,15 @@ import os
 import platform
 import subprocess
 import zipfile
+from datetime import datetime
 from functools import partial
 from log import error
 from quantity import kilo, Quantity
 from sortedcontainers import SortedSet
-from typing import Any, Callable, Hashable, Iterable, Protocol, TypeVar, runtime_checkable
+from typing import Any, Callable, Generic, Hashable, Iterable, Protocol, TypeVar, runtime_checkable
 
-T = TypeVar("T")
-TContra = TypeVar("TContra", contravariant=True)
+T: TypeVar = TypeVar("T")
+TContra: TypeVar = TypeVar("TContra", contravariant=True)
 
 
 @runtime_checkable
@@ -23,7 +24,29 @@ class SupportsDunderGT(Protocol[TContra]):
     def __gt__(self, other: TContra, /) -> bool: ...
 
 
-RichComparisonT = TypeVar("RichComparisonT", bound=SupportsDunderLT[Any] | SupportsDunderGT[Any])
+RichComparisonT: TypeVar = TypeVar("RichComparisonT", bound=SupportsDunderLT[Any] | SupportsDunderGT[Any])
+
+
+class memoized:
+    def __init__(self, func):
+        self.func = func
+        self.cache: dict[tuple[Any, ...], Any] = {}
+
+    def __call__(self, *args):
+        hashed_args: tuple[Any, ...] = tuple(arg if isinstance(arg, Hashable) else (type(arg), id(arg)) for arg in args)
+        if hashed_args in self.cache:
+            return self.cache[hashed_args]
+        else:
+            value = self.func(*args)
+            self.cache[hashed_args] = value
+            return value
+
+    def __repr__(self):
+        return self.func.__doc__
+
+    def __get__(self, obj, objtype):
+        return partial(self.__call__, obj)
+
 
 __roman_num__: dict[int, str] = {1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V', 6: 'VI', 7: 'VII', 8: 'VIII', 9: 'IX', 10: 'X'}
 
@@ -80,11 +103,15 @@ def format_distance(distance: Quantity) -> str:
         if distance >= Quantity(1000, 'm') else distance.format(precision=0)
 
 
-def prepare_path(file_path: str | os.PathLike[str]) -> str | os.PathLike[str]:
-    directory_path = os.path.dirname(os.path.abspath(file_path))
+def absolute_path(path: str | os.PathLike[str]) -> str:
+    return os.path.abspath(path)
+
+
+def prepare_path(path: str | os.PathLike[str], path_is_directory: bool = False) -> str | os.PathLike[str]:
+    directory_path = path if path_is_directory else os.path.dirname(absolute_path(path))
     if not os.path.exists(directory_path):
         os.makedirs(directory_path, exist_ok=True)
-    return file_path
+    return path
 
 
 def prepare_file(path: str | os.PathLike[str], initial_content: str = '', override: bool = False) -> str | os.PathLike[str]:
@@ -110,6 +137,10 @@ def system_open(file_path: str | os.PathLike[str]) -> None:
         subprocess.call(('xdg-open', file_path))
 
 
+def file_last_modified(file_path: str | os.PathLike[str]) -> datetime | None:
+    return datetime.fromtimestamp(os.path.getmtime(file_path)) if os.path.exists(file_path) else None
+
+
 def file_to_string(file_path: str | os.PathLike[str]) -> str:
     with open(file_path, 'r') as file:
         return file.read()
@@ -131,7 +162,7 @@ def get_csv_rows(file: str | os.PathLike[str]) -> tuple[list[list[str]], list[li
                     comment_rows.append(row)
             return data_rows, comment_rows
         except StopIteration:
-            error(f'File {os.path.abspath(file)} is empty')
+            error(f'File {absolute_path(file)} is empty')
             return [], []
 
 
@@ -169,7 +200,7 @@ class zip_file(zipfile.ZipFile):
         os.rename(member_name, output)
 
 
-class HashableSet[T](SortedSet[T]):
+class HashableSet(Generic[T], SortedSet[T]):
     def __init__(self, iterable: Iterable[T] = ()):
         super().__init__(iterable)
 
@@ -178,25 +209,3 @@ class HashableSet[T](SortedSet[T]):
 
     def __repr__(self):
         return f'HashableSet({super().__repr__()})'
-
-
-class memoized:
-    def __init__(self, func):
-        self.func = func
-        self.cache = {}
-
-    def __call__(self, *args):
-        if not isinstance(args, Hashable):
-            return self.func(*args)
-        if args in self.cache:
-            return self.cache[args]
-        else:
-            value = self.func(*args)
-            self.cache[args] = value
-            return value
-
-    def __repr__(self):
-        return self.func.__doc__
-
-    def __get__(self, obj, objtype):
-        return partial(self.__call__, obj)
