@@ -1,12 +1,15 @@
+import geo
 import os.path
 import quantity
 import util
 from branca.element import MacroElement
 from data import *
+from database import Database
 from folium import DivIcon, Map, Marker, PolyLine, Popup
 from geo import LineSegment
 from markupsafe import Markup
 from jinja2 import Environment, FileSystemLoader, Template
+from player import Player
 from typing import Sequence
 
 
@@ -135,6 +138,41 @@ class UIBuilder(Environment):
                     yield draw_route(element, r)
                 else:
                     raise ValueError(f'Unsupported raid element type: {element}')
+
+    def create_line_maps(self, all_variants: bool) -> None:
+        for line in self.__database__.lines.values():
+            variant: int = 0
+            for line_variant in line.variants if all_variants else [line.variants[0]]:
+                variant += 1
+                stops: list[Stop] = []
+                for stop_id in line_variant:
+                    stop: Stop = self.__database__.stops.get(stop_id)
+                    if stop and not any(stop.full_name == s.full_name for s in stops):
+                        stops.append(stop)
+                stops_locations: list[geopoint] = list(map(self.__database__.group_location, stops))
+                geo.create_route_diagram(stops_locations, line.background_color,
+                                         f'{ref.mapdata_paths_lines}/{line.number}/{variant}.svg')
+
+    def create_raid_maps(self) -> None:
+        for raid in self.__database__.raids:
+            stops_locations: list[list[geopoint]] = [r.shape for r in raid.routes if r.shape_defined()]
+            geo.create_multi_route_map(stops_locations, ref.color_raid_route, f'{ref.mapdata_paths_raids}/{raid.raid_id}.svg')
+
+    def compile_data(self) -> None:
+        log('  Compiling data to JavaScript... ', end='')
+        db: Database = self.__database__
+        with open(prepare_path(ref.compileddata_stops), 'w') as file:
+            file.write(f'const stops = {{\n{'\n'.join(map(Stop.json_entry, sorted(db.stops.values())))}\n}};')
+            file.write(f'const terminals = {{\n{'\n'.join(map(Terminal.json_entry, db.terminals))}\n}};')
+        with open(prepare_path(ref.compileddata_vehicles), 'w') as file:
+            file.write(f'const vehicle_models = {{\n{'\n'.join(map(VehicleModel.json_entry, db.models.values()))}\n}};\n')
+            file.write(f'const carriers = {{\n{'\n'.join(map(Carrier.json_entry, db.carriers.values()))}\n}};\n')
+            file.write(f'const vehicles = {{\n{'\n'.join(map(Vehicle.json_entry, db.vehicles.values()))}\n}};')
+        with open(prepare_path(ref.compileddata_lines), 'w') as file:
+            file.write(f'const lines = {{\n{'\n'.join(map(Line.json_entry, db.lines.values()))}\n}};')
+        with open(prepare_path(ref.compileddata_players), 'w') as file:
+            file.write(f'const players = {{\n{'\n'.join(map(Player.json_entry, db.players))}\n}};')
+        log('Done!')
 
     def create_map(self, initial_html: str) -> Template:
         folium_head: str = re.search(r'<head>(.*)</head>', initial_html, re.DOTALL).group(1).strip()

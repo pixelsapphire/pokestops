@@ -20,6 +20,9 @@ from tqdm import tqdm
 from typing import override
 from util import *
 
+if TYPE_CHECKING:
+    from database import Database
+
 
 class Announcement(JsonSerializable):
     def __init__(self, announcement_id: str, title: str,
@@ -51,6 +54,10 @@ class Announcement(JsonSerializable):
         # warning caused by Pycharm issue PY-70668
         # noinspection PyTypeChecker
         return __read_collection__(source, [], constructor, list.append)
+
+    def __repr__(self):
+        return (f'Announcement(date_from={self.date_from}, date_to={self.date_to}, '
+                f'date_published={self.date_published}, title={self.title})')
 
 
 class ArticleScraper(ABC):
@@ -249,9 +256,11 @@ def __fetch_article__(url: str, scrapper: type, announcements: list[Announcement
             pbar.update(0.5)
 
 
-def fetch_announcements(first_update: bool, initial_db: Database) -> None:
+def fetch_announcements(db: Database) -> None:
+    from database import Database
+    first_update: bool = get_last_update_time() == 'never'
     if not first_update:
-        initial_db.report_old_data(Database.partial(announcements=Announcement.read_list(ref.rawdata_announcements, {})))
+        db.report_old_data(Database.partial(announcements=Announcement.read_list(ref.rawdata_announcements, {})))
     clear_directory(ref.templates_path_announcements)
 
     pbar: tqdm = tqdm(total=70, desc='Fetching announcements...', unit='article', dynamic_ncols=True, file=stdout)
@@ -279,7 +288,8 @@ def fetch_announcements(first_update: bool, initial_db: Database) -> None:
                                         for url in ztm_article_urls]
         for future in as_completed(mpk_jobs + ztm_jobs):
             future.result()
-    announcements.sort(key=lambda a: (coalesce(a.date_from, a.date_published), a.date_to, a.announcement_id), reverse=True)
+    announcements.sort(key=lambda a: (coalesce(a.date_from, a.date_published),
+                                      coalesce(a.date_to, DateAndOrder.distant_future), a.announcement_id), reverse=True)
 
     header: str = 'announcement_id,title,date_from,date_to,date_published,lines'
     with open(prepare_file(ref.rawdata_announcements, f'{header}\n', True), 'a') as file:
@@ -292,4 +302,9 @@ def fetch_announcements(first_update: bool, initial_db: Database) -> None:
             with open(prepare_file(f'{ref.templates_path_announcements}/{announcement.announcement_id}.jinja'), 'w') as article:
                 article.write(announcement.content)
 
-    initial_db.announcements = announcements
+    db.announcements = announcements
+
+
+def get_last_update_time() -> str:
+    update_time: float = os.path.getmtime(ref.rawdata_announcements)
+    return datetime.fromtimestamp(update_time).strftime('%Y-%m-%d %-I:%M %p') if update_time > 0 else 'never'

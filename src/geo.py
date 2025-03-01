@@ -2,7 +2,7 @@ from __future__ import annotations
 from math import atan2, pi
 from pyproj import Geod
 from quantity import *
-from typing import Any, Protocol, Sequence, TypeVar
+from typing import Any, Generic, Protocol, Sequence, TypeVar
 from util import prepare_path, sign, to_css
 
 TFloatSeq = TypeVar("TFloatSeq", bound=Sequence[float])
@@ -113,7 +113,7 @@ class vector2f(Sequence[float]):
         return self.x if index == 0 else self.y if index == 1 else None
 
 
-class LineSegment[TFloatSeq](Sequence[TFloatSeq]):
+class LineSegment(Generic[TFloatSeq], Sequence[TFloatSeq]):
     def __init__(self, a: TFloatSeq, b: TFloatSeq):
         self._a: TFloatSeq = a
         self._b: TFloatSeq = b

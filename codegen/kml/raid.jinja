@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2"
+     xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+    <Document>
+        <name>raid-{{ raid.date.format('M-y') }}</name>
+        <Style id="route">
+            <LineStyle>
+                <color>fff439ff</color>
+                <width>3.5</width>
+            </LineStyle>
+        </Style>
+        <Folder>
+            <name>stops</name>
+            {% for stop in raid.stops %}
+                <Placemark>
+                    <name>{{ stop.stop }}</name>
+                    <visibility>1</visibility>
+                    <Point>
+                        <gx:drawOrder>1</gx:drawOrder>
+                        <coordinates>{{ stop.location.longitude }},{{ stop.location.latitude }},0</coordinates>
+                    </Point>
+                </Placemark>
+            {% endfor %}
+        </Folder>
+        <Folder>
+            <name>routes</name>
+            {% for route in raid.routes -%}
+                <Placemark>
+                    {% if route.line_number is not none %}
+                        <name>route ({{ route.line_number }})</name>
+                    {% else %}
+                        <name>walk</name>
+                    {% endif %}
+                    <visibility>1</visibility>
+                    <styleUrl>#route</styleUrl>
+                    <LineString>
+                        <tessellate>1</tessellate>
+                        <coordinates>
+                            {% for point in route.shape -%}
+                                {{ point.longitude }},{{ point.latitude }},0{{ '' if loop.last else ' ' }}
+                            {%- endfor %}
+                        </coordinates>
+                    </LineString>
+                </Placemark>
+            {%- endfor %}
+        </Folder>
+    </Document>
+</kml>

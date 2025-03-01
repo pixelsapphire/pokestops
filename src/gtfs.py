@@ -1,5 +1,6 @@
 import sqlite3
 from data import *
+from database import Database
 from util import *
 
 
@@ -141,11 +142,12 @@ def attach_line_stops(gtfs_db: sqlite3.Connection) -> None:
     log('Done!')
 
 
-def update_gtfs_data(first_update: bool, initial_db: Database) -> None:
+def update_gtfs_data(db: Database) -> None:
+    first_update: bool = get_last_update_time() == 'never'
     old_db: Database = Database.partial()
     if not first_update:
         if os.path.exists(ref.rawdata_stops):
-            old_db.stops = Stop.read_stops(ref.rawdata_stops, initial_db)[0]
+            old_db.stops = Stop.read_stops(ref.rawdata_stops, db)[0]
         if os.path.exists(ref.rawdata_lines):
             old_db.lines = Line.read_dict(ref.rawdata_lines)
     log(f'  Downloading latest GTFS data from {ref.url_ztm_gtfs}... ', end='')
@@ -169,9 +171,17 @@ def update_gtfs_data(first_update: bool, initial_db: Database) -> None:
     os.remove(ref.rawdata_stop_times)
     os.remove(ref.rawdata_trips)
 
-    initial_db.stops, initial_db.stop_groups = Stop.read_stops(ref.rawdata_stops, initial_db)
-    initial_db.routes = Route.read_dict(ref.rawdata_routes)
-    initial_db.lines = Line.read_dict(ref.rawdata_lines)
+    db.stops, db.stop_groups = Stop.read_stops(ref.rawdata_stops, db)
+    db.routes = Route.read_dict(ref.rawdata_routes)
+    db.lines = Line.read_dict(ref.rawdata_lines)
 
     if not first_update:
-        initial_db.report_old_data(old_db)
+        db.report_old_data(old_db)
+
+
+def get_last_update_time() -> str:
+    lines_update_time: float = os.path.getmtime(ref.rawdata_lines) if os.path.exists(ref.rawdata_lines) else 0
+    routes_update_time: float = os.path.getmtime(ref.rawdata_routes) if os.path.exists(ref.rawdata_routes) else 0
+    stops_update_time: float = os.path.getmtime(ref.rawdata_stops) if os.path.exists(ref.rawdata_stops) else 0
+    update_time: float = max(lines_update_time, routes_update_time, stops_update_time)
+    return datetime.fromtimestamp(update_time).strftime('%Y-%m-%d %-I:%M %p') if update_time > 0 else 'never'
