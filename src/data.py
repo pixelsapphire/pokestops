@@ -437,8 +437,10 @@ class Line(JsonSerializable):
     def __cmp_key__(self) -> RichComparisonT:
         if self.number.isdigit():
             return int(self.number), ''
-        else:
+        elif re.search(r'\d', self.number):
             return int(re.sub(r'\D', '', self.number)) - 1000, re.sub(r'\d', '_', self.number)
+        else:
+            return -1000, self.number
 
     def is_discovered(self) -> bool:
         return len(self.discoveries) > 0

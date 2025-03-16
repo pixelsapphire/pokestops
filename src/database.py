@@ -125,9 +125,8 @@ class Database:
         if (added_stops or removed_stops or changed_stops or
                 added_lines or removed_lines or changed_lines or added_announcements):
             log('Data has changed, creating report... ', end='')
-            lines: int = max(len(added_lines), len(removed_lines), len(changed_lines))
             lexmap: dict[str, float] = create_lexicographic_mapping(file_to_string(ref.lexmap_polish))
-            line_key = lambda line: int(line) if line.isdigit() else int(re.sub(r'\D', '', line)) - lines
+            line_key = lambda line: Line.dummy(line).__cmp_key__()
             stop_key = lambda stop: lexicographic_sequence(f'{stop.full_name}{stop.short_name}', lexmap)
             with (open(prepare_path(ref.report_gtfs), 'w') as file):
                 if (('stops' in self.__reported_collections__ and (added_stops or removed_stops or changed_stops)) or
