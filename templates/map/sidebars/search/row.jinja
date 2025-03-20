@@ -1,4 +1,4 @@
-<div class='result-row{% if not result.unlocked %} undiscovered{% endif %}'>
+<div class='result-row{% if result.state != 'unlocked' %} undiscovered{% endif %}'>
     <div class='result-icon material-symbols-outlined'>
         {% if result.type == 'stop' %}
             pin_drop
@@ -24,9 +24,9 @@
             {% if result.details | length > 0 %}{{ result.details }}{% else %}unknown vehicle{% endif %} #{{ result.key }}
         {% endif %}
     </div>
-    {% if result.unlocked %}
-        <div class='result-lock-icon material-symbols-outlined'>lock_open_right</div>
-    {% else %}
+    {% if result.state == 'locked' %}
         <div class='result-lock-icon material-symbols-outlined'>lock</div>
+    {% else %}
+        <div class='result-lock-icon material-symbols-outlined'>lock_open_right</div>
     {% endif %}
 </div>

@@ -233,11 +233,10 @@ async function searchObject() {
     let resultsStartingWith = [];
     let resultsContaining = [];
     let resultsContainingDetail = [];
-    const searchDictionary = (dictionary, type, unlockedGetter, searchKeyExtractor, searchDetailExtractor = null) => {
+    const searchDictionary = (dictionary, type, stateGetter, searchKeyExtractor, searchDetailExtractor = null) => {
         for (let key in dictionary) {
             const searchKeys = searchKeyExtractor(key);
             const details = searchDetailExtractor ? searchDetailExtractor(key) : '';
-            const unlocked = unlockedGetter(key) === true;
             let resultsList = null;
             if (searchKeys.any((k) => k.toLowerCase() === searchQuery)) resultsList = resultsEqualTo;
             else if (searchKeys.any((k) => k.toLowerCase().startsWith(searchQuery))) resultsList = resultsStartingWith;
@@ -248,16 +247,23 @@ async function searchObject() {
                 key: key,
                 object: dictionary[key],
                 details: details,
-                unlocked: unlocked
+                state: stateGetter(key)
             });
         }
     };
-    searchDictionary(stops, 'stop', (key) => stops[key].v && stops[key].v.any((v) => v[0] === activePlayer),
+    const getDiscoveryState = (array) => {
+        if (!array) return 'locked';
+        const playerDiscovery = array.filter((d) => d[0] === activePlayer);
+        if (playerDiscovery.length === 0) return 'locked';
+        return playerDiscovery[0][1].length > 0 ? 'unlocked' : 'partial';
+    }
+    searchDictionary(stops, 'stop', (key) => getDiscoveryState(stops[key].v),
         (key) => [key, stops[key].n]);
-    searchDictionary(lines, 'line', (key) => lines[key].d && lines[key].d.any((d) => d[0] === activePlayer),
+    searchDictionary(lines, 'line', (key) => getDiscoveryState(lines[key].d),
         (key) => [key], (key) => lines[key].t);
-    searchDictionary(vehicles, 'vehicle', (key) => vehicles[key].d && vehicles[key].d.any((d) => d[0] === activePlayer),
-        (key) => [key].concat(key.includes('+') ? key.split('+') : []), (key) => {
+    searchDictionary(vehicles, 'vehicle', (key) => getDiscoveryState(vehicles[key].d),
+        (key) => [key].concat(key.includes('+') ? key.split('+') : []),
+        (key) => {
             if (!vehicles[key].m) return '';
             const model = vehicle_models[vehicles[key].m];
             return `${model.b} ${model.m}`;

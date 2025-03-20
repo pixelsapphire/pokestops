@@ -54,7 +54,7 @@
     <script src='data/js/vehicles_data.min.js'></script>
     <script src='data/js/lines_data.min.js'></script>
     <script src='https://mozilla.github.io/nunjucks/files/nunjucks.min.js'></script>
-    <script>let searchResultTemplate = `<div class='result-row{% if not result.unlocked %} undiscovered{% endif %}'>
+    <script>let searchResultTemplate = `<div class='result-row{% if result.state != 'unlocked' %} undiscovered{% endif %}'>
     <div class='result-icon material-symbols-outlined'>{% if result.type == 'stop' %}
             pin_drop
         {% elif result.type == 'line' %}
@@ -75,10 +75,10 @@
             {% if result.details | length > 0 %}{{ result.details }}{% else %}unknown vehicle{% endif %} #{{ result.key }}
         {% endif %}
     </div>
-    {% if result.unlocked %}
-        <div class='result-lock-icon material-symbols-outlined'>lock_open_right</div>
-    {% else %}
+    {% if result.state == 'locked' %}
         <div class='result-lock-icon material-symbols-outlined'>lock</div>
+    {% else %}
+        <div class='result-lock-icon material-symbols-outlined'>lock_open_right</div>
     {% endif %}
 </div>`;</script>
     <script src='assets/scripts/map.js'></script>
