@@ -1,5 +1,5 @@
 <div class='raid-preview' data-raid-id='{{ raid.raid_id }}'>
-    <div class='raid-icon material-symbols-outlined'>{{ raid.icon }}</div>
+    <img src='assets/raids/{{ raid.icon }}.svg' class='raid-icon'>
     <div class='raid-name-and-date'>
         {% if raid.name %}<div class='raid-name'>{{ raid.name }}</div>{% endif %}
         <div class='raid-date'>{{ raid.date.format('M D, y') }}</div>
